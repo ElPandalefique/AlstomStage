@@ -1,5 +1,9 @@
 <?php
 
+use PHPMailer\PHPMailer\Exception;
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+
 class ActiviteController extends Controller
 {
 
@@ -88,22 +92,22 @@ class ActiviteController extends Controller
 
         /*$projection['projection'] =
             'c.DATE_CRENEAU, 
-    c.HEURE_CRENEAU, 
-    c.EFFECTIF_CRENEAU,
-    GROUP_CONCAT(inv.NOM, " ", inv.PRENOM SEPARATOR "<br>") as listeinv,
-	CASE 
+            c.HEURE_CRENEAU, 
+            c.EFFECTIF_CRENEAU,
+            GROUP_CONCAT(inv.NOM, " ", inv.PRENOM SEPARATOR "<br>") as listeinv,
+	        CASE 
     	WHEN AUTO_PARTICIPATION=1 THEN GROUP_CONCAT(DISTINCT a.NOM, " ", a.PRENOM SEPARATOR "<br>") 
-    END as adh,
-    CASE 
+        END as adh,
+        CASE 
     	WHEN AUTO_PARTICIPATION=1 THEN COUNT(DISTINCT i.ID) + COUNT(li.ID_INVITE)
     	ELSE COUNT(li.ID_INVITE)
-    END as effectif';*/
+        END as effectif';*/
         $projection['projection'] = 'i.DATE_PAIEMENT, i.ID, c.DATE_CRENEAU, c.HEURE_CRENEAU,c.EFFECTIF_CRENEAU,
-i.PAYE, i.CRENEAU, i.ID_ADHERENT, 
-MONTANT, AUTO_PARTICIPATION, i.ID_ACTIVITE, 
-GROUP_CONCAT(a.NOM, a.PRENOM) as adh, 
-GROUP_CONCAT(inv.NOM, " ", inv.PRENOM separator "<br>") as listeinv,
-COUNT(DISTINCT i.ID) + COUNT(li.ID_INVITE)as effectif';
+        i.PAYE, i.CRENEAU, i.ID_ADHERENT, 
+        MONTANT, AUTO_PARTICIPATION, i.ID_ACTIVITE, 
+        GROUP_CONCAT(a.NOM, a.PRENOM) as adh, 
+        GROUP_CONCAT(inv.NOM, " ", inv.PRENOM separator "<br>") as listeinv,
+        COUNT(DISTINCT i.ID) + COUNT(li.ID_INVITE)as effectif';
         /*$projection['conditions'] = "i.ID_ACTIVITE = {$id}";
         //$projection['groupby'] = "ID_ADHERENT";
         $result = $modInscription->find($projection);
@@ -151,7 +155,7 @@ COUNT(DISTINCT i.ID) + COUNT(li.ID_INVITE)as effectif';
         $this->set($d);
     }
 
-// Permet de savoir si le même invité a été renseigné plus d'une fois.
+    // Permet de savoir si le même invité a été renseigné plus d'une fois.
     function has_dupes($array)
     {
         $dupe_array = array();
@@ -187,10 +191,10 @@ COUNT(DISTINCT i.ID) + COUNT(li.ID_INVITE)as effectif';
 
         if (isset($invites)) {
             foreach ($invites as $inv) {
-//                echo "invites=";
-//                var_dump($invites);
-//                echo "nouvel invité";
-//                var_dump($inv);
+                //                echo "invites=";
+                //                var_dump($invites);
+                //                echo "nouvel invité";
+                //                var_dump($inv);
                 if ($inv->STATUT == 'FAMILLE') {
                     $famille[] = $inv->ID_INVITE;
                 } else if ($inv->STATUT == 'EXTERNE') {
@@ -411,12 +415,12 @@ COUNT(DISTINCT i.ID) + COUNT(li.ID_INVITE)as effectif';
         $reqI['conditions'] = "i.ID_ACTIVITE = {$id} AND i.CRENEAU = {$_POST['CRENEAU']} AND i.ATTENTE = 0";
         // $projection['groupby'] = "c.NUM_CRENEAU, c.ID_ACTIVITE";
         $effectifc = $modInscription->findfirst($reqI);
-//        "SELECT COUNT(*) FROM liste_invites
-//join inscription on inscription.ID = liste_invites.ID_INSCRIPTION
-//where inscription.ID_ACTIVITE=163 and inscription.creneau = 3";
-
+        //        "SELECT COUNT(*) FROM liste_invites
+        //join inscription on inscription.ID = liste_invites.ID_INSCRIPTION
+        //where inscription.ID_ACTIVITE=163 and inscription.creneau = 3";
+        
         //compter les personnes en attente
-        $reqIA['projection'] =
+                $reqIA['projection'] =
             'CASE 
     	        WHEN (i.AUTO_PARTICIPATION=1) THEN COUNT(DISTINCT i.ID) + COUNT(li.ID_INVITE)
     	        ELSE COUNT(li.ID_INVITE)
@@ -425,20 +429,21 @@ COUNT(DISTINCT i.ID) + COUNT(li.ID_INVITE)as effectif';
         $reqIA['conditions'] = "c.ID_ACTIVITE = {$id} AND c.NUM_CRENEAU = {$_POST['CRENEAU']} AND i.ATTENTE = 1";
         $effectifca = $modInscription->findfirst($reqIA);
 
+        //combien de personnes vont être inscrits avec cette inscription
         $nombreinscription = 0;
         if (isset($_POST['famille'])) $nombreinscription += count($_POST['famille']);
         if (isset($_POST['ext'])) $nombreinscription += count($_POST['ext']);
         if ($_POST['AUTO_PARTICIPATION'] == 1) $nombreinscription++;
-//        echo 'nombreinscription';
-//        var_dump($nombreinscription);
-//        echo'places';
-//        var_dump($effectifc->places);
-//        echo'inscrits';
-//        var_dump($effectifc->inscrits);$donnees = array();
-//        echo'places attente';
-//        var_dump(($effectifca->places*3));
-//        echo'inscrits attente';
-//        var_dump(($effectifca->inscrits));
+        //        echo 'nombreinscription';
+        //        var_dump($nombreinscription);
+        //        echo'places';
+        //        var_dump($effectifc->places);
+        //        echo'inscrits';
+        //        var_dump($effectifc->inscrits);$donnees = array();
+        //        echo'places attente';
+        //        var_dump(($effectifca->places*3));
+        //        echo'inscrits attente';
+        //        var_dump(($effectifca->inscrits));
         $donnees['ID_ACTIVITE'] = $id;
         $donnees['ID_ADHERENT'] = $_SESSION['ID_ADHERENT'];
         if ($_POST['AUTO_PARTICIPATION'] == 1) {
@@ -463,44 +468,47 @@ COUNT(DISTINCT i.ID) + COUNT(li.ID_INVITE)as effectif';
         //SI il reste de la place dans la liste principale
         if (!($nombreinscription > $effectifc->places - $effectifc->inscrits)) {
             $colonnes = array('ID_ACTIVITE', 'ID_ADHERENT', 'AUTO_PARTICIPATION', 'CRENEAU', 'DATE_INSCRIPTION', 'MONTANT');
+            $this->mailAdherent($donnees['ID_ADHERENT'], "principale", $id);
         }
         //SI il reste de la place dans la liste d'attente
         elseif(!($nombreinscription > ($effectifc->places*3) - $effectifca->inscrits)){
             $colonnes = array('ID_ACTIVITE', 'ID_ADHERENT', 'AUTO_PARTICIPATION', 'CRENEAU', 'DATE_INSCRIPTION', 'MONTANT', 'ATTENTE');
             $donnees['ATTENTE'] = 1;
             $d['info'] = "L'effectif de cette activité étant complet, vous avez été placé en liste d'attente";
+            $this->mailAdherent($donnees['ID_ADHERENT'], "attente", $id);
         }
         //SI il n'y a pas de place pour ce créneau
         else{
             $d['info'] = "La liste d'attente est complète";
             $inscription=false;
+            $this->mailAdherent($donnees['ID_ADHERENT'], "non inscrit", $id);
         }
         if($inscription){
             $valid = true;
-//            $donnees = array();
-//            $donnees['ID_ACTIVITE'] = $id;
-//            $donnees['ID_ADHERENT'] = $_SESSION['ID_ADHERENT'];
-//            if ($_POST['AUTO_PARTICIPATION'] == 1) {
-//                $adh = Session::get('ID_ADHERENT');
-//
-//            } else {
-//                $adh = "non"; // l'adhérent ne participe pas
-//            }
-//            $donnees['AUTO_PARTICIPATION'] = $_POST['AUTO_PARTICIPATION'];
-//            $donnees['CRENEAU'] = $_POST['CRENEAU'];
-//            $donnees['DATE_INSCRIPTION'] = date('Y-m-d');
-//            if(isset($_POST['famille'])) {
-//                $donnees['MONTANT'] = $this->calculMontant($id, $adh, $_POST['famille']);
-//            }
-//            elseif (isset($_POST['ext'])){
-//                $donnees['MONTANT'] = $this->calculMontant($id, $adh, $_POST['ext']);
-//            }
-//            else{
-//                $donnees['MONTANT'] = $this->calculMontant($id, $adh, NULL);
-//            }
-            //$donnees['DATE_PAIEMENT'] = date_create('0000-00-00');
-            //$donnees['DATE_DESINSCRIPTION'] = date_create('0000-00-00');
-
+            //            $donnees = array();
+            //            $donnees['ID_ACTIVITE'] = $id;
+            //            $donnees['ID_ADHERENT'] = $_SESSION['ID_ADHERENT'];
+            //            if ($_POST['AUTO_PARTICIPATION'] == 1) {
+                //                $adh = Session::get('ID_ADHERENT');
+                //
+                //            } else {
+                    //                $adh = "non"; // l'adhérent ne participe pas
+                    //            }
+                    //            $donnees['AUTO_PARTICIPATION'] = $_POST['AUTO_PARTICIPATION'];
+                    //            $donnees['CRENEAU'] = $_POST['CRENEAU'];
+                    //            $donnees['DATE_INSCRIPTION'] = date('Y-m-d');
+                    //            if(isset($_POST['famille'])) {
+                        //                $donnees['MONTANT'] = $this->calculMontant($id, $adh, $_POST['famille']);
+                        //            }
+                        //            elseif (isset($_POST['ext'])){
+                            //                $donnees['MONTANT'] = $this->calculMontant($id, $adh, $_POST['ext']);
+                            //            }
+                            //            else{
+                                //                $donnees['MONTANT'] = $this->calculMontant($id, $adh, NULL);
+                                //            }
+                                            //$donnees['DATE_PAIEMENT'] = date_create('0000-00-00');
+                                                        //$donnees['DATE_DESINSCRIPTION'] = date_create('0000-00-00');
+                                                        
             $modInscription = $this->loadModel('Inscription');
             // Test si l'on est pas déjà inscrit !
             $projection['conditions'] = "ID_ACTIVITE =" . $id . " AND ID_ADHERENT = " . $_SESSION['ID_ADHERENT'];
@@ -512,7 +520,8 @@ COUNT(DISTINCT i.ID) + COUNT(li.ID_INVITE)as effectif';
             } elseif (isset($_POST['ext']) && $this->has_dupes($_POST['ext']) == true) {
                 $d['info'] = "Une erreur est survenue : vous ne pouvez pas incrire la même personne plusieurs fois !";
             } else {
-
+                var_dump($colonnes);
+                var_dump($donnees);
                 $projection['conditions'] = "ID_ADHERENT = " . $_SESSION['ID_ADHERENT'];
 
                 $IDInscription = $modInscription->insertAI($colonnes, $donnees);
@@ -543,7 +552,7 @@ COUNT(DISTINCT i.ID) + COUNT(li.ID_INVITE)as effectif';
                 }
 
 
-//si le code id est numerique c'est ok
+        //si le code id est numerique c'est ok
                 if (is_numeric($IDInscription)) {
                     // On met le montant
                     $modListeInviteNom = $this->loadModel('ListeInviteNom');
@@ -558,12 +567,12 @@ COUNT(DISTINCT i.ID) + COUNT(li.ID_INVITE)as effectif';
                 } else {
                     $d['info'] = "Problème pour s'inscrire à l'activité";
                 }
-//                echo "data";
-//                var_dump($data);
-//                echo "donnees";
-//                var_dump($donnees);
-//                echo "d";
-//                var_dump($d);
+                //                echo "data";
+                //                var_dump($data);
+                //                echo "donnees";
+                //                var_dump($donnees);
+                //                echo "d";
+                //                var_dump($d);
 
                 $this->set($d);
                 $this->mesActivites($id);
@@ -579,50 +588,51 @@ COUNT(DISTINCT i.ID) + COUNT(li.ID_INVITE)as effectif';
     }
 
 
-//    public function formulaireInscription($id) {
-//        
-//    }
-//
-//    public function inscriptionActivite($id) {
-//        $ID_ACTIVITE = $id;
-//        $ID_ADHERENT = $_SESSION['ID_ADHERENT'];
-//        $DATE_INSCRIPTION = date("Y-m-d");
-//        $CRENEAU = 0;<<<<
-//        $DATE_PAIEMENT = date("Y-m-d");
-//        $NB_ENFANTS = 0;
-//        $NB_EXT = 0;
-//        $MONTANT = 100;
-//        $DATE_DESINSCRIPTION = date("Y-m-d");
-//        $modInscription = $this->loadModel('Inscription');
-//        $donnees = array($ID_ACTIVITE, $ID_ADHERENT, $DATE_INSCRIPTION, $CRENEAU, $DATE_PAIEMENT, $NB_ENFANTS, $NB_EXT, $MONTANT, $DATE_DESINSCRIPTION);
-//        $colonne = array('ID_ACTIVITE', 'ID_ADHERENT', 'DATE_INSCRIPTION', 'CRENEAU', 'DATE_PAIEMENT', 'NB_ENFANTS', 'NB_EXT', 'MONTANT', 'DATE_DESINSCRIPTION');
-//        $ID_ACIVITE = $modInscription->insertAI($colonne, $donnees);
-//    }
-//put your code here
-//    function detail($id) {
-//        $ID = $id;
-//        $modInscription = $this->loadModel('INSCRIPTION');
-//        $i['inscription'] = $modInscription->findFirst(array('conditions' => array('ID' => $ID)));
-//        $this->set($i);
-//    }
-//
-//    function liste($id) {
-//        $ID = trim($id);
-//
-//        $this->modIncription = $this->loadModel('INSCRIPTION');
-//        $i['inscription'] = $this->modInscription->findFirst(array(
-//            'conditions' => array('id' => $ID)
-//        ));
-//        if (empty($i['inscription'])) {
-//            $this->e404('Clé invalide');
-//        }
-//        $this->set($i);
-//    }
-//
-//
-//}
-    public
-    function listerActiviteInscrit()
+    //    public function formulaireInscription($id) {  
+        //        
+        //    }
+
+    //    public function inscriptionActivite($id) {
+            //        $ID_ACTIVITE = $id;
+                //        $ID_ADHERENT = $_SESSION['ID_ADHERENT'];
+                    //        $DATE_INSCRIPTION = date("Y-m-d");
+                        //        $CRENEAU = 0;<<<<
+                            //        $DATE_PAIEMENT = date("Y-m-d");
+                                //        $NB_ENFANTS = 0;
+                                    //        $NB_EXT = 0;
+                                        //        $MONTANT = 100;
+                                            //        $DATE_DESINSCRIPTION = date("Y-m-d");
+                                                //        $modInscription = $this->loadModel('Inscription');
+                                                    //        $donnees = array($ID_ACTIVITE, $ID_ADHERENT, $DATE_INSCRIPTION, $CRENEAU, $DATE_PAIEMENT, $NB_ENFANTS, $NB_EXT, $MONTANT, $DATE_DESINSCRIPTION);
+                                                        //        $colonne = array('ID_ACTIVITE', 'ID_ADHERENT', 'DATE_INSCRIPTION', 'CRENEAU', 'DATE_PAIEMENT', 'NB_ENFANTS', 'NB_EXT', 'MONTANT', 'DATE_DESINSCRIPTION');
+                                                            //        $ID_ACIVITE = $modInscription->insertAI($colonne, $donnees);
+                                                                //    }
+                                                                    //put your code here
+                                                                        //    function detail($id) {
+                                                                                    //        $ID = $id;
+                                                                                            //        $modInscription = $this->loadModel('INSCRIPTION');
+                                                                                                    //        $i['inscription'] = $modInscription->findFirst(array('conditions' => array('ID' => $ID)));
+                                                                                                            //        $this->set($i);
+                                                                                                                    //    }
+                                                                                                                            //
+                                                                                                                                    //    function liste($id) {
+                                                                                                                                                    //        $ID = trim($id);
+                                                                                                                                                                //
+                                                                                                                                                                            //        $this->modIncription = $this->loadModel('INSCRIPTION');
+                                                                                                                                                                                        //        $i['inscription'] = $this->modInscription->findFirst(array(
+                                                                                                                                                                                                            //            'conditions' => array('id' => $ID)
+                                                                                                                                                                                                                            //        ));
+                                                                                                                                                                                                                                            //        if (empty($i['inscription'])) {
+                                                                                                                                                                                                                                                                    //            $this->e404('Clé invalide');
+                                                                                                                                                                                                                                                                                        //        }
+                                                                                                                                                                                                                                                                                                            //        $this->set($i);
+                                                                                                                                                                                                                                                                                                                                //    }
+                                                                                                                                                                                                                                                                                                                                                    //
+                                                                                                                                                                                                                                                                                                                                                                        //
+                                                                                                                                                                                                                                                                                                                                                                                            //}
+    
+                                                                                                                                                                                                                                                                                                                                                                                            
+    public function listerActiviteInscrit()
     {
         $modActiviteInscrit = $this->loadModel('ActiviteInscriptionCreneau'); //instancier le modele
         $projection['projection'] = "ACTIVITE.ID_ACTIVITE,ACTIVITE.NOM,DETAIL,VILLE,INDICATION_PARTICIPANT, DATE_CRENEAU, HEURE_CRENEAU, MONTANT, ADHERENT.NOM as an, ADHERENT.PRENOM as ap";
@@ -654,17 +664,17 @@ COUNT(DISTINCT i.ID) + COUNT(li.ID_INVITE)as effectif';
         // requete 3 pour récupérer les info de l'inscription
         $modInscription = $this->loadModel('Inscription');
         $projectionI['conditions'] = "ID_ACTIVITE = {$ID_ACTIVITE} AND ID_ADHERENT = {$_SESSION['ID_ADHERENT']}";
-//        var_dump($ID_ACTIVITE);
-//        var_dump($_SESSION['ID_ADHERENT']);
+        //        var_dump($ID_ACTIVITE);
+        //        var_dump($_SESSION['ID_ADHERENT']);
         $d['inscription'] = $modInscription->findfirst($projectionI);
-//        var_dump($d['inscription']);
+        //        var_dump($d['inscription']);
 
         //requete 4 : on recupère la liste des invites
         $modListeInvite = $this->loadModel('ListeInviteNom');
         $projectionL['conditions'] = "ID_INSCRIPTION = {$d['inscription']->ID}";
         //$projectionL['conditions'] = "ID_INSCRIPTION = {$d['inscription']}";
         $d['invites'] = $modListeInvite->find($projectionL);
-//        var_dump($d['invites']);
+        //        var_dump($d['invites']);
         $modCreneaudate = $this->loadModel('ListeCreneau');
         $projectionM['projection'] = "CRENEAU.DATE_PAIEMENT";
         $projectionM['conditions'] = "ID_ACTIVITE = {$ID_ACTIVITE} AND NUM_CRENEAU = {$d['inscription']->CRENEAU}";
@@ -673,12 +683,103 @@ COUNT(DISTINCT i.ID) + COUNT(li.ID_INVITE)as effectif';
         // Place liste d'attente:
         /*
         $d['position'] = $this->positionListeAttente($d['inscription']->ID);
-*/
+        */
         $this->set($d);
 
         $this->render('mesActivites');
 
 
+    }
+
+    public function mailconfig(){
+
+        $mail = new PHPMailer(true);
+
+        try {
+            //configuration
+        //            $mail->SMTPDebug = SMTP::DEBUG_SERVER;
+
+            //configure smtp
+            $mail->isSMTP();
+                    $mail->Host = "smtp.gmail.com";
+                    $mail->SMTPAuth="true";
+                    $mail->SMTPSecure = "tls";
+                    $mail->Port = 587;
+                    $mail->Username = "remimorettimail@gmail.com";
+                    $mail->Password = "Gmailctrobi1*";
+
+            //config mailhog
+            //$mail->Host = "localhost";
+            //$mail->Port = 1025;
+            //CharSet
+            $mail->CharSet = "utf-8";
+
+            //destinataires
+            //            $mail->addAddress("test@pcyp3525.odns.fr");
+            $mail->addAddress("none@alstomgroup.com");
+            //Expediteur
+            $mail->setFrom("updates@alstomgroup.com");
+
+            //contenu
+            //            $mail->Subject = "Leader sur la liste principale";
+            //            $mail->Body = "Refresh de la page de la liste leader";
+            
+            //envoi du mail
+            //            $mail->send();
+            
+            //vérif envoi
+            //            echo "mail envoyé";
+            return $mail;
+
+        } catch (Exception $e) {
+            echo "message non envoyé. Erreur : {$mail->ErrorInfo}";
+        }
+
+    }
+
+    public function mailAdherent($idinscrit, $mess, $activite){
+        $modInscription = $this->loadModel('Adherent');
+        $projection['projection'] = 'ADHERENT.mail';
+        $projection['conditions'] = "ADHERENT.ID_adherent = {$idinscrit}";
+        $result = $modInscription->find($projection);
+        $modActivite = $this->loadModel("Activite");
+        $projection['projection'] = "ACTIVITE.nom";
+        $projection['conditions'] = "ACTIVITE.ID_ACTIVITE = {$activite}";
+        $resulta = $modActivite->findfirst($projection);
+        echo "activite";
+        var_dump($activite);
+        echo "result";
+        var_dump($result);
+        echo "resulta";
+        var_dump($resulta);
+        echo "mess";
+        var_dump($mess);
+        echo "idinscrit";
+        var_dump($idinscrit);
+        foreach($resulta as $nom){
+            $nomactivite=$nom;
+        }
+
+        $mail=$this->mailconfig();
+        foreach($result as $dest){
+            $mail->addAddress($dest->mail);
+        }
+        switch ($mess){
+            case "principale":
+                $mail->Subject="Inscription en liste principale";
+                $mail->Body="Vous avez été inscrit dans la liste principale de l'activité $nomactivite";
+                break;
+            case "attente":
+                $mail->Subject="Mise en liste d'attente";
+                $mail->Body="Vous avez été placé en liste d'attente pour l'activité $nomactivite";
+                break;
+            case "non inscrit":
+                $mail->Subject="Inscription impossible";
+                $mail->Body="Vous ne pouvez pas vous inscrire pour l'activité $nomactivite, l'effectif de la liste d'attente est complet.";
+                break;
+        }
+        $mail->send();
+        $mail->smtpClose();
     }
 
 

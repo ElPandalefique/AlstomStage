@@ -23,7 +23,7 @@ class ActiviteLeaderController extends Controller
     function nouveau($id)
     {
         $modActivite = $this->loadModel('ActiviteLeader');
-//recup les données du formulaire
+        //recup les données du formulaire
         $donnees = array();
         $donnees["COUT_ADULTE"] = 0;
         $donnees["COUT_ENFANT"] = 0;
@@ -64,7 +64,7 @@ class ActiviteLeaderController extends Controller
         $donnees["STATUT"] = 'A';
 
         $colonnes = array('COUT_ADULTE', 'COUT_ENFANT', 'TARIF_FORFAIT', 'ID_DOMAINE', 'ID_LEADER', 'ID_PRESTATAIRE', 'NOM', 'DETAIL', 'DATE_CREATION', 'ADRESSE', 'VILLE', 'CP', 'INDICATION_PARTICIPANT', 'INFO_IMPORTANT_PARTICIPANT', 'FORFAIT', 'AGE_MINIMUM', 'OUVERT_EXT', 'STATUT');
-//appeler la méthode insertAI
+        //appeler la méthode insertAI
 
         $ID_ACTIVITE = $modActivite->insertAI($colonnes, $donnees);
         if (is_numeric($ID_ACTIVITE)) {
@@ -77,8 +77,8 @@ class ActiviteLeaderController extends Controller
         } else {
             $d['info'] = "Problème pour créer l'activité";
         }
-//dans tous les cas
-//charger le tableau
+        //dans tous les cas
+        //charger le tableau
         $this->set($d);
         $this->mailAdmin();
         $this->formulaireCreneau($ID_ACTIVITE);
@@ -118,10 +118,10 @@ class ActiviteLeaderController extends Controller
 
 
            $tab = array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE), 'donnees' => $donnees);
-   //appeler la methode update
+            //appeler la methode update
            $modActivite->update($tab);
            $d['info'] = "Activité modifié";
-   //charger le tableau
+            //charger le tableau
            $this->set($d);
            $this->liste();
            $this->render('liste');
@@ -151,19 +151,19 @@ class ActiviteLeaderController extends Controller
         $modInscription = $this->loadModel('ActiviteParticipantsLeader');
         $projection['projection'] = 'INSCRIPTION.DATE_INSCRIPTION, INSCRIPTION.DATE_PAIEMENT, INSCRIPTION.ID, CRENEAU.DATE_CRENEAU, CRENEAU.HEURE_CRENEAU,INSCRIPTION.PAYE, INSCRIPTION.CRENEAU, INSCRIPTION.ID_ADHERENT, MONTANT, AUTO_PARTICIPATION, INSCRIPTION.ID_ACTIVITE, ADHERENT.NOM as ADN, ADHERENT.PRENOM as ADP, GROUP_CONCAT(INVITE.NOM, " ", INVITE.PRENOM separator "<br>") as INN, INSCRIPTION.ATTENTE as ATTENTE';
         $projection['conditions'] = "INSCRIPTION.ID_ACTIVITE = {$id} AND INSCRIPTION.ATTENTE = 0";
-//        $projection['groupby'] = "CRENEAU.DATE_CRENEAU";
+        //$projection['groupby'] = "CRENEAU.DATE_CRENEAU";
         $projection['groupby'] = "INSCRIPTION.DATE_INSCRIPTION";
-//        //$projection['order by'] = "INSCRIPTION.DATE_INSCRIPTION";
+        //$projection['order by'] = "INSCRIPTION.DATE_INSCRIPTION";
 
-//        $projection['order by'] = "INSCRIPTION.DATE_INSCRIPTION";
-//        var_dump($projection);
+        //$projection['order by'] = "INSCRIPTION.DATE_INSCRIPTION";
+        //var_dump($projection);
         $result = $modInscription->find($projection);
         $projection['groupby'] = "INSCRIPTION.DATE_INSCRIPTION";
         $projection['conditions'] = "INSCRIPTION.ID_ACTIVITE = {$id} AND INSCRIPTION.ATTENTE = 1";
-//        $projection['order by'] = "INSCRIPTION.DATE_INSCRIPTION";
+        //$projection['order by'] = "INSCRIPTION.DATE_INSCRIPTION";
         $resultA = $modInscription->find($projection);
-//        var_dump($result);
-//        var_dump($resultA);
+        //var_dump($result);
+        //var_dump($resultA);
         $d['inscrits'] = $result;
         $d['inscritsA'] = $resultA;
         $this->set($d);
@@ -224,8 +224,8 @@ class ActiviteLeaderController extends Controller
         $projection['conditions'] = "STATUT = 'O' AND ID_ACTIVITE = ". $d['donnees']->ID_ACTIVITE;
         $d['creneaux'] = $modCreneau->find($projection);
 
-//        echo'var_dump d';
-//        var_dump($d);
+        //echo'var_dump d';
+        //var_dump($d);
         // Rendu du formulaire
         $this->set($d);
         $this->render('gererAttente');
@@ -235,8 +235,7 @@ class ActiviteLeaderController extends Controller
         $modParticipants = $this->loadModel('ActiviteParticipantsAdherent');
         $reqI['projection'] = '
             COUNT(DISTINCT i.ID) + COUNT(li.ID_INVITE) as inscrits,
-            c.EFFECTIF_CRENEAU as places
-        ';
+            c.EFFECTIF_CRENEAU as places';
         $reqI['conditions'] = "c.ID_ACTIVITE = {$id} AND c.NUM_CRENEAU = {$_POST['creneau']} AND i.ATTENTE = 0" ;
         $effectifc = $modParticipants->findfirst($reqI);
         $modInscription = $this->loadModel('ActiviteParticipantsLeader');
@@ -291,19 +290,19 @@ class ActiviteLeaderController extends Controller
         $donnees["OUVERT_EXT"] = $_POST["OUVERT_EXT"];
 
         $tab = array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE), 'donnees' => $donnees);
-//appeler la methode update
+        //appeler la methode update
         $modActivite->update($tab);
         $d['info'] = "Activité modifié";
-//charger le tableau
+        //charger le tableau
         $this->liste();
         $this->render('liste');
     }
 
-//    public function liste() {
-//        $modActiviteLeader = $this->loadModel('ActiviteLeader'); //instancier le modele 
-//        $d['activiteleader'] = $modActiviteLeader->find(array('conditions' => 1));
-//        $this->set($d);
-//    }
+    //    public function liste() {
+    //        $modActiviteLeader = $this->loadModel('ActiviteLeader'); //instancier le modele 
+    //        $d['activiteleader'] = $modActiviteLeader->find(array('conditions' => 1));
+    //        $this->set($d);
+    //    }
     public function liste()
     {
         $modActiviteLeader = $this->loadModel('ActiviteLeader'); //instancier le modele 
@@ -316,7 +315,7 @@ class ActiviteLeaderController extends Controller
 
         //passer les informations à la vue qui s'appellera liste.php
         $this->set($d);
-//methode pour afficher le formulaire de création du tournois
+        //methode pour afficher le formulaire de création du tournois
 
 
         /* function supprimer($id){
@@ -388,12 +387,12 @@ class ActiviteLeaderController extends Controller
         }
         $donnees["NUM_CRENEAU"] = $nbCreneau + 1;
 
-//        var_dump($donnees);
+        //        var_dump($donnees);
         $colonnes = array('ID_ACTIVITE', 'DATE_CRENEAU', 'HEURE_CRENEAU', 'DATE_PAIEMENT', 'EFFECTIF_CRENEAU', 'COMMENTAIRE', 'STATUT', 'NUM_CRENEAU' );
         //appeler la méthode insert
         $modCreneau->insert($colonnes, $donnees);
 
-//        $this->mail($ID_ACTIVITE);
+        //        $this->mail($ID_ACTIVITE);
         $this->liste();
 
         $this->redirect('liste');
@@ -421,9 +420,9 @@ class ActiviteLeaderController extends Controller
             $donnees["COMMENTAIRE"] = $_POST["COMMENTAIRE"];
         else
             $donnees["COMMENTAIRE"]='';
-//        var_dump($donnees);
-//        var_dump($ID_ACTIVITE);
-//        var_dump($NUM_CRENEAU);
+        //        var_dump($donnees);
+        //        var_dump($ID_ACTIVITE);
+        //        var_dump($NUM_CRENEAU);
         $colonnes = array('ID_ACTIVITE', 'DATE_CRENEAU', 'HEURE_CRENEAU', 'EFFECTIF_CRENEAU', 'STATUT', 'NUM_CRENEAU', 'COMMENTAIRE');
         $tab = array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE, 'NUM_CRENEAU' => $NUM_CRENEAU),'donnees' => $donnees);
         //appeler la methode update
@@ -519,7 +518,7 @@ class ActiviteLeaderController extends Controller
         $modInscription = $this->loadModel('ActiviteParticipantsLeader');
         $projection['projection'] = 'ADHERENT.mail';
         $projection['conditions'] = "INSCRIPTION.ID_ACTIVITE = {$idactivite}";
-//        var_dump($projection);
+        //        var_dump($projection);
         $resulta = $modInscription->find($projection);
         foreach($resulta as $nom){
             $nomactivite=$nom;
@@ -608,7 +607,7 @@ class ActiviteLeaderController extends Controller
         }
         $mail->send();
         $mail->smtpClose();
-//        var_dump($mail);
+        //        var_dump($mail);
     }
 
     public function mailAdmin(){
@@ -625,17 +624,17 @@ class ActiviteLeaderController extends Controller
 
         try {
             //configuration
-//            $mail->SMTPDebug = SMTP::DEBUG_SERVER;
-//            $mail->IMAPDebug = IMAP::DEBUG_SERVER;
+            //            $mail->SMTPDebug = SMTP::DEBUG_SERVER;
+            //            $mail->IMAPDebug = IMAP::DEBUG_SERVER;
 
             //configure smtp
             $mail->isSMTP();
-//            $mail->Host = "smtp.gmail.com";
-//            $mail->SMTPAuth="true";
-//            $mail->SMTPSecure = "tls";
-//            $mail->Port = 587;
-//            $mail->Username = "remimorettimail@gmail.com";
-//            $mail->Password = "Gmailctrobi1*";
+            //            $mail->Host = "smtp.gmail.com";
+            //            $mail->SMTPAuth="true";
+            //            $mail->SMTPSecure = "tls";
+            //            $mail->Port = 587;
+            //            $mail->Username = "remimorettimail@gmail.com";
+            //            $mail->Password = "Gmailctrobi1*";
 
             //config mailhog
             $mail->Host = "localhost";
@@ -644,20 +643,20 @@ class ActiviteLeaderController extends Controller
             $mail->CharSet = "utf-8";
 
             //destinataires
-//            $mail->addAddress("test@pcyp3525.odns.fr");
+            //            $mail->addAddress("test@pcyp3525.odns.fr");
             $mail->addAddress("none@alstomgroup.com");
             //Expediteur
             $mail->setFrom("updates@alstomgroup.com");
 
             //contenu
-//            $mail->Subject = "Leader sur la liste principale";
-//            $mail->Body = "Refresh de la page de la liste leader";
+            //            $mail->Subject = "Leader sur la liste principale";
+            //            $mail->Body = "Refresh de la page de la liste leader";
 
             //envoi du mail
-//            $mail->send();
+            //            $mail->send();
 
             //vérif envoi
-//            echo "mail envoyé";
+            //            echo "mail envoyé";
             return $mail;
 
         } catch (Exception $e) {
