@@ -8,7 +8,7 @@ class ActiviteController extends Controller
 {
 
     //Liste d'attente non fonctionelle
-    /*
+    /* 
     public function positionListeAttente($numinscription)
     {
         $modActiviteInscrit = $this->loadModel('ActiviteInscrit');
