@@ -7,7 +7,7 @@ use PHPMailer\PHPMailer\SMTP;
 class ActiviteController extends Controller
 {
 
-    //Liste d'attente non fonctionelle
+    //Liste d'attente non fonctionnelle
     /* 
     public function positionListeAttente($numinscription)
     {
@@ -588,10 +588,6 @@ class ActiviteController extends Controller
     }
 
 
-    //    public function formulaireInscription($id) {  
-        //        
-        //    }
-
     //    public function inscriptionActivite($id) {
             //        $ID_ACTIVITE = $id;
                 //        $ID_ADHERENT = $_SESSION['ID_ADHERENT'];
@@ -716,7 +712,7 @@ class ActiviteController extends Controller
 
             //destinataires
             //            $mail->addAddress("test@pcyp3525.odns.fr");
-            $mail->addAddress("none@alstomgroup.com");
+            $mail->addAddress("none@none.none");
             //Expediteur
             $mail->setFrom("updates@alstomgroup.com");
 

@@ -80,8 +80,8 @@ class ActiviteLeaderController extends Controller
         //dans tous les cas
         //charger le tableau
         $this->set($d);
-        $this->mailAdmin();
         $this->formulaireCreneau($ID_ACTIVITE);
+        $this->mail($ID_ACTIVITE, "creer");
     }
 
     /*   function modifier($id)
@@ -229,6 +229,7 @@ class ActiviteLeaderController extends Controller
         // Rendu du formulaire
         $this->set($d);
         $this->render('gererAttente');
+
     }
 
     public function passagePrincipale($id){
@@ -239,7 +240,7 @@ class ActiviteLeaderController extends Controller
         $reqI['conditions'] = "c.ID_ACTIVITE = {$id} AND c.NUM_CRENEAU = {$_POST['creneau']} AND i.ATTENTE = 0" ;
         $effectifc = $modParticipants->findfirst($reqI);
         $modInscription = $this->loadModel('ActiviteParticipantsLeader');
-        $projection['projection'] = 'INSCRIPTION.DATE_INSCRIPTION, INSCRIPTION.DATE_PAIEMENT, INSCRIPTION.ID, CRENEAU.DATE_CRENEAU, CRENEAU.HEURE_CRENEAU,INSCRIPTION.PAYE, INSCRIPTION.CRENEAU, INSCRIPTION.ID_ADHERENT, MONTANT, AUTO_PARTICIPATION as ap, INSCRIPTION.ID_ACTIVITE, ADHERENT.NOM as ADN, ADHERENT.PRENOM as ADP, COUNT(INVITE.ID_PERS_EXTERIEUR) as INN, INSCRIPTION.ATTENTE as ATTENTE';
+        $projection['projection'] = 'INSCRIPTION.DATE_INSCRIPTION, INSCRIPTION.DATE_PAIEMENT, INSCRIPTION.ID as ID, CRENEAU.DATE_CRENEAU, CRENEAU.HEURE_CRENEAU,INSCRIPTION.PAYE, INSCRIPTION.CRENEAU, INSCRIPTION.ID_ADHERENT, MONTANT, AUTO_PARTICIPATION as ap, INSCRIPTION.ID_ACTIVITE, ADHERENT.NOM as ADN, ADHERENT.PRENOM as ADP, COUNT(INVITE.ID_PERS_EXTERIEUR) as INN, INSCRIPTION.ATTENTE as ATTENTE';
 
         $projection['conditions'] = "INSCRIPTION.ID_ACTIVITE = {$id} AND INSCRIPTION.ATTENTE = 1 AND INSCRIPTION.ID_ADHERENT = $_POST[idadh]";
         $resultA = $modInscription->findfirst($projection);
@@ -248,6 +249,9 @@ class ActiviteLeaderController extends Controller
         if (!($nombreinscription > $effectifc->places - $effectifc->inscrits)) {
             $donnees['ATTENTE'] = 0;
             $tab = array('conditions' => array('ID' => $_POST['id']), 'donnees' => $donnees);
+            var_dump($resultA->ID);
+            var_dump($id);
+            $this->mailSolo($resultA->ID, "principale", $id);
             $modInscription->update($tab);
             $d['info'] = "Passage en liste principale effectué";
         }
@@ -296,6 +300,7 @@ class ActiviteLeaderController extends Controller
         //charger le tableau
         $this->liste();
         $this->render('liste');
+        $this->mail($ID_ACTIVITE, "modifier");
     }
 
     //    public function liste() {
@@ -442,9 +447,9 @@ class ActiviteLeaderController extends Controller
             //$modActivite = $this->loadModel('ActiviteAdmin');
             $tab = array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE, 'NUM_CRENEAU' => $NUM_CRENEAU));
             //appeler la methode delete
+            $this->mailc($ID_ACTIVITE, "supprimer", $NUM_CRENEAU);
             $modCreneau->delete($tab);
         }
-        $this->mail($ID_ACTIVITE, "supprimer");
         $this->liste();
         header('Location: ../liste');
     }
@@ -515,54 +520,98 @@ class ActiviteLeaderController extends Controller
     }
 
     public function mail($idactivite, $mess){
-        $modInscription = $this->loadModel('ActiviteParticipantsLeader');
-        $projection['projection'] = 'ADHERENT.mail';
-        $projection['conditions'] = "INSCRIPTION.ID_ACTIVITE = {$idactivite}";
-        //        var_dump($projection);
-        $resulta = $modInscription->find($projection);
-        foreach($resulta as $nom){
-            $nomactivite=$nom;
-        }
-
         $mail=$this->mailconfig();
+
+        //récupérer le nom de l'activité
+        $nomactivite=$this->nomActivite($idactivite);
+
+
         switch ($mess){
-            case "supprimer":
-                $mail->Subject="Activité supprimée";
-                $mail->Body="L'activité $nomactivite à été supprimée";
-            case "creneauAdherent":
-                $mail->Subject="Modification créneau";
-                $mail->Body="Vous avez été changé de créneau sur l'activité $nomactivite";
+            case "creer":
+                $mail->Subject="Activité créée";
+                $mail->Body="L'activité $nomactivite à été créée";
+                break;
+            case "modifier":
+                $mail->Subject="Activité modifiée";
+                $mail->Body="L'activité $nomactivite à été modifiée";
+                break;
 
         }
+
+        //Récupérer adresse leader
+        $this->mailLeader($idactivite, $mail);
+
+        //Récupérer adresses admins
+        $this->mailAdmin($mail);
+
         $mail->send();
         $mail->smtpClose();
     }
 
-    public function mailc($idactivite, $mess, $creneau){
-        $modInscription = $this->loadModel('ActiviteParticipantsLeader');
-        $projection['projection'] = 'ADHERENT.mail';
-        $projection['conditions'] = "INSCRIPTION.ID_ACTIVITE = {$idactivite} and INSCRIPTION.CRENEAU= {$creneau}";
-        var_dump($projection);
-        $result = $modInscription->find($projection);
-        $modActivite = $this->loadModel("ActiviteInscrit");
-        $projection['projection'] = "ACTIVITE.nom";
-        $projection['conditions'] = "ACTIVITE.ID_ACTIVITE = {$idactivite}";
-        $resulta = $modActivite->findfirst($projection);
-        var_dump($resulta);
+    public function mailrappel($idactivite){
 
         $mail=$this->mailconfig();
-        foreach($result as $dest){
-            $mail->addAddress($dest->mail);
-        }
 
-        foreach($resulta as $nom){
-            $nomactivite=$nom;
-        }
+        //récupérer le nom de l'activité
+        $nomactivite=$this->nomActivite($idactivite);
+
+        $this->mailAdherent($idactivite, $mail);
+
+        $mail->Subject="Rappel du leader sur l'activité $nomactivite";
+        $mail->Body="Bonjour, le leader vous envoi un rappel concernant l'activité $nomactivite, veuillez vérifier si votre créneau est proche ou si il y a eu des modifications";
+
+        $mail->send();
+
+        $this->inscrits($idactivite);
+    }
+
+    public function mailc($idactivite, $mess, $creneau){
+
+        $mail=$this->mailconfig();
+
+        //récupérer les adresses mail des adhérents à l'activité et au créneau voulu
+        $this->mailAdherents($idactivite, $creneau, $mail);
+
+        //récupérer le nom de l'activité
+        $nomactivite = $this->nomActivite($idactivite);
+
+        //récupérer la date et l'heure du créneau
+        $modCreneau = $this->loadModel('Creneau');
+        $projection['projection'] = 'Creneau.date_creneau as date, creneau.heure_creneau as heure';
+        $projection['conditions'] = "Creneau.ID_ACTIVITE = {$idactivite} and Creneau.NUM_CRENEAU= {$creneau}";
+        $resultc = $modCreneau->findfirst($projection);
+        $date = $resultc->date;
+        $heure = $resultc->heure;
+
+        //récupérer l'adresse mail du leader de l'activité
+        $this->mailLeader($idactivite, $mail);
+//        $modInscription = $this->loadModel('ActiviteParticipantsLeader');
+//        $projection['projection'] = 'ADHERENT.mail';
+//        $projection['conditions'] = "ACTIVITE.ID_ACTIVITE = {$idactivite} and ACTIVITE.ID_LEADER=ADHERENT.ID_ADHERENT";
+//        var_dump($projection);
+//        $resultb = $modInscription->find($projection);
+
+
+//        foreach($resultb as $dest){
+//            $mail->addAddress($dest->mail);
+//        }
+        //ajout de la recherche des admins
+        /*$modAdmin = $this->loadModel("Adherent");
+        $projection['projection'] = 'ADHERENT.mail';
+        $projection['conditions'] = "ADHERENT.GRADE = 'A'";
+        $result = $modInscription->find($projection);*/
+        $this->mailAdmin($mail);
 
         switch ($mess){
             case "modifier":
                 $mail->Subject="Créneau modifié";
-                $mail->Body="Le créneau de l'activité $nomactivite à été modifié";
+                $mail->Body="Le créneau du $date à $heure de l'activité $nomactivite à été modifié";
+
+                break;
+            case "supprimer":
+                $mail->Subject="Créneau supprimé";
+                $mail->Body="Le créneau du $date à $heure de l'activité $nomactivite à été supprimée";
+                break;
 
         }
         $mail->send();
@@ -571,12 +620,18 @@ class ActiviteLeaderController extends Controller
     }
 
     public function mailSolo($idinscrit, $mess, $activite){
+
+        $mail=$this->mailconfig();
+
+        //récupération adresse participant
         $modInscription = $this->loadModel('ActiviteParticipantsLeader');
         $projection['projection'] = 'ADHERENT.mail';
         $projection['conditions'] = "INSCRIPTION.ID = {$idinscrit}";
         $result = $modInscription->find($projection);
-        var_dump($idinscrit);
-        $modActivite = $this->loadModel("ActiviteInscrit");
+
+        //récupération nom activité
+        $nomactivite=$this->nomActivite($activite);
+        /*$modActivite = $this->loadModel("ActiviteInscrit");
         $projection['projection'] = "ACTIVITE.nom";
         $projection['conditions'] = "ACTIVITE.ID_ACTIVITE = {$activite}";
         $resulta = $modActivite->findfirst($projection);
@@ -585,9 +640,8 @@ class ActiviteLeaderController extends Controller
         var_dump($mess);
         foreach($resulta as $nom){
             $nomactivite=$nom;
-        }
+        }*/
 
-        $mail=$this->mailconfig();
         foreach($result as $dest){
             $mail->addAddress($dest->mail);
         }
@@ -604,18 +658,69 @@ class ActiviteLeaderController extends Controller
                 $mail->Subject="Modification créneau";
                 $mail->Body="Vous avez été changé de créneau sur l'activité $nomactivite";
                 break;
+            case "principale":
+                $mail->Subject="Passage en liste principale";
+                $mail->Body="Vous avez été changé en liste principale sur l'activité $nomactivite";
+                break;
         }
         $mail->send();
         $mail->smtpClose();
         //        var_dump($mail);
     }
 
-    public function mailAdmin(){
+    public function mailLeader($idactivite, $mail)
+    {
+        //Récupérer adresse leader
+        $modInscription = $this->loadModel('NomLeader');
+        $projection['projection'] = 'ADHERENT.mail';
+        $projection['conditions'] = "ACTIVITE.ID_ACTIVITE = {$idactivite} and ACTIVITE.ID_LEADER=ADHERENT.ID_ADHERENT";
+        $result = $modInscription->find($projection);
+        foreach($result as $dest){
+            $mail->addAddress($dest->mail);
+        }
+    }
+
+    public function mailAdmin($mail){
         $modInscription = $this->loadModel('Adherent');
         $projection['projection'] = 'ADHERENT.mail';
         $projection['conditions'] = "Adherent.grade = 'A'";
         $result = $modInscription->find($projection);
+        foreach($result as $dest){
+            $mail->addAddress($dest->mail);
+        }
+        return $result;
+    }
+
+    public function mailAdherents($idactivite, $creneau, $mail){
+        $modInscription = $this->loadModel('ActiviteParticipantsLeader');
+        $projection['projection'] = 'ADHERENT.mail';
+        $projection['conditions'] = "INSCRIPTION.ID_ACTIVITE = {$idactivite} and INSCRIPTION.CRENEAU= {$creneau}";
+        $result = $modInscription->find($projection);
+        foreach($result as $dest){
+            $mail->addAddress($dest->mail);
+        }
+    }
+
+    public function mailAdherent($idactivite, $mail){
+        $modInscription = $this->loadModel('ActiviteParticipantsLeader');
+        $projection['projection'] = 'ADHERENT.mail';
+        $projection['conditions'] = "INSCRIPTION.ID_ACTIVITE = {$idactivite}";
+        $result = $modInscription->find($projection);
+        foreach($result as $dest){
+            $mail->addAddress($dest->mail);
+        }
+    }
+
+    public function nomActivite($idactivite){
+        $modActivite = $this->loadModel("Activite");
+        $projection['projection'] = "ACTIVITE.nom";
+        $projection['conditions'] = "ACTIVITE.ID_ACTIVITE = {$idactivite}";
+        $result = $modActivite->findfirst($projection);
         var_dump($result);
+        foreach ($result as $nom){
+            $nomactivite = $nom;
+        }
+        return $nomactivite;
     }
 
     public function mailconfig(){
@@ -644,7 +749,7 @@ class ActiviteLeaderController extends Controller
 
             //destinataires
             //            $mail->addAddress("test@pcyp3525.odns.fr");
-            $mail->addAddress("none@alstomgroup.com");
+            $mail->addAddress("none@none.none");
             //Expediteur
             $mail->setFrom("updates@alstomgroup.com");
 

@@ -1,5 +1,9 @@
 <?php
 
+use PHPMailer\PHPMailer\Exception;
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+
 class ActiviteAdminController extends Controller {
 
     public function liste() {
@@ -92,6 +96,8 @@ class ActiviteAdminController extends Controller {
 //charger le tableau
         $this->liste();
         $this->render('liste');
+
+        $this->mailc($ID_ACTIVITE, "modifier");
     }
 
     function archivage($id) {
@@ -209,13 +215,103 @@ class ActiviteAdminController extends Controller {
         header('Location: ../liste');
     }
 
-    function mailLeader($id){
+    public function mailLeader($idactivite, $mail)
+    {
+        //Récupérer adresse leader
         $modInscription = $this->loadModel('NomLeader');
         $projection['projection'] = 'ADHERENT.mail';
-        $projection['conditions'] = "ACTIVITE.ID = {$id}";
+        $projection['conditions'] = "ACTIVITE.ID_ACTIVITE = {$idactivite} and ACTIVITE.ID_LEADER=ADHERENT.ID_ADHERENT";
         $result = $modInscription->find($projection);
-        var_dump($id);
+        foreach($result as $dest){
+            $mail->addAddress($dest->mail);
+        }
+    }
+
+    public function mailc($idactivite, $mess){
+
+        //config mail
+        $mail = $this->mailconfig();
+
+        //récupération du mail du leader
+        $this->mailLeader($idactivite, $mail);
+
+        //récupération des mails des admins
+        $this->mailAdmin($mail);
+
+        //récupération nom activité
+        $nomactivite = $this->nomActivite($idactivite);
+
+        switch($mess){
+            case "modifier":
+                $mail->Subject="Activité modifiée par un administrateur";
+                $mail->Body="L'activité $nomactivite à été modifiée par un administrateur";
+                break;
+        }
+
+
+
+        $mail->send();
+    }
+
+    public function mailAdmin($mail){
+        $modInscription = $this->loadModel('Adherent');
+        $projection['projection'] = 'ADHERENT.mail';
+        $projection['conditions'] = "Adherent.grade = 'A'";
+        $result = $modInscription->find($projection);
+        foreach($result as $dest){
+            $mail->addAddress($dest->mail);
+        }
+        return $result;
+    }
+
+    public function mailconfig(){
+
+        $mail = new PHPMailer(true);
+
+        try {
+            //debug
+            //$mail->SMTPDebug = SMTP::DEBUG_SERVER;
+
+            //configure smtp
+            $mail->isSMTP();
+            //envoi de mail par gmail
+            //            $mail->Host = "smtp.gmail.com";
+            //            $mail->SMTPAuth="true";
+            //            $mail->SMTPSecure = "tls";
+            //            $mail->Port = 587;
+            //            $mail->Username = "remimorettimail@gmail.com";
+            //            $mail->Password = "Gmailctrobi1*";
+
+            //config mailhog
+            $mail->Host = "localhost";
+            $mail->Port = 1025;
+            //CharSet
+            $mail->CharSet = "utf-8";
+
+            //destinataires
+            $mail->addAddress("none@none.none");
+
+            //Expediteur
+            $mail->setFrom("updates@alstomgroup.com");
+
+            return $mail;
+
+        } catch (Exception $e) {
+            echo "message non envoyé. Erreur : {$mail->ErrorInfo}";
+        }
+
+    }
+
+    public function nomActivite($idactivite){
+        $modActivite = $this->loadModel("Activite");
+        $projection['projection'] = "ACTIVITE.nom";
+        $projection['conditions'] = "ACTIVITE.ID_ACTIVITE = {$idactivite}";
+        $result = $modActivite->findfirst($projection);
         var_dump($result);
+        foreach ($result as $nom){
+            $nomactivite = $nom;
+        }
+        return $nomactivite;
     }
 
 }
