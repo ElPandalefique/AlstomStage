@@ -631,13 +631,14 @@ class ActiviteController extends Controller
     public function listerActiviteInscrit()
     {
         $modActiviteInscrit = $this->loadModel('ActiviteInscriptionCreneau'); //instancier le modele
-        $projection['projection'] = "ACTIVITE.ID_ACTIVITE,ACTIVITE.NOM,DETAIL,VILLE,INDICATION_PARTICIPANT, DATE_CRENEAU, HEURE_CRENEAU, MONTANT, ADHERENT.NOM as an, ADHERENT.PRENOM as ap";
+        $projection['projection'] = "ACTIVITE.ID_ACTIVITE,INSCRIPTION.ATTENTE, ACTIVITE.NOM,DETAIL,VILLE,INDICATION_PARTICIPANT, DATE_CRENEAU, HEURE_CRENEAU, MONTANT, ADHERENT.NOM as an, ADHERENT.PRENOM as ap";
         $projection['conditions'] = 'INSCRIPTION.ID_ADHERENT = ' . $_SESSION['ID_ADHERENT'];
         $d['inscription'] = $modActiviteInscrit->find($projection);
         //  $projection ['projection'] = "ACTIVITE.ID_ACTIVITE,NOM,DETAIL,VILLE,NB_ENFANTS,NB_EXT,INDICATION_PARTICIPANT,MONTANT";
         // $projection['conditions'] = 'ID_ADHERENT = '.$_SESSION['ID_ADHERENT'];
         //  $params = array('projection' => $projection, 'condition' => $condition);
         //  $d['activites'] = $modActiviteInscrit->find($params);
+//        var_dump($d['inscription']);
         $this->set($d);
     }
 
@@ -646,7 +647,7 @@ class ActiviteController extends Controller
         $ID_ACTIVITE = $id;
         $modActiviteInscrit = $this->loadModel('ActiviteInscrit');
         //$projection ['projection']="activite.ID_ACTIVITE, activite.NOM, activite.DETAIL, activite.ADRESSE, activite.CP, activite.VILLE, activite.AGE_MINIMUM,,activite.DATE_PAIEMENT, activite.INDICATION_PARTICIPANT, activite.INFO_IMPORTANT_PARTICIPANT";
-        $projection ['projection'] = "ACTIVITE.ID_ACTIVITE, ACTIVITE.ID_LEADER, ACTIVITE.NOM, ACTIVITE.DETAIL, ACTIVITE.ADRESSE, ACTIVITE.CP, ACTIVITE.VILLE, ACTIVITE.AGE_MINIMUM,ACTIVITE.PRIX_ADULTE,ACTIVITE.PRIX_ENFANT,ACTIVITE.PRIX_ADULTE_EXT,ACTIVITE.PRIX_ENFANT_EXT, ACTIVITE.INDICATION_PARTICIPANT, ACTIVITE.INFO_IMPORTANT_PARTICIPANT";
+        $projection ['projection'] = "ACTIVITE.ID_ACTIVITE, ACTIVITE.ID_LEADER, ACTIVITE.NOM, ACTIVITE.DETAIL, ACTIVITE.ADRESSE, ACTIVITE.CP, ACTIVITE.VILLE, ACTIVITE.AGE_MINIMUM,ACTIVITE.PRIX_ADULTE,ACTIVITE.PRIX_ENFANT,ACTIVITE.PRIX_ADULTE_EXT,ACTIVITE.PRIX_ENFANT_EXT, ACTIVITE.INDICATION_PARTICIPANT, ACTIVITE.INFO_IMPORTANT_PARTICIPANT, INSCRIPTION.ATTENTE";
         $projection['conditions'] = "ACTIVITE.ID_ACTIVITE = " . $ID_ACTIVITE;
         $d['donnees'] = $modActiviteInscrit->findfirst($projection);
 
@@ -663,7 +664,7 @@ class ActiviteController extends Controller
         //        var_dump($ID_ACTIVITE);
         //        var_dump($_SESSION['ID_ADHERENT']);
         $d['inscription'] = $modInscription->findfirst($projectionI);
-        //        var_dump($d['inscription']);
+//                var_dump($d['inscription']);
 
         //requete 4 : on recupère la liste des invites
         $modListeInvite = $this->loadModel('ListeInviteNom');

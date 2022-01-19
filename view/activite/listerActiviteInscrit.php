@@ -14,13 +14,17 @@
         </tr>
         <?php foreach ($inscription as $ia):
             $date = date_create($ia->DATE_CRENEAU);
+        $attente="";
+        if($ia->ATTENTE==1) {
+            $attente = "(vous êtes en liste d'attente)";
+                }
             ?>
             <tr>
 
                 <td><?= $ia->NOM ?></td>
                 <td><?= $ia->DETAIL ?></td>
                 <td><?= $ia->VILLE ?></td>
-                <td><?= 'Le '.date_format($date, 'd-m-Y').' à '.substr($ia->HEURE_CRENEAU, 0, -3) ?></td>
+                <td><?= 'Le '.date_format($date, 'd-m-Y').' à '.substr($ia->HEURE_CRENEAU, 0, -3)."<br>".$attente ?></td>
                 <td><?= $ia->INDICATION_PARTICIPANT?></td>
                 <td><?= $ia->MONTANT . " €"?></td>
                 <td><button id="singlebutton" name="singlebutton" class="btn btn-info" onclick="window.location.href = '../activite/mesActivites/<?= $ia->ID_ACTIVITE?>'">Voir</button></td>

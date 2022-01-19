@@ -149,23 +149,32 @@ class ActiviteLeaderController extends Controller
 
           $d['donnees'] = $participants;*/
         $modInscription = $this->loadModel('ActiviteParticipantsLeader');
-        $projection['projection'] = 'INSCRIPTION.DATE_INSCRIPTION, INSCRIPTION.DATE_PAIEMENT, INSCRIPTION.ID, CRENEAU.DATE_CRENEAU, CRENEAU.HEURE_CRENEAU,INSCRIPTION.PAYE, INSCRIPTION.CRENEAU, INSCRIPTION.ID_ADHERENT, MONTANT, AUTO_PARTICIPATION, INSCRIPTION.ID_ACTIVITE, ADHERENT.NOM as ADN, ADHERENT.PRENOM as ADP, GROUP_CONCAT(INVITE.NOM, " ", INVITE.PRENOM separator "<br>") as INN, INSCRIPTION.ATTENTE as ATTENTE';
+        $projection['projection'] = 'INSCRIPTION.DATE_INSCRIPTION, INSCRIPTION.DATE_PAIEMENT, INSCRIPTION.ID,CRENEAU.NUM_CRENEAU, CRENEAU.DATE_CRENEAU, CRENEAU.HEURE_CRENEAU,INSCRIPTION.PAYE, INSCRIPTION.CRENEAU, INSCRIPTION.ID_ADHERENT, MONTANT, AUTO_PARTICIPATION, INSCRIPTION.ID_ACTIVITE, ADHERENT.NOM as ADN, ADHERENT.PRENOM as ADP, GROUP_CONCAT(INVITE.NOM, " ", INVITE.PRENOM separator "<br>") as INN, INSCRIPTION.ATTENTE as ATTENTE';
         $projection['conditions'] = "INSCRIPTION.ID_ACTIVITE = {$id} AND INSCRIPTION.ATTENTE = 0";
-        //$projection['groupby'] = "CRENEAU.DATE_CRENEAU";
-        $projection['groupby'] = "INSCRIPTION.DATE_INSCRIPTION";
-        //$projection['order by'] = "INSCRIPTION.DATE_INSCRIPTION";
+//        $projection['groupby'] = "CRENEAU.DATE_CRENEAU";
+        $projection['groupby'] = "INSCRIPTION.DATE_INSCRIPTION ";
+        $projection['orderby'] = "INSCRIPTION.CRENEAU";
 
         //$projection['order by'] = "INSCRIPTION.DATE_INSCRIPTION";
         //var_dump($projection);
         $result = $modInscription->find($projection);
-        $projection['groupby'] = "INSCRIPTION.DATE_INSCRIPTION";
+        $projection['groupby'] = "INSCRIPTION.DATE_INSCRIPTION ";
         $projection['conditions'] = "INSCRIPTION.ID_ACTIVITE = {$id} AND INSCRIPTION.ATTENTE = 1";
-        //$projection['order by'] = "INSCRIPTION.DATE_INSCRIPTION";
+        $projection['orderby'] = "INSCRIPTION.DATE_INSCRIPTION";
         $resultA = $modInscription->find($projection);
         //var_dump($result);
         //var_dump($resultA);
+
+        //Récuperer les effectifs des créneaux
+        $modEffectif = $this->loadModel('ActiviteParticipantsAdherent');
+        $projectionC['projection'] = 'c.EFFECTIF_CRENEAU, c.DATE_CRENEAU, c.HEURE_CRENEAU,COUNT(DISTINCT i.ID) + COUNT(li.ID_INVITE)as effectif';
+        $projectionC['conditions'] = "i.ID_ACTIVITE = {$id} AND c.STATUT = 'O' AND i.ATTENTE = 0";
+        $projectionC['groupby'] = "c.NUM_CRENEAU, c.ID_ACTIVITE";
+        $resultE = $modEffectif->find($projectionC);
+
         $d['inscrits'] = $result;
         $d['inscritsA'] = $resultA;
+        $d['effectifs'] = $resultE;
         $this->set($d);
         $this->render('inscrits');
 
@@ -499,8 +508,9 @@ class ActiviteLeaderController extends Controller
 
         $d['info'] = "Le créneau de l'adhérent a été déplacé avec succès.";
         $this->mailSolo($id, "creneauAdherent", $infoi->ID_ACTIVITE);
-        $this->set($d);
-        $this->gerer($id);
+//        $this->set($d);
+//        $this->gerer($id);
+        $this->inscrits($infoi->ID_ACTIVITE);
 
     }
 
