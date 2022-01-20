@@ -3,6 +3,8 @@
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\mailConfig;
+require("../core/phpmailer/mailConfig.php");
 
 class ActiviteLeaderController extends Controller
 {
@@ -530,7 +532,9 @@ class ActiviteLeaderController extends Controller
     }
 
     public function mail($idactivite, $mess){
-        $mail=$this->mailconfig();
+
+        $configMail = new mailConfig();
+        $mail = $configMail->config();
 
         //récupérer le nom de l'activité
         $nomactivite=$this->nomActivite($idactivite);
@@ -560,7 +564,8 @@ class ActiviteLeaderController extends Controller
 
     public function mailrappel($idactivite){
 
-        $mail=$this->mailconfig();
+        $configMail = new mailConfig();
+        $mail = $configMail->config();
 
         //récupérer le nom de l'activité
         $nomactivite=$this->nomActivite($idactivite);
@@ -577,7 +582,8 @@ class ActiviteLeaderController extends Controller
 
     public function mailc($idactivite, $mess, $creneau){
 
-        $mail=$this->mailconfig();
+        $configMail = new mailConfig();
+        $mail = $configMail->config();
 
         //récupérer les adresses mail des adhérents à l'activité et au créneau voulu
         $this->mailAdherents($idactivite, $creneau, $mail);
@@ -631,7 +637,8 @@ class ActiviteLeaderController extends Controller
 
     public function mailSolo($idinscrit, $mess, $activite){
 
-        $mail=$this->mailconfig();
+        $configMail = new mailConfig();
+        $mail = $configMail->config();
 
         //récupération adresse participant
         $modInscription = $this->loadModel('ActiviteParticipantsLeader');
@@ -733,51 +740,5 @@ class ActiviteLeaderController extends Controller
         return $nomactivite;
     }
 
-    public function mailconfig(){
-
-        $mail = new PHPMailer(true);
-
-        try {
-            //configuration
-            //            $mail->SMTPDebug = SMTP::DEBUG_SERVER;
-            //            $mail->IMAPDebug = IMAP::DEBUG_SERVER;
-
-            //configure smtp
-            $mail->isSMTP();
-            //            $mail->Host = "smtp.gmail.com";
-            //            $mail->SMTPAuth="true";
-            //            $mail->SMTPSecure = "tls";
-            //            $mail->Port = 587;
-            //            $mail->Username = "remimorettimail@gmail.com";
-            //            $mail->Password = "Gmailctrobi1*";
-
-            //config mailhog
-            $mail->Host = "localhost";
-            $mail->Port = 1025;
-            //CharSet
-            $mail->CharSet = "utf-8";
-
-            //destinataires
-            //            $mail->addAddress("test@pcyp3525.odns.fr");
-            $mail->addAddress("none@none.none");
-            //Expediteur
-            $mail->setFrom("updates@alstomgroup.com");
-
-            //contenu
-            //            $mail->Subject = "Leader sur la liste principale";
-            //            $mail->Body = "Refresh de la page de la liste leader";
-
-            //envoi du mail
-            //            $mail->send();
-
-            //vérif envoi
-            //            echo "mail envoyé";
-            return $mail;
-
-        } catch (Exception $e) {
-            echo "message non envoyé. Erreur : {$mail->ErrorInfo}";
-        }
-
-    }
 }
 

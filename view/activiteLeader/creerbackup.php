@@ -118,142 +118,85 @@
 
 
         <!-- Si l'on séléctionne le mode Unitaire (par défaut) : required="required" -->
-        <div id="getText" name = "prestation_principale">
-
-            <div class="form-group" id="COUT_ADULTE_SELECT">
-                <label class="col-md-2 control-label" for="textinput">Prestation<span class="important">*</span> :</label>
-
-                <div class="col-md-4">
-                    <input id="Prestation" name="Prestation" placeholder="Intitulé de la prestation" class="form-control input-md"
-                           type="text" value="<?= (isset($activite->prestation) ? $activite->prestation : '') ?>">
-                </div>
-
+        <div class="form-group" id="COUT_ADULTE_SELECT">
+            <label class="col-md-2 control-label" for="textinput">Préstation<span class="important">*</span> :</label>
+            <div class="col-md-4">
+                <input id="COUT_ADULTE" name="COUT_ADULTE" placeholder="Coût par adulte" class="form-control input-md"
+                       type="number" value="<?= (isset($activite->COUT_ADULTE) ? $activite->COUT_ADULTE : '') ?>">
             </div>
-            <div class="form-group">
-                <label class="col-md-2 control-label" for="textinput">Coût<span class="important">*</span> :</label>
+        </div>
+        <!-- ************************************** -->
 
-                <div class="col-md-4">
-                    <input id="COUT" name="COUT" placeholder="Coût" class="form-control input-md"
-                           type="number" value="<?= (isset($activite->COUT) ? $activite->COUT : '') ?>">
-                </div>
 
+        <!-- Si l'on séléctionne le mode Forfait : -->
+
+        <div style="display: none" class="form-group" id="TARIF_FORFAIT_SELECT">
+            <label class="col-md-2 control-label" for="textinput">Coût Forfaitaire <span class="important">*</span>
+                :</label>
+            <div class="col-md-4">
+                <input id="TARIF_FORFAIT" name="TARIF_FORFAIT" placeholder="Coût du forfait"
+                       class="form-control input-md"
+                       type="number" value="<?= (isset($activite->TARIF_FORFAIT) ? $activite->TARIF_FORFAIT : '') ?>">
             </div>
-
-            <div class="form-group">
-                <label class="col-md-2 control-label" for="textinput">Âge minimum :</label>
-
-                <div class="col-md-4">
-                    <input id="AGE_MIN" name="AGE_MIN" placeholder="Âge minimum" class="form-control input-md"
-                           type="number" value="<?= (isset($activite->AGE_MIN) ? $activite->AGE_MIN : '') ?>">
-                </div>
-
-            </div>
-
-            <div class="form-group">
-
-                <label class="col-md-2 control-label" for="textinput">Âge maximum :</label>
-                <div class="col-md-4">
-                    <input id="AGE_MAX" name="AGE_MAX" placeholder="Âge maximum" class="form-control input-md"
-                           type="number" value="<?= (isset($activite->AGE_MAX) ? $activite->AGE_MAX : '') ?>">
-                </div>
-
-            </div>
-
-            <div class="form-group">
-
-                <label class="col-md-2 control-label" for="textinput">adhérent / externe <span class="important">*</span>
-                    :</label>
-                <div class="col-md-1">
-                    <input id="OUVERT_ENFANT_OUI" name="OUVERT_EXTERNE" type="radio" value="0" checked onclick="ouvertEnfants();">
-                    <label for="OUVERT_ENFANT">adhérent (+famille)</label>
-                </div>
-
-                <div class="col-md-1">
-                    <input id="OUVERT_ENFANT_NON" name="OUVERT_EXTERNE" type="radio" value="1" onclick="ouvertEnfants();">
-                    <label for="OUVERT_ENFANT">externe</label>
-                </div>
-            </div>
-
         </div>
 
+        <!-- ************************************** -->
 
-        <input type="button" onClick="createDiv()" value="Ajout prestation principale">
+
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="textinput">Ouvert enfants <span class="important">*</span>
+                :</label>
+            <div class="col-md-1">
+                <input id="OUVERT_ENFANT_OUI" name="OUVERT_ENFANT" type="radio" value="1" checked onclick="ouvertEnfants();">
+                <label for="OUVERT_ENFANT">Oui</label>
+
+            </div>
+            <div class="col-md-1">
+                <input id="OUVERT_ENFANT_NON" name="OUVERT_ENFANT" type="radio" value="0" onclick="ouvertEnfants();">
+                <label for="OUVERT_ENFANT">Non</label>
+            </div>
+        </div>
+
+        <div class="ENFANT_FORM">
+            <div class="form-group" id="COUT_ENFANT_SELECT">
+
+                <label class="col-md-2 control-label" for="textinput">Coût Enfant <span class="important">*</span>
+                    :</label>
+                <div class="col-md-4">
+                    <input id="COUT_ENFANT" name="COUT_ENFANT" placeholder="COUT_ENFANT"
+                           class="form-control input-md" type="number"
+                           value="<?= (isset($activite->COUT_ENFANT) ? $activite->COUT_ENFANT : '') ?>">
+                </div>
+
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label" for="textinput">Age minimium <span class="important">*</span>
+                    :</label>
+                <div class="col-md-4">
+                    <input id="AGE_MINIMUM" name="AGE_MINIMUM" placeholder="AGE_MINIMUM"
+                           class="form-control input-md" type="number"
+                           value="<?= (isset($activite->AGE_MINIMUM) ? $activite->AGE_MINIMUM : '') ?>">
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="textinput">Ouvert aux personnes extérieures <span
+                        class="important">*</span> :</label>
+            <div class="col-md-4">
+                <select name="OUVERT_EXT" value="0">
+                    <option value="1">Oui</option>
+                    <option value="0">Non</option>
+
+                </select>
+            </div>
+        </div>
 
         <!-- Button -->
         <div class="form-group">
             <label class="col-md-2 control-label" for="singlebutton"></label>
             <div class="col-md-4">
-                <button id="singlebutton" name="singlebutton" class="btn btn-info" type="submit">Créer</button>
+                <button id="singlebutton" name="singlebutton" class="btn btn-info">Créer</button>
             </div>
         </div>
-
-
-
     </fieldset>
 </form>
-
-
-<div id="getText" style="display: none;">
-    INNER TEXT
-</div>
-
-<script>
-
-
-    function createDiv() {
-        let formContainer = document.getElementById("getText");
-        let div = document.createElement('div');
-        div.innerHTML = document.getElementById('getText').innerHTML;
-        formContainer.insertAdjacentHTML('beforeend', div.innerHTML);
-    }
-
-    function calculMontantLive(){
-        let auto_participation = document.getElementById('AUTO_PARTICIPATION');
-        let extSelectInput = document.getElementsByClassName("participantext");
-        let familleSelectInput = document.getElementsByClassName("participantfamille");
-
-        let montant = 0;
-
-        <?php if(isset($inscription->MONTANT)){?>
-        montant = <?= $inscription->MONTANT ?>
-        <?php }  ?>
-
-        if(auto_participation.value == 1){
-            if(auto_participation[auto_participation.selectedIndex].id == 'ap'){
-
-            }else{
-                montant += prix_adulte;
-            }
-
-        }
-        for(var i = 0; i < extSelectInput.length; i++){
-            if(extSelectInput[i].value == 'none'){
-
-            }else{
-                if(extSelectInput[i][extSelectInput[i].selectedIndex].id == 'enfant'){
-                    montant += prix_enfant_ext;
-                }else{
-                    montant += prix_adulte_ext;
-                }
-            }
-
-        }
-        for(var i = 0; i < familleSelectInput.length; i++){
-            if(familleSelectInput[i].value == 'none'){
-
-            }else{
-                if(familleSelectInput[i][familleSelectInput[i].selectedIndex].id == 'enfant'){
-                    montant += prix_enfant;
-                }else {
-                    montant += prix_adulte;
-                }
-            }
-        }
-
-        let divAffichageMontant = document.getElementById('live_montant');
-        divAffichageMontant.innerHTML = 'Montant : ' + montant + " €";
-
-    }
-
-
-</script>

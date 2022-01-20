@@ -3,6 +3,8 @@
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\mailConfig;
+require("../core/phpmailer/mailConfig.php");
 
 class ActiviteAdminController extends Controller {
 
@@ -230,7 +232,8 @@ class ActiviteAdminController extends Controller {
     public function mailc($idactivite, $mess){
 
         //config mail
-        $mail = $this->mailconfig();
+        $configMail = new mailConfig();
+        $mail = $configMail->config();
 
         //récupération du mail du leader
         $this->mailLeader($idactivite, $mail);
@@ -262,44 +265,6 @@ class ActiviteAdminController extends Controller {
             $mail->addAddress($dest->mail);
         }
         return $result;
-    }
-
-    public function mailconfig(){
-
-        $mail = new PHPMailer(true);
-
-        try {
-            //debug
-            //$mail->SMTPDebug = SMTP::DEBUG_SERVER;
-
-            //configure smtp
-            $mail->isSMTP();
-            //envoi de mail par gmail
-            //            $mail->Host = "smtp.gmail.com";
-            //            $mail->SMTPAuth="true";
-            //            $mail->SMTPSecure = "tls";
-            //            $mail->Port = 587;
-            //            $mail->Username = "remimorettimail@gmail.com";
-            //            $mail->Password = "Gmailctrobi1*";
-
-            //config mailhog
-            $mail->Host = "localhost";
-            $mail->Port = 1025;
-            //CharSet
-            $mail->CharSet = "utf-8";
-
-            //destinataires
-            $mail->addAddress("none@none.none");
-
-            //Expediteur
-            $mail->setFrom("updates@alstomgroup.com");
-
-            return $mail;
-
-        } catch (Exception $e) {
-            echo "message non envoyé. Erreur : {$mail->ErrorInfo}";
-        }
-
     }
 
     public function nomActivite($idactivite){

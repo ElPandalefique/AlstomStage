@@ -3,9 +3,12 @@
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\mailConfig;
+require("../core/phpmailer/mailConfig.php");
 
 class ActiviteController extends Controller
 {
+
 
     //Liste d'attente non fonctionnelle
     /* 
@@ -434,16 +437,16 @@ class ActiviteController extends Controller
         if (isset($_POST['famille'])) $nombreinscription += count($_POST['famille']);
         if (isset($_POST['ext'])) $nombreinscription += count($_POST['ext']);
         if ($_POST['AUTO_PARTICIPATION'] == 1) $nombreinscription++;
-        //        echo 'nombreinscription';
-        //        var_dump($nombreinscription);
-        //        echo'places';
-        //        var_dump($effectifc->places);
-        //        echo'inscrits';
-        //        var_dump($effectifc->inscrits);$donnees = array();
-        //        echo'places attente';
-        //        var_dump(($effectifca->places*3));
-        //        echo'inscrits attente';
-        //        var_dump(($effectifca->inscrits));
+                echo 'nombreinscription';
+                var_dump($nombreinscription);
+                echo'places';
+                var_dump($effectifc->places);
+                echo'inscrits';
+                var_dump($effectifc->inscrits);$donnees = array();
+                echo'places attente';
+                var_dump(($effectifca->places*3));
+                echo'inscrits attente';
+                var_dump(($effectifca->inscrits));
         $donnees['ID_ACTIVITE'] = $id;
         $donnees['ID_ADHERENT'] = $_SESSION['ID_ADHERENT'];
         if ($_POST['AUTO_PARTICIPATION'] == 1) {
@@ -575,8 +578,8 @@ class ActiviteController extends Controller
                 //                var_dump($d);
 
                 $this->set($d);
-                $this->mesActivites($id);
-                //$this->render('mesActivites');
+//                $this->mesActivites($id);
+//                $this->render('mesActivites');
             }
         }
     }
@@ -688,53 +691,13 @@ class ActiviteController extends Controller
 
     }
 
-    public function mailconfig(){
-
-        $mail = new PHPMailer(true);
-
-        try {
-            //configuration
-        //            $mail->SMTPDebug = SMTP::DEBUG_SERVER;
-
-            //configure smtp
-            $mail->isSMTP();
-//                    $mail->Host = "smtp.gmail.com";
-//                    $mail->SMTPAuth="true";
-//                    $mail->SMTPSecure = "tls";
-//                    $mail->Port = 587;
-//                    $mail->Username = "remimorettimail@gmail.com";
-//                    $mail->Password = "Gmailctrobi1*";
-
-            //config mailhog
-            $mail->Host = "localhost";
-            $mail->Port = 1025;
-            //CharSet
-            $mail->CharSet = "utf-8";
-
-            //destinataires
-            //            $mail->addAddress("test@pcyp3525.odns.fr");
-            $mail->addAddress("none@none.none");
-            //Expediteur
-            $mail->setFrom("updates@alstomgroup.com");
-
-            //contenu
-            //            $mail->Subject = "Leader sur la liste principale";
-            //            $mail->Body = "Refresh de la page de la liste leader";
-            
-            //envoi du mail
-            //            $mail->send();
-            
-            //vérif envoi
-            //            echo "mail envoyé";
-            return $mail;
-
-        } catch (Exception $e) {
-            echo "message non envoyé. Erreur : {$mail->ErrorInfo}";
-        }
-
-    }
 
     public function mailAdherent($idinscrit, $mess, $activite){
+
+//        $mail = new mailConfig();
+        $configMail = new mailConfig();
+        $mail = $configMail->config();
+
         $modInscription = $this->loadModel('Adherent');
         $projection['projection'] = 'ADHERENT.mail';
         $projection['conditions'] = "ADHERENT.ID_adherent = {$idinscrit}";
@@ -757,7 +720,6 @@ class ActiviteController extends Controller
             $nomactivite=$nom;
         }
 
-        $mail=$this->mailconfig();
         foreach($result as $dest){
             $mail->addAddress($dest->mail);
         }
@@ -781,6 +743,7 @@ class ActiviteController extends Controller
 
 
 }
-
+//amicadreslrh@gmail.com
+//Amicadres2020
 ?>
 
