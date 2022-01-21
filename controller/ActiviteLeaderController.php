@@ -260,8 +260,8 @@ class ActiviteLeaderController extends Controller
         if (!($nombreinscription > $effectifc->places - $effectifc->inscrits)) {
             $donnees['ATTENTE'] = 0;
             $tab = array('conditions' => array('ID' => $_POST['id']), 'donnees' => $donnees);
-            var_dump($resultA->ID);
-            var_dump($id);
+            //var_dump($resultA->ID);
+            //var_dump($id);
             $this->mailSolo($resultA->ID, "principale", $id);
             $modInscription->update($tab);
             $d['info'] = "Passage en liste principale effectué";
@@ -733,7 +733,7 @@ class ActiviteLeaderController extends Controller
         $projection['projection'] = "ACTIVITE.nom";
         $projection['conditions'] = "ACTIVITE.ID_ACTIVITE = {$idactivite}";
         $result = $modActivite->findfirst($projection);
-        var_dump($result);
+        //var_dump($result);
         foreach ($result as $nom){
             $nomactivite = $nom;
         }

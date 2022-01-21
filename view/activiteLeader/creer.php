@@ -118,13 +118,13 @@
 
 
         <!-- Si l'on séléctionne le mode Unitaire (par défaut) : required="required" -->
-        <div id="getText" name = "prestation_principale">
+        <div id="prestation_principale" name = "prestation_principale">
 
-            <div class="form-group" id="COUT_ADULTE_SELECT">
+            <div class="form-group" id="libelle">
                 <label class="col-md-2 control-label" for="textinput">Prestation<span class="important">*</span> :</label>
 
                 <div class="col-md-4">
-                    <input id="Prestation" name="Prestation" placeholder="Intitulé de la prestation" class="form-control input-md"
+                    <input id="Prestation" name="Prestation" placeholder="Intitulé de la prestation" class="prestation"
                            type="text" value="<?= (isset($activite->prestation) ? $activite->prestation : '') ?>">
                 </div>
 
@@ -177,7 +177,7 @@
         </div>
 
 
-        <input type="button" onClick="createDiv()" value="Ajout prestation principale">
+        <input type="button" onClick="addPrestationInput()" value="Ajout prestation principale">
 
         <!-- Button -->
         <div class="form-group">
@@ -199,6 +199,15 @@
 
 <script>
 
+function addPrestationInput() {
+        // type sera égal à "famille" où à "ext"
+        let formContainer = document.getElementById("prestation_principale");
+        //let formContainer = document.getElementById("prestation_principale");
+        //let baseSelectInput = document.getElementsByClassName("prestation")
+        //let base = baseSelectInput[0];
+        formContainer.insertAdjacentHTML('beforeend', formContainer.outerHTML);
+
+    }
 
     function createDiv() {
         let formContainer = document.getElementById("getText");

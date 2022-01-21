@@ -437,16 +437,16 @@ class ActiviteController extends Controller
         if (isset($_POST['famille'])) $nombreinscription += count($_POST['famille']);
         if (isset($_POST['ext'])) $nombreinscription += count($_POST['ext']);
         if ($_POST['AUTO_PARTICIPATION'] == 1) $nombreinscription++;
-                echo 'nombreinscription';
-                var_dump($nombreinscription);
-                echo'places';
-                var_dump($effectifc->places);
-                echo'inscrits';
-                var_dump($effectifc->inscrits);$donnees = array();
-                echo'places attente';
-                var_dump(($effectifca->places*3));
-                echo'inscrits attente';
-                var_dump(($effectifca->inscrits));
+                //echo 'nombreinscription';
+                //var_dump($nombreinscription);
+                //echo'places';
+                //var_dump($effectifc->places);
+                //echo'inscrits';
+                //var_dump($effectifc->inscrits);$donnees = array();
+                //echo'places attente';
+                //var_dump(($effectifca->places*3));
+                //echo'inscrits attente';
+                //var_dump(($effectifca->inscrits));
         $donnees['ID_ACTIVITE'] = $id;
         $donnees['ID_ADHERENT'] = $_SESSION['ID_ADHERENT'];
         if ($_POST['AUTO_PARTICIPATION'] == 1) {
@@ -523,8 +523,8 @@ class ActiviteController extends Controller
             } elseif (isset($_POST['ext']) && $this->has_dupes($_POST['ext']) == true) {
                 $d['info'] = "Une erreur est survenue : vous ne pouvez pas incrire la même personne plusieurs fois !";
             } else {
-                var_dump($colonnes);
-                var_dump($donnees);
+                //var_dump($colonnes);
+                //var_dump($donnees);
                 $projection['conditions'] = "ID_ADHERENT = " . $_SESSION['ID_ADHERENT'];
 
                 $IDInscription = $modInscription->insertAI($colonnes, $donnees);
@@ -578,8 +578,8 @@ class ActiviteController extends Controller
                 //                var_dump($d);
 
                 $this->set($d);
-//                $this->mesActivites($id);
-//                $this->render('mesActivites');
+                $this->mesActivites($id);
+                $this->render('mesActivites');
             }
         }
     }
@@ -706,16 +706,16 @@ class ActiviteController extends Controller
         $projection['projection'] = "ACTIVITE.nom";
         $projection['conditions'] = "ACTIVITE.ID_ACTIVITE = {$activite}";
         $resulta = $modActivite->findfirst($projection);
-        echo "activite";
-        var_dump($activite);
-        echo "result";
-        var_dump($result);
-        echo "resulta";
-        var_dump($resulta);
-        echo "mess";
-        var_dump($mess);
-        echo "idinscrit";
-        var_dump($idinscrit);
+        //echo "activite";
+        //var_dump($activite);
+        //echo "result";
+        //var_dump($result);
+        //echo "resulta";
+        //var_dump($resulta);
+        //echo "mess";
+        //var_dump($mess);
+        //echo "idinscrit";
+        //var_dump($idinscrit);
         foreach($resulta as $nom){
             $nomactivite=$nom;
         }
