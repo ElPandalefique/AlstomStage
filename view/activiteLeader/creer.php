@@ -118,66 +118,76 @@
 
 
         <!-- Si l'on séléctionne le mode Unitaire (par défaut) : required="required" -->
-        <div id="prestation_principale" name = "prestation_principale">
+        <div id="prestation_principale"  name = "prestation_principale" class = "prestation_principale">
+            <br>Prestation principale n°1
+            <div class = "prestation">
 
-            <div class="form-group" id="libelle">
-                <label class="col-md-2 control-label" for="textinput">Prestation<span class="important">*</span> :</label>
+                <?php //if(isset($prestation)){
+                //ajouter des séparations
+                //ajouter bouton pour supprimer
+                ?>
 
-                <div class="col-md-4">
-                    <input id="Prestation" name="Prestation" placeholder="Intitulé de la prestation" class="prestation"
-                           type="text" value="<?= (isset($activite->prestation) ? $activite->prestation : '') ?>">
+                <div class="form-group">
+                    <label class="col-md-2 control-label" for="textinput">Prestation<span class="important">*</span> :</label>
+
+                    <div class="col-md-4">
+                        <input id="Libelle" title ="Entrez le nom de la prestation" name="Libelle" placeholder="Intitulé de la prestation" class="libelle"
+                               type="textinput" value="<?= (isset($activite->prestation) ? $activite->prestation : '') ?>"required>
+                    </div>
+
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label" for="textinput">Coût<span class="important">*</span> :</label>
+
+                    <div class="col-md-4">
+                        <input id="COUT" name="COUT" title="Entrez le coût de la prestation" placeholder="Coût" class="form-control input-md"
+                               type="number" value="<?= (isset($activite->COUT) ? $activite->COUT : '') ?>"required>
+                    </div>
+
                 </div>
 
+                <div class="form-group">
+                    <label class="col-md-2 control-label" for="textinput">Âge minimum :</label>
+
+                    <div class="col-md-4">
+                        <input id="AGE_MIN" name="AGE_MIN" title="Entrez l'âge minimum requis pour participer à la prestation" placeholder="Âge minimum" class="form-control input-md"
+                               type="number" value="<?= (isset($activite->AGE_MIN) ? $activite->AGE_MIN : '') ?>">
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label class="col-md-2 control-label" for="textinput">Âge maximum :</label>
+                    <div class="col-md-4">
+                        <input id="AGE_MAX" name="AGE_MAX" title="Entrez l'âge maximum requis pour participer à la prestation" placeholder="Âge maximum" class="form-control input-md"
+                               type="number" value="<?= (isset($activite->AGE_MAX) ? $activite->AGE_MAX : '') ?>">
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label class="col-md-2 control-label" for="textinput">adhérent / externe <span class="important">*</span>
+                        :</label>
+                    <div class="col-md-1">
+                        <input id="OUVERT_EXTERNE_OUI" name="OUVERT_EXTERNE" title="Si la prestation n'est ouverte qu'aux adhérents d'Alstom et leur famille" type="radio" value="0" checked onclick="ouvertEnfants();">
+                        <label for="OUVERT_EXTERNE">adhérent (+famille)</label>
+                    </div>
+
+                    <div class="col-md-1">
+                        <input id="OUVERT_EXTERNE_NON" name="OUVERT_EXTERNE" title="Si la prestation est ouverte aux personnes externes à Alstom" type="radio" value="1" onclick="ouvertEnfants();">
+                        <label for="OUVERT_EXTERNE">externe</label>
+                    </div>
+                </div>
+                <?php //} ?>
             </div>
-            <div class="form-group">
-                <label class="col-md-2 control-label" for="textinput">Coût<span class="important">*</span> :</label>
-
-                <div class="col-md-4">
-                    <input id="COUT" name="COUT" placeholder="Coût" class="form-control input-md"
-                           type="number" value="<?= (isset($activite->COUT) ? $activite->COUT : '') ?>">
-                </div>
-
-            </div>
-
-            <div class="form-group">
-                <label class="col-md-2 control-label" for="textinput">Âge minimum :</label>
-
-                <div class="col-md-4">
-                    <input id="AGE_MIN" name="AGE_MIN" placeholder="Âge minimum" class="form-control input-md"
-                           type="number" value="<?= (isset($activite->AGE_MIN) ? $activite->AGE_MIN : '') ?>">
-                </div>
-
-            </div>
-
-            <div class="form-group">
-
-                <label class="col-md-2 control-label" for="textinput">Âge maximum :</label>
-                <div class="col-md-4">
-                    <input id="AGE_MAX" name="AGE_MAX" placeholder="Âge maximum" class="form-control input-md"
-                           type="number" value="<?= (isset($activite->AGE_MAX) ? $activite->AGE_MAX : '') ?>">
-                </div>
-
-            </div>
-
-            <div class="form-group">
-
-                <label class="col-md-2 control-label" for="textinput">adhérent / externe <span class="important">*</span>
-                    :</label>
-                <div class="col-md-1">
-                    <input id="OUVERT_ENFANT_OUI" name="OUVERT_EXTERNE" type="radio" value="0" checked onclick="ouvertEnfants();">
-                    <label for="OUVERT_ENFANT">adhérent (+famille)</label>
-                </div>
-
-                <div class="col-md-1">
-                    <input id="OUVERT_ENFANT_NON" name="OUVERT_EXTERNE" type="radio" value="1" onclick="ouvertEnfants();">
-                    <label for="OUVERT_ENFANT">externe</label>
-                </div>
-            </div>
-
         </div>
 
 
         <input type="button" onClick="addPrestationInput()" value="Ajout prestation principale">
+        <input type="button" onClick="removePrestationInput()" value="Suppression prestation principale">
+
 
         <!-- Button -->
         <div class="form-group">
@@ -192,21 +202,56 @@
     </fieldset>
 </form>
 
-
-<div id="getText" style="display: none;">
-    INNER TEXT
-</div>
+<p>Clicks: <a id="clicks">0</a></p>
 
 <script>
 
-function addPrestationInput() {
-        // type sera égal à "famille" où à "ext"
-        let formContainer = document.getElementById("prestation_principale");
-        //let formContainer = document.getElementById("prestation_principale");
-        //let baseSelectInput = document.getElementsByClassName("prestation")
-        //let base = baseSelectInput[0];
-        formContainer.insertAdjacentHTML('beforeend', formContainer.outerHTML);
+    //Une solution pour ce qui est de la transmission des données et du maintient des boutons radios serait de séparer en trois partie le formulaire,
+    //coupant sur le radio qui aura un id défini dans le JS grace au "clicks" qui change a chaque ajout de formulaire
 
+    //Voir https://openclassrooms.com/forum/sujet/cloner-des-elements-en-js-et-les-differencier
+    //Simplification de l'idée précédente, besoin cependant de comprendre clairement comment ça marche
+    // (pas sûr de comprendre la récupération ni la tronche des données exportées)
+
+    //Pour la récupération des données pour la partie admin/validation il faudra voir pour récupérer les données avec un foreach
+    //à voir quoi mettre comme initiation et comment les données seront stockées -->
+
+    //remodelage de la bdd à faire
+    //voir pour mettre les prestations dans une autre table, reliée à activite par l'id
+    //prestation_id prenant comme valeur "clicks" et non unique
+    // parce que la recherche de prestations associées à une activité passera par une requete où les 2 id seront demandés
+
+    var clicks = 2;
+
+    function onClick(s) {
+        if(s == "+") {
+            clicks += 1;
+        }
+        else{
+            clicks -= 1;
+        }
+        document.getElementById("clicks").innerHTML = clicks;
+    }
+
+    function addPrestationInput() {
+        let formContainer = document.getElementById("prestation_principale");
+        let baseSelectInput = document.getElementsByClassName("prestation")
+        let base = "<div class='prestationajoutee'><br>Prestation principale n°"+clicks;
+        base += baseSelectInput[0].innerHTML + '</div>';
+        clicks +=1;
+        document.getElementById("clicks").innerHTML = clicks;
+        formContainer.insertAdjacentHTML('beforeend', base);
+
+    }
+
+    function removePrestationInput(){
+        let baseSelectInput = document.getElementsByClassName("prestationajoutee")
+        if(baseSelectInput.length >= 1){
+            let latestInput = baseSelectInput[baseSelectInput.length-1];
+            latestInput.remove();
+            clicks-=1;
+            document.getElementById("clicks").innerHTML = clicks;
+        }
     }
 
     function createDiv() {
@@ -263,6 +308,5 @@ function addPrestationInput() {
         divAffichageMontant.innerHTML = 'Montant : ' + montant + " €";
 
     }
-
 
 </script>
