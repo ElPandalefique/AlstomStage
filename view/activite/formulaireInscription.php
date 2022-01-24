@@ -117,8 +117,10 @@
 //                    var_dump($creneaux);
 //                    echo "prix adulte";
 //                    var_dump( $donnees->PRIX_ADULTE);
-//                    echo "invites famille";
-//                    var_dump($invitesfamille);
+                    echo "invites famille";
+                    var_dump($invitesfamille);
+                    echo "invites externe";
+                    var_dump($invitesext);
 //                    echo "id activité";
 //                    var_dump($donnees->ID_ACTIVITE);?>
                     <button id="singlebutton" name="singlebutton" class="btn btn-info">S'inscrire</button>

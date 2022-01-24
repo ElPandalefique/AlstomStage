@@ -22,7 +22,7 @@ class ActiviteLeaderController extends Controller
     }
 
     //méthode créer
-    function nouveau($id)
+    function backupnouveau($id)
     {
         $modActivite = $this->loadModel('ActiviteLeader');
         //recup les données du formulaire
@@ -71,6 +71,96 @@ class ActiviteLeaderController extends Controller
         $ID_ACTIVITE = $modActivite->insertAI($colonnes, $donnees);
         if (is_numeric($ID_ACTIVITE)) {
             $d['info'] = "La création de l'activité " . $donnees["NOM"] . " a été effectuée";
+            // $d['activite'] = $modActivite->findFirst(array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE)));
+            //$modActivite = $this->loadModel('ActiviteLeader');
+            //$modCreneau = $this->loadModel('ActiviteCreneauAdmin');
+            //$d['activite'] = $modActivite->find(array('conditions' => 1));
+            // $d['creneau'] = $modCreneau->find(array('conditions' => 1));
+        } else {
+            $d['info'] = "Problème pour créer l'activité";
+        }
+        //dans tous les cas
+        //charger le tableau
+        $this->set($d);
+        $this->formulaireCreneau($ID_ACTIVITE);
+        $this->mail($ID_ACTIVITE, "creer");
+    }
+
+    function nouveau($id)
+    {
+        $modActivite = $this->loadModel('ActiviteLeader');
+        //recup les données du formulaire
+        $donnees = array();
+        $donnees["TARIF_FORFAIT"] = 0;
+        $donnees["ID_DOMAINE"] = 1;
+        $donnees["ID_LEADER"] = $_SESSION['ID_ADHERENT'];
+        $donnees["ID_PRESTATAIRE"] = $_POST["ID_PRESTATAIRE"];
+        $donnees["NOM"] = $_POST["NOM"];
+        $donnees["DETAIL"] = $_POST["DETAIL"];
+        $donnees["DATE_CREATION"] = date("Y-m-d");
+        $donnees["ADRESSE"] = $_POST["ADRESSE"];
+        $donnees["VILLE"] = $_POST["VILLE"];
+        $donnees["CP"] = $_POST["CP"];
+        $donnees["INDICATION_PARTICIPANT"] = $_POST["INDICATION_PARTICIPANT"];
+        $donnees["INFO_IMPORTANT_PARTICIPANT"] = $_POST["INFO_IMPORTANT_PARTICIPANT"];
+        $donnees["FORFAIT"] = $_POST["TYPE_FORFAIT"];
+
+        //récupération des données des prestations apres la méthode d'insertion car on les inserera un par un avec des foreach et il faut bien s'assurer que l'insertion est valide
+
+        $colonnes = array('TARIF_FORFAIT', 'ID_DOMAINE', 'ID_LEADER', 'ID_PRESTATAIRE', 'NOM', 'DETAIL', 'DATE_CREATION', 'ADRESSE', 'VILLE', 'CP', 'INDICATION_PARTICIPANT', 'INFO_IMPORTANT_PARTICIPANT', 'FORFAIT');
+        //appeler la méthode insertAI
+//        var_dump($colonnes);
+//        var_dump($donnees);
+
+        $ID_ACTIVITE = $modActivite->insertAI($colonnes, $donnees);
+        if (is_numeric($ID_ACTIVITE)) {
+            $d['info'] = "La création de l'activité " . $donnees["NOM"] . " a été effectuée";
+
+            //préparation de l'insertion dans la table prestation de la base de données
+            $modPresta = $this->loadModel('Prestation');
+            $colonnesPresta=array('ID_ACTIVITE', 'ID_PRESTATION', 'COUT', 'AGEMIN', 'AGEMAX', 'LIBELLE', 'OUVERT_EXT');
+
+            //compte du nombre de prestation
+            $count =0;
+
+            //limites d'age
+            $limmin = 0;
+            $limmax = 99;
+
+            //opération pour chaque créneau en se servant du libelle, étant obligatoire
+            foreach ($_POST['Libelle'] as $libelle){
+                //récupération de chaque valeur dans des variables pour facilité la compréhension
+                $post = "OUVERT_EXTERNE".$count;
+                $cout = $_POST['COUT'][$count];
+                $agemin = $_POST['AGE_MIN'][$count];
+                $agemax = $_POST['AGE_MAX'][$count];
+                $ouvertext = $_POST["$post"];
+
+
+                //ajout des données dans pour l'insertion
+                $donneesPresta['ID_ACTIVITE']=$ID_ACTIVITE;
+                $donneesPresta['ID_PRESTATION'] = $count+1;
+                $donneesPresta['COUT'] = $cout;
+                $donneesPresta['AGE_MIN'] = $agemin;
+                $donneesPresta['AGE_MAX'] = $agemax;
+                $donneesPresta['LIBELLE'] = $libelle;
+                $donneesPresta['OUVERT_EXT'] = $ouvertext;
+
+                //insertion dans la base de données
+                $modPresta->insert($colonnesPresta, $donneesPresta);
+
+                //ajout d'une valeur du count pour selectionner la prestation suivante de l'activité
+                $count+=1;
+
+            }
+
+
+
+
+            //début d'insertion des différentes prestations
+
+
+
             // $d['activite'] = $modActivite->findFirst(array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE)));
             //$modActivite = $this->loadModel('ActiviteLeader');
             //$modCreneau = $this->loadModel('ActiviteCreneauAdmin');
@@ -291,16 +381,10 @@ class ActiviteLeaderController extends Controller
         //$donnees["STATUT"] = $_POST["STATUT"];
         $donnees["ID_PRESTATAIRE"] = $_POST["ID_PRESTATAIRE"];
         $donnees["FORFAIT"] = $_POST["TYPE_FORFAIT"];
-        $donnees["COUT_ADULTE"] = $_POST["COUT_ADULTE"];
 
         $donnees["TARIF_FORFAIT"] = $_POST["TARIF_FORFAIT"];
-        $donnees["COUT_ENFANT"] = $_POST["COUT_ENFANT"];
 
-        if($_POST["OUVERT_ENFANT"] == 1){
-            $donnees["AGE_MINIMUM"] = $_POST["AGE_MINIMUM"];
-        }else{
-            $donnees["AGE_MINIMUM"] = 18;
-        }
+
 
         $donnees["OUVERT_EXT"] = $_POST["OUVERT_EXT"];
 
@@ -364,6 +448,7 @@ class ActiviteLeaderController extends Controller
     {
         $modActivite = $this->loadModel('ActiviteAdmin');
         $modCreneau = $this->loadModel('ActiviteCreneauAdmin');
+        $modPresta = $this->loadModel('Prestation');
         if (strpos($id, '_') !== FALSE) {
             $ids = explode("_", $id);
             // NUM_ACTIVITE : $ids[1]
@@ -373,6 +458,7 @@ class ActiviteLeaderController extends Controller
         } else {
             $ID_ACTIVITE = $id;
         }
+        $d['prestations'] = $modPresta->find(array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE)));
         $d['activite'] = $modActivite->findFirst(array('conditions' => array('ACTIVITE.ID_ACTIVITE' => $ID_ACTIVITE)));
         $d['creneauG'] = $modCreneau->find(array('conditions' => array('CRENEAU.ID_ACTIVITE' => $ID_ACTIVITE)));
         $this->set($d);
