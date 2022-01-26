@@ -29,6 +29,24 @@
             ?>
         </ul>
     </div>
+    <div class='form-group'>
+        <label class = "col-md-2 control-label" for="textinput">Prestations :</label>
+        <ul class="col-md-10">
+            <?php foreach($prestations as $prestation) {
+                if($prestation->OUVERT_EXT==1){
+                    $ouvertext = "ouvert aux personnes externes";
+                }
+                else{
+                    $ouvertext = "non ouvert aux personnes externes";
+                };
+                echo "
+<li>Prestation intitulée $prestation->LIBELLE, ayant pour coût $prestation->COUT, et comme limites d'age $prestation->AGEMIN et $prestation->AGEMAX ans, $ouvertext</li>
+    ";
+            }
+            //VOIR LEADER DETAIL A MODIFIER UTILISER LE MEME PRINCIPE EN REPRENANT LA FORME DU FORMULAIRE
+            ?>
+        </ul>
+    </div>
     <hr>
 
     <div class = "form-group">

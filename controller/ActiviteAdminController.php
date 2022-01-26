@@ -23,6 +23,7 @@ class ActiviteAdminController extends Controller {
         $ID_ACTIVITE = $id;
         $modActivite = $this->loadModel('ActiviteAdmin');
         $d['activite'] = $modActivite->findFirst(array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE)));
+
         // requete 2 pour récupérer le nom
         $modNomLeader = $this->loadModel('NomLeader');
         $projection ['projection'] = "ADHERENT.NOM as NOMLEADER, ADHERENT.PRENOM as PRENOMLEADER";
@@ -30,16 +31,21 @@ class ActiviteAdminController extends Controller {
         // $d['nomleader'] = $modNomLeader->findfirst($projection);
         $d['leader'] = $modNomLeader->findfirst($projection);
 
-        // prestataires
+        //prestations
+        $modPresta = $this->loadModel('Prestation');
+        $projection['projection'] = "COUT, AGEMIN, AGEMAX, LIBELLE, OUVERT_EXT";
+        $d['prestations'] = $modPresta->find($projection);
 
+        // prestataires
         $modPrestataire = $this->loadModel('Prestataire');
         $projection = "ID,NOM";
         $params = array('projection' => $projection);
         $d['prestataires'] = $modPrestataire->find($params);
+
         $this->set($d);
     }
 
-    function modifier($id) {
+    function modifierbackup($id) {
         $ID_ACTIVITE = $id;
         $modActivite = $this->loadModel('ActiviteAdmin');
         //recup les données du form
@@ -102,6 +108,81 @@ class ActiviteAdminController extends Controller {
         $this->mailc($ID_ACTIVITE, "modifier");
     }
 
+    function modifier($id) {
+        $ID_ACTIVITE = $id;
+        $modActivite = $this->loadModel('ActiviteAdmin');
+        //recup les données du form
+        $donnees = array();
+        $donnees["ID_DOMAINE"] = 1;
+        $donnees["NOM"] = $_POST["NOM"];
+        $donnees["DETAIL"] = $_POST["DETAIL"];
+
+
+
+        $donnees["ADRESSE"] = $_POST["ADRESSE"];
+        $donnees["CP"] = $_POST["CP"];
+        $donnees["VILLE"] = $_POST["VILLE"];
+        $donnees["INDICATION_PARTICIPANT"] = $_POST["INDICATION_PARTICIPANT"];
+        $donnees["INFO_IMPORTANT_PARTICIPANT"] = $_POST["INFO_IMPORTANT_PARTICIPANT"];
+        $donnees["STATUT"] = $_POST["STATUT"];
+        $donnees["ID_PRESTATAIRE"] = $_POST["ID_PRESTATAIRE"];
+        $donnees["FORFAIT"] = $_POST["TYPE_FORFAIT"];
+
+        //préparation de la récup des prestations
+        $modPresta = $this->loadModel('Prestation');
+        $colonnesPresta=array('ID_ACTIVITE', 'ID_PRESTATION', 'COUT', 'AGEMIN', 'AGEMAX', 'LIBELLE', 'OUVERT_EXT', 'PRIX');
+        $count=0;
+        $modPresta->delete(array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE)));
+
+        foreach ($_POST['Libelle'] as $libelle){
+            //récupération de chaque valeur dans des variables pour facilité la compréhension
+            $post = "OUVERT_EXTERNE".($count+1);
+            $cout = $_POST['COUT'][$count];
+            $agemin = $_POST['AGE_MIN'][$count];
+            $agemax = $_POST['AGE_MAX'][$count];
+            $ouvertext = $_POST["$post"];
+            $prix = $_POST['PRIX'][$count];
+
+
+            //ajout des données dans pour l'insertion
+            $donneesPresta['ID_ACTIVITE']=$ID_ACTIVITE;
+            $donneesPresta['ID_PRESTATION'] = $count+1;
+            $donneesPresta['COUT'] = $cout;
+            $donneesPresta['AGE_MIN'] = $agemin;
+            $donneesPresta['AGE_MAX'] = $agemax;
+            $donneesPresta['LIBELLE'] = $libelle;
+            $donneesPresta['OUVERT_EXT'] = $ouvertext;
+            $donneesPresta['PRIX'] = $prix;
+
+            /*if(isset($_POST["PRIX"])) {
+                $donnees["PRIX"] = $_POST["PRIX"];
+                var_dump($_POST["PRIX"]);
+            }
+            else{
+                $donnees["PRIX"] = $_POST["COUT"];
+            }*/
+
+            //insertion dans la base de données
+            $modPresta->insert($colonnesPresta, $donneesPresta);
+
+            //ajout d'une valeur du count pour selectionner la prestation suivante de l'activité
+            $count+=1;
+
+        }
+
+
+
+        $tab = array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE), 'donnees' => $donnees);
+//appeler la methode update
+        $modActivite->update($tab);
+        $d['info'] = "Activité modifié";
+//charger le tableau
+        $this->liste();
+        $this->render('liste');
+
+        $this->mailc($ID_ACTIVITE, "modifier");
+    }
+
     function archivage($id) {
 
         $modActivite = $this->loadModel('ActiviteAdmin');
@@ -127,6 +208,7 @@ class ActiviteAdminController extends Controller {
     function formulaireCreneau($id) {
         $modActivite = $this->loadModel('ActiviteAdmin');
         $modCreneau = $this->loadModel('ActiviteCreneauAdmin');
+        $modPresta = $this->loadModel('Prestation');
         if (strpos($id, '_') !== FALSE) {
             $ids = explode("_", $id);
             // NUM_ACTIVITE : $ids[1]
@@ -136,6 +218,7 @@ class ActiviteAdminController extends Controller {
         } else {
             $ID_ACTIVITE = $id;
         }
+        $d['prestations'] = $modPresta->find(array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE)));
         $d['activite'] = $modActivite->findFirst(array('conditions' => array('ACTIVITE.ID_ACTIVITE' => $ID_ACTIVITE)));
         $d['creneauG'] = $modCreneau->find(array('conditions' => array('CRENEAU.ID_ACTIVITE' => $ID_ACTIVITE)));
         $this->set($d);

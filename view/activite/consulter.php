@@ -54,8 +54,54 @@
                 <td class="pl-3"><?= (isset($donnees->INFO_IMPORTANT_PARTICIPANT) ? $donnees->INFO_IMPORTANT_PARTICIPANT : '') ?></td>
             </tr>
 
+        </table>
+<br>
+
+        <h4><strong>Liste des prestations</strong></h4>
+        <table class="table table-bordered table-condensed table-striped">
+            <td>Nom de la prestation</td>
+            <td>Prix de la prestation</td>
+            <td>Age minimum requis</td>
+            <td>Age maximum</td>
+            <td>Ouvert aux personnes externes</td>
+
+            <?php
+            foreach($prestations as $prestation){
+                if($prestation->OUVERT_EXT==1){
+                    $ouvertext = "Oui";
+                }
+                else{
+                    $ouvertext = "Non";
+                };
+                echo "<tr>
+<td>$prestation->LIBELLE</td>
+<td>$prestation->PRIX €</td>
+<td>";
+                if($prestation->AGEMIN==0){
+                echo"aucun";
+                }
+                else{
+                    echo "$prestation->AGEMIN ans";
+                }
+
+                    echo"</td>
+<td>";
+                if($prestation->AGEMAX==99){
+                    echo"aucun";
+                }
+                else{
+                    echo "$prestation->AGEMAX ans";
+                }
+
+                echo"</td>
+<td>$ouvertext</td>
+</tr>";
+            }
+
+            ?>
 
         </table>
+
         <table id="liste_tournoi" class="table table-bordered table-condensed table-striped">
 
             <div class="form-group">
@@ -92,8 +138,8 @@
                                 <td>
 
                                     <?php
-//                                    var_dump($c->adh);
-//                                    var_dump($c->listeinv);
+                                    //                                    var_dump($c->adh);
+                                    //                                    var_dump($c->listeinv);
 
                                     if (!empty($c->adh)) {
                                         if (!empty($c->listeinv)) {

@@ -103,95 +103,135 @@
             <div class="col-md-4">
                 <select name="TYPE_FORFAIT" id="TYPE_FORFAIT" required onchange="changeForfait()">
                     <option value='U'<?php if ($activite->FORFAIT == 'U') echo ' selected' ?>>Unitaire</option>
+                    <option value='F'<?php if ($activite->FORFAIT == 'F') echo ' selected' ?>>Forfait</option>
                 </select>
             </div>
         </div>
 
 
         <!-- Si l'on séléctionne le mode Unitaire (par défaut) : -->
-        <div id="prestation_principale"  name = "prestation_principale" class = "prestation_principale">
-            <?php
-            $count = 0;
-            foreach($prestations as $presta){
-                $count+=1;
-                if($count>1) echo "<div class = 'prestationajoutee'>";
-                ?>
+        <div class="form-group" id="COUT_ADULTE_SELECT">
+            <label class="col-md-2 control-label" for="textinput">Coût Adulte <span class="important">*</span> :</label>
+            <div class="col-md-4">
+                <input id="COUT_ADULTE" name="COUT_ADULTE" placeholder="Coût par adulte" class="form-control input-md"
+                       type="number" value="<?= (isset($activite->COUT_ADULTE) ? $activite->COUT_ADULTE : '') ?>">
+            </div>
+        </div>
+        <!-- ************************************** -->
 
-                <br>Prestation principale n°<?= $count ?>
-                <div class = "prestation">
 
-                    <div class="form-group">
-                        <label class="col-md-2 control-label" for="textinput">Prestation<span class="important">*</span> :</label>
+        <!-- Si l'on séléctionne le mode Forfait : -->
 
-                        <div class="col-md-4">
-                            <input id="Libelle" title ="Entrez le nom de la prestation" name="Libelle[]" placeholder="Intitulé de la prestation" class="libelle"
-                                   type="textinput" value="<?= (isset($presta->LIBELLE) ? $presta->LIBELLE : '') ?>"required>
-                        </div>
+        <div style="display: none" class="form-group" id="TARIF_FORFAIT_SELECT">
+            <label class="col-md-2 control-label" for="textinput">Coût Forfaitaire <span class="important">*</span>
+                :</label>
+            <div class="col-md-4">
+                <input id="TARIF_FORFAIT" name="TARIF_FORFAIT" placeholder="Coût du forfait"
+                       class="form-control input-md"
+                       type="number" value="<?= (isset($activite->TARIF_FORFAIT) ? $activite->TARIF_FORFAIT : '') ?>">
+            </div>
+        </div>
 
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-2 control-label" for="textinput">Coût<span class="important">*</span> :</label>
+        <!-- ************************************** -->
 
-                        <div class="col-md-4">
-                            <input id="COUT" name="COUT[]" title="Entrez le coût de la prestation" placeholder="Coût" class="form-control input-md"
-                                   type="number" value="<?= (isset($presta->COUT) ? $presta->COUT : '') ?>"required>
-                        </div>
 
-                    </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="textinput">Ouvert enfants <span class="important">*</span>
+                :</label>
+            <div class="col-md-1">
+                <input id="OUVERT_ENFANT_OUI" name="OUVERT_ENFANT" type="radio" value="1"
+                    <?php if ($activite->AGE_MINIMUM < 18) echo 'checked'; ?>
+                       onclick="ouvertEnfants();">
+                <label for="OUVERT_ENFANT">Oui</label>
 
-                    <div class="form-group">
-                        <label class="col-md-2 control-label" for="textinput">Âge minimum :</label>
+            </div>
+            <div class="col-md-1">
+                <input id="OUVERT_ENFANT_NON" name="OUVERT_ENFANT" type="radio"
+                       value="0" <?php if ($activite->AGE_MINIMUM >= 18) echo 'checked'; ?> onclick="ouvertEnfants();">
+                <label for="OUVERT_ENFANT">Non</label>
+            </div>
+        </div>
 
-                        <div class="col-md-4">
-                            <input id="AGE_MIN" name="AGE_MIN[]" title="Entrez l'âge minimum requis pour participer à la prestation" placeholder="Âge minimum" class="form-control input-md"
-                                   type="number" value="<?= (isset($presta->AGEMIN) ? $presta->AGEMIN : '0') ?>">
-                        </div>
+        <div style='display: <?php if ($activite->AGE_MINIMUM >= 18) echo 'none'; else echo 'block'; ?>'
+             class="ENFANT_FORM">
+            <div class="form-group" id="COUT_ENFANT_SELECT">
 
-                    </div>
-
-                    <div class="form-group">
-
-                        <label class="col-md-2 control-label" for="textinput">Âge maximum :</label>
-                        <div class="col-md-4">
-                            <input id="AGE_MAX" name="AGE_MAX[]" title="Entrez l'âge maximum requis pour participer à la prestation" placeholder="Âge maximum" class="form-control input-md"
-                                   type="number" value="<?= (isset($presta->AGEMAX) ? $presta->AGEMAX : '99') ?>">
-                        </div>
-
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="textinput">adhérent / externe <span class="important">*</span>
-                        :</label>
-                    <div class="col-md-1">
-                        <input id="OUVERT_EXTERNE<?= $count ?>" name="OUVERT_EXTERNE<?= $count ?>" title="Si la prestation n'est ouverte qu'aux adhérents d'Alstom et leur famille" type="radio" value="0" <?php if($presta->OUVERT_EXT==0) echo'checked'; ?> onclick="ouvertEnfants();">
-                        <label for="OUVERT_EXTERNE">adhérent (+famille)</label>
-                    </div>
-
-                    <div class="col-md-1">
-                        <input id="OUVERT_EXTERNE<?= $count ?>" name="OUVERT_EXTERNE<?= $count ?>" title="Si la prestation est ouverte aux personnes externes à Alstom" type="radio" value="1" <?php if($presta->OUVERT_EXT==1) echo'checked'; ?> onclick="ouvertEnfants();">
-                        <label for="OUVERT_EXTERNE">externe</label>
-                    </div>
-                </div>
-
-            <div class="form-group">
-                <label class="col-md-2 control-label" for="textinput">Prix Prestation :</label>
+                <label class="col-md-2 control-label" for="textinput">Coût Enfant <span class="important">*</span>
+                    :</label>
                 <div class="col-md-4">
-                    <input id="PRIX[]" name="PRIX[]" placeholder="Prix de la prestation" class="form-control input-md " title="Prix de la prestation"
-                           type="text" value="<?= (isset($presta->PRIX) ? $presta->PRIX : '') ?>">
+                    <input id="COUT_ENFANT" name="COUT_ENFANT" placeholder="COUT_ENFANT"
+                           class="form-control input-md" type="number"
+                           value="<?= (isset($activite->COUT_ENFANT) ? $activite->COUT_ENFANT : '') ?>">
+                </div>
+
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label" for="textinput">Age minimium <span class="important">*</span>
+                    :</label>
+                <div class="col-md-4">
+                    <input id="AGE_MINIMUM" name="AGE_MINIMUM" placeholder="AGE_MINIMUM"
+                           class="form-control input-md" type="number"
+                           value="<?= (isset($activite->AGE_MINIMUM) ? $activite->AGE_MINIMUM : '') ?>">
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="textinput">Ouvert aux personnes extérieur <span
+                        class="important">*</span> :</label>
+            <div class="col-md-4">
+                <select name="OUVERT_EXT" id="OUVERT_EXT" value="0" onchange="ouvertExt();">
+                    <option value="1"<?php if ($activite->OUVERT_EXT == '1') echo ' selected' ?>>Oui</option>
+                    <option value="0"<?php if ($activite->OUVERT_EXT == '0') echo ' selected' ?>>Non</option>
+
+                </select>
+            </div>
+        </div>
+
+        <hr>
+        Les prix :
+        <br>
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="textinput">Prix Adulte :</label>
+            <div class="col-md-4">
+                <input id="PRIX_ADULTE" name="PRIX_ADULTE" placeholder="Prix par adulte" class="form-control input-md"
+                       type="text" value="<?= (isset($activite->PRIX_ADULTE) ? $activite->PRIX_ADULTE : '') ?>">
+
+            </div>
+        </div>
+
+
+        <div style="display : <?php if ($activite->OUVERT_EXT == '1') echo 'block'; else echo 'none' ?>;" class="form-group OUVERTURE_EXTER">
+            <label class="col-md-2 control-label" for="textinput">Prix Adulte Exterieur :</label>
+            <div class="col-md-4">
+                <input id="PRIX_ADULTE_EXT" name="PRIX_ADULTE_EXT" placeholder="Prix par adulte extérieur"
+                       class="ouvertExtInputs form-control input-md" type="text"
+                       value="<?= (isset($activite->PRIX_ADULTE_EXT) ? $activite->PRIX_ADULTE_EXT : '') ?>">
+
+            </div>
+        </div>
+
+        <div class="ENFANT_FORM" style='display: <?php if ($activite->AGE_MINIMUM >= 18) echo 'none'; else echo 'block'; ?>'>
+            <div class="form-group">
+                <label class="col-md-2 control-label" for="textinput">Prix Enfant :</label>
+                <div class="col-md-4">
+                    <input id="PRIX_ENFANT" name="PRIX_ENFANT" placeholder="Prix par enfant"
+                           class="form-control input-md " type="text"
+                           value="<?= (isset($activite->PRIX_ENFANT) ? $activite->PRIX_ENFANT : '') ?>">
 
                 </div>
             </div>
-                <hr>
 
-                <?php if($count>1) echo "</div>";}?>
+            <div style="display : <?php if ($activite->OUVERT_EXT == '1') echo 'block'; else echo 'none' ?>;" class="form-group OUVERTURE_EXTER">
+                <label class="col-md-2 control-label" for="textinput">Prix Enfant Exterieur :</label>
+                <div class="col-md-4">
+                    <input id="PRIX_ENFANT_EXT" name="PRIX_ENFANT_EXT" placeholder="Prix par enfant extérieur"
+                           class="ouvertExtInputs form-control input-md" type="text"
+                           value="<?= (isset($activite->PRIX_ENFANT_EXT) ? $activite->PRIX_ENFANT_EXT : '') ?>">
+
+                </div>
+            </div>
         </div>
-
-        <input type="button" onClick="addPrestationInput()" value="Ajout prestation principale">
-        <input type="button" onClick="removePrestationInput()" value="Suppression prestation principale">
-
-
-
+        <hr>
         <div class="form-group">
             <label class="col-md-2 control-label" for="textinput">Statut <span class="important">*</span> :</label>
             <div class="col-md-4">

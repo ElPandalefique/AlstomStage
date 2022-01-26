@@ -259,10 +259,18 @@ class ActiviteLeaderController extends Controller
 
         //Récuperer les effectifs des créneaux
         $modEffectif = $this->loadModel('ActiviteParticipantsAdherent');
-        $projectionC['projection'] = 'c.EFFECTIF_CRENEAU, c.DATE_CRENEAU, c.HEURE_CRENEAU,COUNT(DISTINCT i.ID) + COUNT(li.ID_INVITE)as effectif';
+        $projectionC['projection'] = 'c.EFFECTIF_CRENEAU, c.DATE_CRENEAU, c.HEURE_CRENEAU,
+        COUNT(DISTINCT i.ID) + COUNT(li.ID_INVITE)as effectif';
+
+        //test sur le serveur sql directement, mais visiblement il ne prend pas en compte le auto_participation requis à 1...
+        //select c.EFFECTIF_CRENEAU, c.DATE_CRENEAU, c.HEURE_CRENEAU,
+        //(select COUNT(li.ID_INVITE) where i.ID_ACTIVITE = 163 AND c.STATUT = 'O' AND i.ATTENTE = 0) as effectif_passif,
+        //(select COUNT(i.ID) where i.ID_ACTIVITE = 163 AND c.STATUT = 'O' AND i.ATTENTE = 0 AND i.AUTO_PARTICIPATION = 1) as effectif_actif
+
+        //COUNT(DISTINCT i.ID) + COUNT(li.ID_INVITE)as effectif';
         $projectionC['conditions'] = "i.ID_ACTIVITE = {$id} AND c.STATUT = 'O' AND i.ATTENTE = 0";
         $projectionC['groupby'] = "c.NUM_CRENEAU, c.ID_ACTIVITE";
-        $resultE = $modEffectif->find($projectionC);
+        $resultE = $modEffectif->find($projectionC, true);
 
         $d['inscrits'] = $result;
         $d['inscritsA'] = $resultA;
@@ -283,6 +291,10 @@ class ActiviteLeaderController extends Controller
         $projection['conditions'] = "ID_ACTIVITE = " . $ID_ACTIVITE;
         // $d['nomleader'] = $modNomLeader->findfirst($projection);
         $d['leader'] = $modNomLeader->findfirst($projection);
+        //prestations
+        $modPresta = $this->loadModel('Prestation');
+        $projection['projection'] = "COUT, AGEMIN, AGEMAX, LIBELLE, OUVERT_EXT";
+        $d['prestations'] = $modPresta->find($projection);
         // prestataires
         $modPrestataire = $this->loadModel('Prestataire');
         $projection = "ID,NOM";
@@ -363,7 +375,7 @@ class ActiviteLeaderController extends Controller
         $this->inscrits($id);
     }
 
-    function modifier($id)
+    function modifierbackup($id)
     {
         $ID_ACTIVITE = $id;
         $modActivite = $this->loadModel('ActiviteAdmin');
@@ -387,6 +399,71 @@ class ActiviteLeaderController extends Controller
 
 
         $donnees["OUVERT_EXT"] = $_POST["OUVERT_EXT"];
+
+        $tab = array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE), 'donnees' => $donnees);
+        //appeler la methode update
+        $modActivite->update($tab);
+        $d['info'] = "Activité modifié";
+        //charger le tableau
+        $this->liste();
+        $this->render('liste');
+        $this->mail($ID_ACTIVITE, "modifier");
+    }
+
+    function modifier($id)
+    {
+        $ID_ACTIVITE = $id;
+        $modActivite = $this->loadModel('ActiviteAdmin');
+
+        //préparation de la récup des prestations
+        $modPresta = $this->loadModel('Prestation');
+        $colonnesPresta=array('ID_ACTIVITE', 'ID_PRESTATION', 'COUT', 'AGEMIN', 'AGEMAX', 'LIBELLE', 'OUVERT_EXT');
+        $count=0;
+
+        //recup les données du form
+        $donnees = array();
+        $donnees["ID_DOMAINE"] = 1;
+        $donnees["NOM"] = $_POST["NOM"];
+        $donnees["DETAIL"] = $_POST["DETAIL"];
+
+        $donnees["ADRESSE"] = $_POST["ADRESSE"];
+        $donnees["CP"] = $_POST["CP"];
+        $donnees["VILLE"] = $_POST["VILLE"];
+        $donnees["INDICATION_PARTICIPANT"] = $_POST["INDICATION_PARTICIPANT"];
+        $donnees["INFO_IMPORTANT_PARTICIPANT"] = $_POST["INFO_IMPORTANT_PARTICIPANT"];
+        //$donnees["STATUT"] = $_POST["STATUT"];
+        $donnees["ID_PRESTATAIRE"] = $_POST["ID_PRESTATAIRE"];
+        $donnees["FORFAIT"] = $_POST["TYPE_FORFAIT"];
+
+       // $req['conditions'] = 'ID_ACTIVITE' => $ID_ACTIVITE;
+       // $tabPresta = array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE));
+        $modPresta->delete(array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE)));
+
+        foreach ($_POST['Libelle'] as $libelle){
+            //récupération de chaque valeur dans des variables pour facilité la compréhension
+            $post = "OUVERT_EXTERNE".($count+1);
+            $cout = $_POST['COUT'][$count];
+            $agemin = $_POST['AGE_MIN'][$count];
+            $agemax = $_POST['AGE_MAX'][$count];
+            $ouvertext = $_POST["$post"];
+
+
+            //ajout des données dans pour l'insertion
+            $donneesPresta['ID_ACTIVITE']=$ID_ACTIVITE;
+            $donneesPresta['ID_PRESTATION'] = $count+1;
+            $donneesPresta['COUT'] = $cout;
+            $donneesPresta['AGE_MIN'] = $agemin;
+            $donneesPresta['AGE_MAX'] = $agemax;
+            $donneesPresta['LIBELLE'] = $libelle;
+            $donneesPresta['OUVERT_EXT'] = $ouvertext;
+
+            //insertion dans la base de données
+            $modPresta->insert($colonnesPresta, $donneesPresta);
+
+            //ajout d'une valeur du count pour selectionner la prestation suivante de l'activité
+            $count+=1;
+
+        }
 
         $tab = array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE), 'donnees' => $donnees);
         //appeler la methode update

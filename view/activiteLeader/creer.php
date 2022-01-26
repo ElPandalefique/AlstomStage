@@ -91,11 +91,12 @@
 
 
         <hr>
+
         Le prestataire :
 
         <br>
         <div class="form-group">
-            <label class="col-md-2 control-label" for="textinput">Choix du prestataire :</label>
+            <label class="col-md-2 control-label" title="Sélectionnez le prestataire de votre activité" for="textinput">Choix du prestataire :</label>
             <div class="col-md-4">
                 <select name="ID_PRESTATAIRE">
                     <?php if (isset($prestataires)) {
@@ -107,7 +108,7 @@
             </div>
         </div>
         <div class="form-group">
-            <label class="col-md-2 control-label" for="textinput">Type Tarif <span class="important">*</span> :</label>
+            <label class="col-md-2 control-label" title="Sélectionnez le type de tarif pour votre activité" for="textinput">Type Tarif <span class="important">*</span> :</label>
             <div class="col-md-4">
                 <select name="TYPE_FORFAIT" id="TYPE_FORFAIT" value="0" required onchange="changeForfait()">
                     <option value='U'>Unitaire</option>
@@ -116,9 +117,9 @@
             </div>
         </div>
 
-
+        <p style="color:#FF0000"><strong>Pour avoir des informations sur les données à entrer pour les prestations, passez simplement votre souris sur le champ en question, une bulle informative s'affichera</strong></p>
         <!-- Si l'on séléctionne le mode Unitaire (par défaut) : required="required" -->
-        <div id="prestation_principale"  name = "prestation_principale" class = "prestation_principale">
+        <div id="prestation_principale"  name = "prestation_principale" class = "prestation_principale d-inline-block">
             <br>Prestation principale n°1
             <div class = "prestation">
 
@@ -131,7 +132,7 @@
                     <label class="col-md-2 control-label" for="textinput">Prestation<span class="important">*</span> :</label>
 
                     <div class="col-md-4">
-                        <input id="Libelle" title ="Entrez le nom de la prestation" name="Libelle[]" placeholder="Intitulé de la prestation" class="libelle"
+                        <input id="Libelle" title ="Entrez l'intitulé de la prestation, donner un nom qui indique clairement et facilement son contenu" name="Libelle[]" placeholder="Intitulé de la prestation" class="libelle"
                                type="textinput" value="<?= (isset($activite->prestation) ? $activite->prestation : '') ?>"required>
                     </div>
 
@@ -150,7 +151,7 @@
                     <label class="col-md-2 control-label" for="textinput">Âge minimum :</label>
 
                     <div class="col-md-4">
-                        <input id="AGE_MIN" name="AGE_MIN[]" title="Entrez l'âge minimum requis pour participer à la prestation" placeholder="Âge minimum" class="form-control input-md"
+                        <input id="AGE_MIN" name="AGE_MIN[]" title="Entrez l'âge minimum requis pour participer à la prestation (0 signifie qu'il n'y a pas d'age minimum limite)" placeholder="Âge minimum" class="form-control input-md"
                                type="number" value="<?= (isset($activite->AGE_MIN) ? $activite->AGE_MIN : '0') ?>">
                     </div>
 
@@ -160,7 +161,7 @@
 
                     <label class="col-md-2 control-label" for="textinput">Âge maximum :</label>
                     <div class="col-md-4">
-                        <input id="AGE_MAX" name="AGE_MAX[]" title="Entrez l'âge maximum requis pour participer à la prestation" placeholder="Âge maximum" class="form-control input-md"
+                        <input id="AGE_MAX" name="AGE_MAX[]" title="Entrez l'âge maximum requis pour participer à la prestation (99 signifie qu'il n'y a pas d'age maximum limite)" placeholder="Âge maximum" class="form-control input-md"
                                type="number" value="<?= (isset($activite->AGE_MAX) ? $activite->AGE_MAX : '99') ?>">
                     </div>
 
@@ -183,8 +184,8 @@
             <?php //} ?>
         </div>
 
-        <input type="button" onClick="addPrestationInput()" value="Ajout prestation principale">
-        <input type="button" onClick="removePrestationInput()" value="Suppression prestation principale">
+        <input type="button" title="ajouter une prestation principale qui pourra être supprimée plus tard si besoin" onClick="addPrestationInput()" value="Ajout prestation principale">
+        <input type="button" title="supprimer la dernière prestation principale entrée" onClick="removePrestationInput()" value="Suppression prestation principale">
 
         <!-- Button -->
         <div class="form-group">
@@ -229,8 +230,15 @@
 
     function addPrestationInput() {
         let formContainer = document.getElementById("prestation_principale");
-        let baseSelectInput = document.getElementsByClassName("prestation")
-        let base = "<div class='prestationajoutee'><hr><br>Prestation principale n°"+clicks+
+        let baseSelectInput = document.getElementsByClassName("prestation");
+        let init="";
+        if(clicks%2===0){
+            init = "";
+        }
+        else{
+            init = "<div class='d-inline-block p-2'>";
+        }
+        let base = init+"<div class='prestationajoutee'><hr><br>Prestation principale n°"+clicks+
             baseSelectInput[0].innerHTML +
             "<div class='form-group'>" +
             "<label class='col-md-2 control-label' for='textinput'>adhérent / externe <span class='important'>*</span>:</label> " +

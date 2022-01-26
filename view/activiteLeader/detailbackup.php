@@ -129,76 +129,82 @@
 
 
         <!-- Si l'on séléctionne le mode Unitaire (par défaut) : -->
-        <div id="prestation_principale"  name = "prestation_principale" class = "prestation_principale">
-            <?php
-            $count = 0;
-            foreach($prestations as $presta){
-                $count+=1;
-                if($count>1) echo "<div class = 'prestationajoutee'>";
-                    ?>
+        <div class="form-group" id="COUT_ADULTE_SELECT">
+            <label class="col-md-2 control-label" for="textinput">Coût Adulte <span class="important">*</span> :</label>
+            <div class="col-md-4">
+                <input id="COUT_ADULTE" name="COUT_ADULTE" placeholder="Coût par adulte" class="form-control input-md"
+                       type="number" value="<?= (isset($activite->COUT_ADULTE) ? $activite->COUT_ADULTE : '') ?>">
+            </div>
+        </div>
+        <!-- ************************************** -->
 
-                    <br>Prestation principale n°<?= $count ?>
-                <div class = "prestation">
 
-                    <div class="form-group">
-                        <label class="col-md-2 control-label" for="textinput">Prestation<span class="important">*</span> :</label>
+        <!-- Si l'on séléctionne le mode Forfait : -->
 
-                        <div class="col-md-4">
-                            <input id="Libelle" title ="Entrez le nom de la prestation" name="Libelle[]" placeholder="Intitulé de la prestation" class="libelle"
-                                   type="textinput" value="<?= (isset($presta->LIBELLE) ? $presta->LIBELLE : '') ?>"required>
-                        </div>
-
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-2 control-label" for="textinput">Coût<span class="important">*</span> :</label>
-
-                        <div class="col-md-4">
-                            <input id="COUT" name="COUT[]" title="Entrez le coût de la prestation" placeholder="Coût" class="form-control input-md"
-                                   type="number" value="<?= (isset($presta->COUT) ? $presta->COUT : '') ?>"required>
-                        </div>
-
-                    </div>
-
-                    <div class="form-group">
-                        <label class="col-md-2 control-label" for="textinput">Âge minimum :</label>
-
-                        <div class="col-md-4">
-                            <input id="AGE_MIN" name="AGE_MIN[]" title="Entrez l'âge minimum requis pour participer à la prestation" placeholder="Âge minimum" class="form-control input-md"
-                                   type="number" value="<?= (isset($presta->AGEMIN) ? $presta->AGEMIN : '0') ?>">
-                        </div>
-
-                    </div>
-
-                    <div class="form-group">
-
-                        <label class="col-md-2 control-label" for="textinput">Âge maximum :</label>
-                        <div class="col-md-4">
-                            <input id="AGE_MAX" name="AGE_MAX[]" title="Entrez l'âge maximum requis pour participer à la prestation" placeholder="Âge maximum" class="form-control input-md"
-                                   type="number" value="<?= (isset($presta->AGEMAX) ? $presta->AGEMAX : '99') ?>">
-                        </div>
-
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="textinput">adhérent / externe <span class="important">*</span>
-                        :</label>
-                    <div class="col-md-1">
-                        <input id="OUVERT_EXTERNE<?= $count ?>" name="OUVERT_EXTERNE<?= $count ?>" title="Si la prestation n'est ouverte qu'aux adhérents d'Alstom et leur famille" type="radio" value="0" <?php if($presta->OUVERT_EXT==0) echo'checked'; ?> onclick="ouvertEnfants();">
-                        <label for="OUVERT_EXTERNE">adhérent (+famille)</label>
-                    </div>
-
-                    <div class="col-md-1">
-                        <input id="OUVERT_EXTERNE<?= $count ?>" name="OUVERT_EXTERNE<?= $count ?>" title="Si la prestation est ouverte aux personnes externes à Alstom" type="radio" value="1" <?php if($presta->OUVERT_EXT==1) echo'checked'; ?> onclick="ouvertEnfants();">
-                        <label for="OUVERT_EXTERNE">externe</label>
-                    </div>
-                </div>
-
-            <?php if($count>1) echo "</div>";} ?>
+        <div style="display: none" class="form-group" id="TARIF_FORFAIT_SELECT">
+            <label class="col-md-2 control-label" for="textinput">Coût Forfaitaire <span class="important">*</span>
+                :</label>
+            <div class="col-md-4">
+                <input id="TARIF_FORFAIT" name="TARIF_FORFAIT" placeholder="Coût du forfait"
+                       class="form-control input-md"
+                       type="number" value="<?= (isset($activite->TARIF_FORFAIT) ? $activite->TARIF_FORFAIT : '') ?>">
+            </div>
         </div>
 
-        <input type="button" onClick="addPrestationInput()" value="Ajout prestation principale">
-        <input type="button" onClick="removePrestationInput()" value="Suppression prestation principale">
+        <!-- ************************************** -->
+
+
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="textinput">Ouvert enfants <span class="important">*</span>
+                :</label>
+            <div class="col-md-1">
+                <input id="OUVERT_ENFANT_OUI" name="OUVERT_ENFANT" type="radio" value="1"
+                    <?php if ($activite->AGE_MINIMUM < 18) echo 'checked'; ?>
+                       onclick="ouvertEnfants();">
+                <label for="OUVERT_ENFANT">Oui</label>
+
+            </div>
+            <div class="col-md-1">
+                <input id="OUVERT_ENFANT_NON" name="OUVERT_ENFANT" type="radio"
+                       value="0" <?php if ($activite->AGE_MINIMUM >= 18) echo 'checked'; ?> onclick="ouvertEnfants();">
+                <label for="OUVERT_ENFANT">Non</label>
+            </div>
+        </div>
+
+        <div style='display: <?php if ($activite->AGE_MINIMUM >= 18) echo 'none'; else echo 'block'; ?>'
+             class="ENFANT_FORM">
+            <div class="form-group" id="COUT_ENFANT_SELECT">
+
+                <label class="col-md-2 control-label" for="textinput">Coût Enfant <span class="important">*</span>
+                    :</label>
+                <div class="col-md-4">
+                    <input id="COUT_ENFANT" name="COUT_ENFANT" placeholder="COUT_ENFANT"
+                           class="form-control input-md" type="number"
+                           value="<?= (isset($activite->COUT_ENFANT) ? $activite->COUT_ENFANT : '') ?>">
+                </div>
+
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label" for="textinput">Age minimium <span class="important">*</span>
+                    :</label>
+                <div class="col-md-4">
+                    <input id="AGE_MINIMUM" name="AGE_MINIMUM" placeholder="AGE_MINIMUM"
+                           class="form-control input-md" type="number"
+                           value="<?= (isset($activite->AGE_MINIMUM) ? $activite->AGE_MINIMUM : '') ?>">
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="textinput">Ouvert aux personnes extérieur <span
+                        class="important">*</span> :</label>
+            <div class="col-md-4">
+                <select name="OUVERT_EXT" id="OUVERT_EXT" value="0" onchange="ouvertExt();">
+                    <option value="1"<?php if ($activite->OUVERT_EXT == '1') echo ' selected' ?>>Oui</option>
+                    <option value="0"<?php if ($activite->OUVERT_EXT == '0') echo ' selected' ?>>Non</option>
+
+                </select>
+            </div>
+        </div>
 
         <!-- Button -->
         <div class="form-group">
@@ -212,38 +218,3 @@
 
 
 <!-- Ancien form -->
-
-<script>
-    var ajout = 1;
-    function addPrestationInput() {
-        clicks = <?=$count?>+ajout;
-        let formContainer = document.getElementById("prestation_principale");
-        let baseSelectInput = document.getElementsByClassName("prestation")
-        let base = "<div class='prestationajoutee'><hr><br>Prestation principale n°"+clicks+
-            baseSelectInput[0].innerHTML +
-            "<div class='form-group'>" +
-            "<label class='col-md-2 control-label' for='textinput'>adhérent / externe <span class='important'>*</span>:</label> " +
-            "<div class='col-md-1'> " +
-            "<input id='OUVERT_EXTERNE"+(clicks)+"' name='OUVERT_EXTERNE"+(clicks)+"' title='Si la prestation n est ouverte qu aux adhérents d Alstom et leur famille' type='radio' value='0' checked onclick='ouvertEnfants();'> " +
-            "<label for='OUVERT_EXTERNE'>adhérent (+famille)</label> " +
-            "</div> " +
-            "<div class='col-md-1'>" +
-            "<input id='OUVERT_EXTERNE"+(clicks)+"' name='OUVERT_EXTERNE"+(clicks)+"' title='Si la prestation est ouverte aux personnes externes à Alstom' type='radio' value='1' onclick='ouvertEnfants();'> " +
-            "<label for='OUVERT_EXTERNE'>externe</label>" +
-            "</div>" +
-            "</fieldset>"+
-            "</div>";
-        ajout+=1;
-        formContainer.insertAdjacentHTML('beforeend', base);
-    }
-
-    function removePrestationInput(){
-        let baseSelectInput = document.getElementsByClassName("prestation_principale")
-        if(baseSelectInput.length >= 1){
-            let latestInput = baseSelectInput[baseSelectInput.length-1];
-            latestInput.remove();
-            ajout-=1;
-        }
-    }
-
-</script>

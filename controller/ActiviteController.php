@@ -108,9 +108,13 @@ class ActiviteController extends Controller
         $projection['projection'] = 'i.DATE_PAIEMENT, i.ID, c.DATE_CRENEAU, c.HEURE_CRENEAU,c.EFFECTIF_CRENEAU,
         i.PAYE, i.CRENEAU, i.ID_ADHERENT, 
         MONTANT, AUTO_PARTICIPATION, i.ID_ACTIVITE, 
-        GROUP_CONCAT(a.NOM, a.PRENOM) as adh, 
+        GROUP_CONCAT(a.NOM," ", a.PRENOM) as adh, 
         GROUP_CONCAT(inv.NOM, " ", inv.PRENOM separator "<br>") as listeinv,
-        COUNT(DISTINCT i.ID) + COUNT(li.ID_INVITE)as effectif';
+        CASE
+        WHEN AUTO_PARTICIPATION = 1 
+        THEN COUNT(DISTINCT i.ID) + COUNT(li.ID_INVITE) 
+        ELSE COUNT(li.ID_INVITE)
+        as effectif';
         /*$projection['conditions'] = "i.ID_ACTIVITE = {$id}";
         //$projection['groupby'] = "ID_ADHERENT";
         $result = $modInscription->find($projection);
@@ -122,6 +126,11 @@ class ActiviteController extends Controller
         $projection['groupby'] = "c.NUM_CRENEAU, c.ID_ACTIVITE";
         $result = $modInscription->find($projection);
         $d['inscrits'] = $result;
+
+        $modPresta = $this->loadModel('Prestation');
+        $projPresta["conditions"] = "ID_ACTIVITE = $id";
+        $d['prestations'] = $modPresta->find($projPresta);
+
         $this->set($d);
 
     }
