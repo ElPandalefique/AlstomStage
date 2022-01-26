@@ -1,5 +1,18 @@
 <legend>Amical des cadres ALSTOM</legend>
 <form class="form-horizontal">
+    <?php
+    if(isset($inscription->ATTENTE)){
+        $attente = $inscription->ATTENTE;
+        if($attente==1){
+            //echo"<input type = 'button' value='voir le statut' onclick='popup()'>";
+            echo "<body onload='popup()'></body>";
+        }
+        else{
+            //echo"<input type = 'button' value='' onclick='popupp()'>";
+            echo "<body onload='popupp()'></body>";
+        }
+    }
+    ?>
     <fieldset>
         <section class="table_responsive">
             <table class="mx-auto" style="border-spacing : 20px;border-collapse : separate;">
@@ -102,7 +115,18 @@
 
 
             </table>
-            <table id="liste_tournoi" class="table table-bordered table-condensed table-striped">
 
-    </fieldset>
+    </fieldset
 </form>
+
+<script>
+
+    function popup(){
+        window.alert("Vous êtes en liste d'attente")
+    }
+
+    function popupp(){
+        window.alert("Vous êtes en liste principale")
+    }
+
+</script>
