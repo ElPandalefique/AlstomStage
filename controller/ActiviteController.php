@@ -164,6 +164,23 @@ class ActiviteController extends Controller
         $resultEI = $modEffectifInvite->find($projectionC);
         $d['effectifInvite'] = $resultEI;
 
+        //Récuperer les effectifs des créneaux en attente
+        $modEffectif = $this->loadModel('ActiviteParticipantsAdherent');
+        $projectionC['projection'] = "c.EFFECTIF_CRENEAU, c.DATE_CRENEAU, c.HEURE_CRENEAU, c.NUM_CRENEAU, COUNT(i.ID_ADHERENT)+COUNT(li.ID_INVITE) as effectif";
+        $projectionC['conditions'] = "i.ID_ACTIVITE = {$id} AND c.STATUT = 'O' AND i.ATTENTE = 1";
+        $projectionC['groupby'] = "c.NUM_CRENEAU, c.ID_ACTIVITE";
+        $resultE = $modEffectif->find($projectionC);
+        $d['effectifsattente'] = $resultE;
+        //var_dump($resultE);
+
+        //Récuperer les personnes qui ne participent pas mais qui ont inscrit des invités en attente
+        $modEffectifInvite= $this->loadModel('ActiviteParticipantsAdherent');
+        $projectionC['projection'] = "c.EFFECTIF_CRENEAU, c.DATE_CRENEAU, c.HEURE_CRENEAU, c.NUM_CRENEAU, COUNT(i.ID) as effectif";
+        $projectionC['conditions'] = "i.ID_ACTIVITE = {$id} AND c.STATUT = 'O' AND i.ATTENTE = 1 AND i.AUTO_PARTICIPATION=0";
+        $projectionC['groupby'] = "c.NUM_CRENEAU, c.ID_ACTIVITE";
+        $resultEI = $modEffectifInvite->find($projectionC);
+        $d['effectifInviteattente'] = $resultEI;
+
         //Récupération liste des invités
         $modInvite = $this->loadModel('Invite');
         $projection['conditions'] = "STATUT = 'FAMILLE' AND ID_ADHERENT = " . Session::get('ID_ADHERENT');

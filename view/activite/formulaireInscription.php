@@ -92,6 +92,7 @@
                 <tr>
                     <td>Créneau</td>
                     <td>Effectif actuel</td>
+                    <td>Personnes en liste d'attente</td>
                 </tr>
                 <?php
                 if(!empty($effectifs)){
@@ -100,13 +101,22 @@
                         $format = date_create($eff->DATE_CRENEAU);
                         $date = date_format($format, 'd-m-Y');
                         $heure = substr($eff->HEURE_CRENEAU, 0, -3);
-                        $effectif=$effectif=$eff->effectif;;
+                        $effectif=$effectif=$eff->effectif;
                         foreach ($effectifInvite as $invite){
                             if($eff->NUM_CRENEAU==$invite->NUM_CRENEAU){
                                 $effectif-=$invite->effectif;
                             }
                         }
-                        echo"<tr><td> Le $date à $heure</td><td>$effectif / $eff->EFFECTIF_CRENEAU</td>";
+                        $attentes=0;
+                        foreach ($effectifsattente as $attente){
+                            $attentes = $attente->effectif;
+                            foreach ($effectifInviteattente as $attenteinv){
+                                if($eff->NUM_CRENEAU==$attente->NUM_CRENEAU && $eff->NUM_CRENEAU==$attenteinv->NUM_CRENEAU){
+                                    $attentes-=$attenteinv->effectif;
+                                }
+                            }
+                        }
+                        echo"<tr><td> Le $date à $heure</td><td>$effectif / $eff->EFFECTIF_CRENEAU</td><td>$attentes</td>";
                     }
                 }
                 ?>
