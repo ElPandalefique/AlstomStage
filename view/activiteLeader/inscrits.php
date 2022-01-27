@@ -12,7 +12,13 @@
                 $format = date_create($eff->DATE_CRENEAU);
                 $date = date_format($format, 'd-m-Y');
                 $heure = substr($eff->HEURE_CRENEAU, 0, -3);
-                echo"<tr><td> Le $date à $heure</td><td>$eff->effectif / $eff->EFFECTIF_CRENEAU</td>";
+                $effectif=$effectif=$eff->effectif;;
+                foreach ($effectifInvite as $invite){
+                    if($eff->NUM_CRENEAU==$invite->NUM_CRENEAU){
+                        $effectif-=$invite->effectif;
+                    }
+                }
+                echo"<tr><td> Le $date à $heure</td><td>$effectif / $eff->EFFECTIF_CRENEAU</td>";
             }
         }
         ?>
