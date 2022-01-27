@@ -600,6 +600,7 @@ class ActiviteLeaderController extends Controller
         $donnees["DATE_CRENEAU"] = $_POST['DATE_CRENEAU'];
         $donnees["HEURE_CRENEAU"] = $_POST['HEURE_CRENEAU'];
         $donnees["EFFECTIF_CRENEAU"] = $_POST["EFFECTIF_CRENEAU"];
+        $donnees["DATE_PAIEMENT"] = $_POST["DATE_PAIEMENT"];
         if(isset($_POST["STATUT"]))
             $donnees["STATUT"] = $_POST["STATUT"];
         else

@@ -128,35 +128,42 @@
                     <td>Heure</td>
                     <td>Participants</td>
                     <td>Effectif</td>
-                    <?php if (isset($inscrits)) {
-                        foreach ($inscrits as $c) :
-                            $date = date_create($c->DATE_CRENEAU);
-                            ?>
-                            <tr>
-                                <td><?= date_format($date, 'd-m-Y') ?></td>
-                                <td><?= substr($c->HEURE_CRENEAU, 0, -3) ?></td>
-                                <td>
-
-                                    <?php
-                                    //                                    var_dump($c->adh);
-                                    //                                    var_dump($c->listeinv);
-
-                                    if (!empty($c->adh)) {
-                                        if (!empty($c->listeinv)) {
-                                            echo $c->listeinv . '<br>';
-                                        }
-                                        echo $c->adh;
-                                    } else {
-                                        echo $c->listeinv;
+                    <td>Nombre de personnes en attente</td>
+                    <?php
+                    if(!empty($effectifs)){
+//            var_dump($effectifs);
+                        foreach ($effectifs as $eff){
+                            $format = date_create($eff->DATE_CRENEAU);
+                            $date = date_format($format, 'd-m-Y');
+                            $heure = substr($eff->HEURE_CRENEAU, 0, -3);
+                            $effectif=$effectif=$eff->effectif;
+                            foreach ($effectifInvite as $invite){
+                                if($eff->NUM_CRENEAU==$invite->NUM_CRENEAU){
+                                    $effectif-=$invite->effectif;
+                                }
+                            }
+                            $attentes=0;
+                            foreach ($effectifsattente as $attente){
+                                $attentes = $attente->effectif;
+                                foreach ($effectifInviteattente as $attenteinv){
+                                    if($eff->NUM_CRENEAU==$attente->NUM_CRENEAU && $eff->NUM_CRENEAU==$attenteinv->NUM_CRENEAU){
+                                        $attentes-=$attenteinv->effectif;
                                     }
-
-
-                                    ?>
-                                </td>
-                                <td><?= "{$c->effectif}/{$c->EFFECTIF_CRENEAU}" ?></td>
-                            </tr>
-                        <?php endforeach;
-                    } ?>
+                                }
+                            }
+                            echo"<tr><td>$date</td><td>$heure</td><td>";
+                            if (!empty($eff->adh)) {
+                                        if (!empty($eff->listeinv)) {
+                                            echo $eff->listeinv . '<br>';
+                                        }
+                                        echo $eff->adh;
+                                    } else {
+                                        echo $eff->listeinv;
+                                    }
+                            echo"</td><td>$effectif / $eff->EFFECTIF_CRENEAU</td><td>$attentes</td></tr>";
+                        }
+                    }
+                    ?>
 
                 </table>
             </div>
