@@ -86,6 +86,32 @@
             Choix du créneau
             <hr>
 
+            <p style="color:#FF0000"><strong>Si un créneau ne s'affiche pas dans le tableau, c'est que l'effectif de ce dernier est vide</strong></p>
+            <table class="table table-bordered table-condensed table-striped">
+                <th>Effectifs des créneaux</th>
+                <tr>
+                    <td>Créneau</td>
+                    <td>Effectif actuel</td>
+                </tr>
+                <?php
+                if(!empty($effectifs)){
+//            var_dump($effectifs);
+                    foreach ($effectifs as $eff){
+                        $format = date_create($eff->DATE_CRENEAU);
+                        $date = date_format($format, 'd-m-Y');
+                        $heure = substr($eff->HEURE_CRENEAU, 0, -3);
+                        $effectif=$effectif=$eff->effectif;;
+                        foreach ($effectifInvite as $invite){
+                            if($eff->NUM_CRENEAU==$invite->NUM_CRENEAU){
+                                $effectif-=$invite->effectif;
+                            }
+                        }
+                        echo"<tr><td> Le $date à $heure</td><td>$effectif / $eff->EFFECTIF_CRENEAU</td>";
+                    }
+                }
+                ?>
+            </table>
+
             <div class="form-group">
                 <label class="col-md-2 control-label" for="textinput">Créneau :</label>
                 <div class="col-md-3" id="creneau">
@@ -117,10 +143,10 @@
 //                    var_dump($creneaux);
 //                    echo "prix adulte";
 //                    var_dump( $donnees->PRIX_ADULTE);
-                    echo "invites famille";
-                    var_dump($invitesfamille);
-                    echo "invites externe";
-                    var_dump($invitesext);
+//                    echo "invites famille";
+//                    var_dump($invitesfamille);
+//                    echo "invites externe";
+//                    var_dump($invitesext);
 //                    echo "id activité";
 //                    var_dump($donnees->ID_ACTIVITE);?>
                     <button id="singlebutton" name="singlebutton" class="btn btn-info">S'inscrire</button>

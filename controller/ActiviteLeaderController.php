@@ -259,28 +259,18 @@ class ActiviteLeaderController extends Controller
 
         //Récuperer les effectifs des créneaux
         $modEffectif = $this->loadModel('ActiviteParticipantsAdherent');
-        $projectionC['projection'] = "c.EFFECTIF_CRENEAU, c.DATE_CRENEAU, c.HEURE_CRENEAU, c.NUM_CRENEAU,
-        COUNT(i.ID_ADHERENT)+COUNT(li.ID_INVITE) as effectif
-        ";
-
-        //test sur le serveur sql directement, mais visiblement il ne prend pas en compte le auto_participation requis à 1...
-        //select c.EFFECTIF_CRENEAU, c.DATE_CRENEAU, c.HEURE_CRENEAU,
-        //(select COUNT(li.ID_INVITE) where i.ID_ACTIVITE = 163 AND c.STATUT = 'O' AND i.ATTENTE = 0) as effectif_passif,
-        //(select COUNT(i.ID) where i.ID_ACTIVITE = 163 AND c.STATUT = 'O' AND i.ATTENTE = 0 AND i.AUTO_PARTICIPATION = 1) as effectif_actif
-
-        //(SELECT COUNT(i.ID_ADHERENT)+COUNT(li.ID_INVITE) where i.ID_ACTIVITE = 163 AND c.STATUT = 'O' AND i.ATTENTE = 0 AND i.AUTO_PARTICIPATION=1) as effectif,
-        //        (SELECT COUNT(li.ID_INVITE) where i.ID_ACTIVITE = 163 AND c.STATUT = 'O' AND i.ATTENTE = 0 AND i.AUTO_PARTICIPATION=0) as effectifinvite
-        //COUNT(DISTINCT i.ID) + COUNT(li.ID_INVITE)as effectif';
+        $projectionC['projection'] = "c.EFFECTIF_CRENEAU, c.DATE_CRENEAU, c.HEURE_CRENEAU, c.NUM_CRENEAU, COUNT(i.ID_ADHERENT)+COUNT(li.ID_INVITE) as effectif";
         $projectionC['conditions'] = "i.ID_ACTIVITE = {$id} AND c.STATUT = 'O' AND i.ATTENTE = 0";
         $projectionC['groupby'] = "c.NUM_CRENEAU, c.ID_ACTIVITE";
-        $resultE = $modEffectif->find($projectionC, true);
-        var_dump($resultE);
+        $resultE = $modEffectif->find($projectionC);
+        //var_dump($resultE);
 
+        //Récuperer les personnes qui ne participent pas mais qui ont inscrit des invités
         $modEffectifInvite= $this->loadModel('ActiviteParticipantsAdherent');
         $projectionC['projection'] = "c.EFFECTIF_CRENEAU, c.DATE_CRENEAU, c.HEURE_CRENEAU, c.NUM_CRENEAU, COUNT(i.ID) as effectif";
         $projectionC['conditions'] = "i.ID_ACTIVITE = {$id} AND c.STATUT = 'O' AND i.ATTENTE = 0 AND i.AUTO_PARTICIPATION=0";
         $projectionC['groupby'] = "c.NUM_CRENEAU, c.ID_ACTIVITE";
-        $resultEI = $modEffectifInvite->find($projectionC, true);
+        $resultEI = $modEffectifInvite->find($projectionC);
 
         $d['inscrits'] = $result;
         $d['inscritsA'] = $resultA;

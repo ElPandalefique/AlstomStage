@@ -147,9 +147,24 @@ class ActiviteController extends Controller
         $projection['conditions'] = "ID_ACTIVITE = " . $ID_ACTIVITE . " AND ID_ADHERENT = " . Session::get('ID_ADHERENT');
         $d['inscription'] = $modActivite->findfirst($projection);
 
-        // Récupération de la liste des invités.
+        //Récuperer les effectifs des créneaux
+        $modEffectif = $this->loadModel('ActiviteParticipantsAdherent');
+        $projectionC['projection'] = "c.EFFECTIF_CRENEAU, c.DATE_CRENEAU, c.HEURE_CRENEAU, c.NUM_CRENEAU, COUNT(i.ID_ADHERENT)+COUNT(li.ID_INVITE) as effectif";
+        $projectionC['conditions'] = "i.ID_ACTIVITE = {$id} AND c.STATUT = 'O' AND i.ATTENTE = 0";
+        $projectionC['groupby'] = "c.NUM_CRENEAU, c.ID_ACTIVITE";
+        $resultE = $modEffectif->find($projectionC);
+        $d['effectifs'] = $resultE;
+        //var_dump($resultE);
 
+        //Récuperer les personnes qui ne participent pas mais qui ont inscrit des invités
+        $modEffectifInvite= $this->loadModel('ActiviteParticipantsAdherent');
+        $projectionC['projection'] = "c.EFFECTIF_CRENEAU, c.DATE_CRENEAU, c.HEURE_CRENEAU, c.NUM_CRENEAU, COUNT(i.ID) as effectif";
+        $projectionC['conditions'] = "i.ID_ACTIVITE = {$id} AND c.STATUT = 'O' AND i.ATTENTE = 0 AND i.AUTO_PARTICIPATION=0";
+        $projectionC['groupby'] = "c.NUM_CRENEAU, c.ID_ACTIVITE";
+        $resultEI = $modEffectifInvite->find($projectionC);
+        $d['effectifInvite'] = $resultEI;
 
+        //Récupération liste des invités
         $modInvite = $this->loadModel('Invite');
         $projection['conditions'] = "STATUT = 'FAMILLE' AND ID_ADHERENT = " . Session::get('ID_ADHERENT');
         $d['invitesfamille'] = $modInvite->find($projection);
@@ -162,7 +177,6 @@ class ActiviteController extends Controller
         $projection['conditions'] = "ID_ACTIVITE = {$id} AND STATUT = 'O'";
         $projection['orderby'] = "DATE_CRENEAU, HEURE_CRENEAU";
         $d['creneaux'] = $modCreneau->find($projection);
-
 
         $this->set($d);
     }
