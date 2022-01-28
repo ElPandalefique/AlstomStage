@@ -327,14 +327,8 @@ class ActiviteAdminController extends Controller {
         //récupération nom activité
         $nomactivite = $this->nomActivite($idactivite);
 
-        switch($mess){
-            case "modifier":
-                $mail->Subject="Activité modifiée par un administrateur";
-                $mail->Body="L'activité $nomactivite à été modifiée par un administrateur";
-                break;
-        }
-
-
+        $mail->Subject="Activité modifiée par un administrateur";
+        $mail->Body="L'activité $nomactivite à été modifiée par un administrateur";
 
         $mail->send();
     }

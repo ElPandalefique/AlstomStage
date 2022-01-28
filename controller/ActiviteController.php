@@ -750,16 +750,6 @@ class ActiviteController extends Controller
         $projection['projection'] = "ACTIVITE.nom";
         $projection['conditions'] = "ACTIVITE.ID_ACTIVITE = {$activite}";
         $resulta = $modActivite->findfirst($projection);
-        //echo "activite";
-        //var_dump($activite);
-        //echo "result";
-        //var_dump($result);
-        //echo "resulta";
-        //var_dump($resulta);
-        //echo "mess";
-        //var_dump($mess);
-        //echo "idinscrit";
-        //var_dump($idinscrit);
         foreach($resulta as $nom){
             $nomactivite=$nom;
         }

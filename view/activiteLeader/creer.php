@@ -261,13 +261,6 @@
 
 <script>
 
-    //Une solution pour ce qui est de la transmission des données et du maintient des boutons radios serait de séparer en trois partie le formulaire,
-    //coupant sur le radio qui aura un id défini dans le JS grace au "clicks" qui change a chaque ajout de formulaire
-
-    //Voir https://openclassrooms.com/forum/sujet/cloner-des-elements-en-js-et-les-differencier
-    //Simplification de l'idée précédente, besoin cependant de comprendre clairement comment ça marche
-    // (pas sûr de comprendre la récupération ni la tronche des données exportées)
-
     //Pour la récupération des données pour la partie admin/validation il faudra voir pour récupérer les données avec un foreach
     //à voir quoi mettre comme initiation et comment les données seront stockées -->
 
@@ -281,16 +274,6 @@
     let baseSelectInput = document.getElementsByClassName("prestationsecondaire");
     var secondaire = baseSelectInput[baseSelectInput.length-1];
     secondaire.remove();
-
-    function onClick(s) {
-        if(s == "+") {
-            clicks += 1;
-        }
-        else{
-            clicks -= 1;
-        }
-        document.getElementById("clicks").innerHTML = clicks;
-    }
 
     function addPrestationInput() {
         let formContainer = document.getElementById("prestation_principale");

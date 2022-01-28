@@ -1,8 +1,5 @@
 <?php
 
-use PHPMailer\PHPMailer\Exception;
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\mailConfig;
 require("../core/phpmailer/mailConfig.php");
 
@@ -122,10 +119,6 @@ class ActiviteLeaderController extends Controller
 
             //compte du nombre de prestation
             $count =0;
-
-            //limites d'age
-            $limmin = 0;
-            $limmax = 99;
 
             //opération pour chaque créneau en se servant du libelle, étant obligatoire
             foreach ($_POST['Libelle'] as $libelle){
@@ -345,7 +338,10 @@ class ActiviteLeaderController extends Controller
         //prestations
         $modPresta = $this->loadModel('Prestation');
         $projection['projection'] = "COUT, AGEMIN, AGEMAX, LIBELLE, OUVERT_EXT";
-        $d['prestations'] = $modPresta->find($projection);
+        $projection['conditions'] = "ID_ACTIVITE = $ID_ACTIVITE, SECONDAIRE = 0";
+        $d['prestationsPrincipales'] = $modPresta->find($projection);
+        $projection['conditions'] = "ID_ACTIVITE = $ID_ACTIVITE, SECONDAIRE = 1";
+        $d['prestationsSecondaires'] = $modPresta->find($projection);
         // prestataires
         $modPrestataire = $this->loadModel('Prestataire');
         $projection = "ID,NOM";
@@ -594,7 +590,8 @@ class ActiviteLeaderController extends Controller
         } else {
             $ID_ACTIVITE = $id;
         }
-        $d['prestations'] = $modPresta->find(array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE)));
+        $d['prestationsPrincipales'] = $modPresta->find(array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE, 'SECONDAIRE' => 0)));
+        $d['prestationsSecondaires'] = $modPresta->find(array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE, 'SECONDAIRE' => 1)));
         $d['activite'] = $modActivite->findFirst(array('conditions' => array('ACTIVITE.ID_ACTIVITE' => $ID_ACTIVITE)));
         $d['creneauG'] = $modCreneau->find(array('conditions' => array('CRENEAU.ID_ACTIVITE' => $ID_ACTIVITE)));
         $this->set($d);
