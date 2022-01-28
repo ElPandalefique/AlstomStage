@@ -153,6 +153,56 @@ class ActiviteLeaderController extends Controller
                 $count+=1;
 
             }
+            var_dump($_POST["LibelleSecondaire"]);
+            foreach ($_POST['LibelleSecondaire'] as $libelle){
+                $count =0;
+                //récupération de chaque valeur dans des variables pour facilité la compréhension
+                $post = "OUVERT_EXTERNESecondaire".$count;
+                var_dump($libelle);
+                var_dump($_POST['COUTSecondaire'][$count]);
+                var_dump($_POST['AGE_MINSecondaire'][$count]);
+                var_dump($_POST['AGE_MAXSecondaire'][$count]);
+                var_dump($_POST["$post"]);
+                $count+=1;
+            }
+
+            //verification de la présence de prestations secondaires et ajout dans la BDD
+            if(isset($_POST["LibelleSecondaire"])){
+                echo "isset valide";
+                $count =0;
+                $colonnesPrestaSecondaire=array('ID_ACTIVITE', 'ID_PRESTATION', 'COUT', 'AGEMIN', 'AGEMAX', 'LIBELLE', 'OUVERT_EXT', 'SECONDAIRE');
+
+                foreach ($_POST['LibelleSecondaire'] as $libelle){
+                    //récupération de chaque valeur dans des variables pour facilité la compréhension
+                    $post = "OUVERT_EXTERNESecondaire".$count;
+                    $cout = $_POST['COUTSecondaire'][$count];
+                    $agemin = $_POST['AGE_MINSecondaire'][$count];
+                    $agemax = $_POST['AGE_MAXSecondaire'][$count];
+                    $ouvertext = $_POST["$post"];
+    
+    
+                    //ajout des données dans pour l'insertion
+                    $donneesPrestaSecondaire['ID_ACTIVITE']=$ID_ACTIVITE;
+                    $donneesPrestaSecondaire['ID_PRESTATION'] = $count+1;
+                    $donneesPrestaSecondaire['COUT'] = $cout;
+                    $donneesPrestaSecondaire['AGE_MIN'] = $agemin;
+                    $donneesPrestaSecondaire['AGE_MAX'] = $agemax;
+                    $donneesPrestaSecondaire['LIBELLE'] = $libelle;
+                    $donneesPrestaSecondaire['OUVERT_EXT'] = $ouvertext;
+                    $donneesPrestaSecondaire['SECONDAIRE'] = 1;
+                    
+                    var_dump($colonnesPrestaSecondaire);
+                    var_dump($donneesPrestaSecondaire);
+
+    
+                    //insertion dans la base de données
+                    $modPresta->insert($colonnesPrestaSecondaire, $donneesPrestaSecondaire);
+    
+                    //ajout d'une valeur du count pour selectionner la prestation suivante de l'activité
+                    $count+=1;
+    
+                }
+            }
 
 
 

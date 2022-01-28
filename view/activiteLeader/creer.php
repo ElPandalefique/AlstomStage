@@ -1,4 +1,5 @@
 <form class="form-horizontal" method="post" action="<?= BASE_URL ?>/activiteLeader/nouveau">
+<body onLoad="InitSecondaire()"></body>
 
     <fieldset>
 
@@ -186,6 +187,64 @@
 
         <input type="button" title="ajouter une prestation principale qui pourra être supprimée plus tard si besoin" onClick="addPrestationInput()" value="Ajout prestation principale">
         <input type="button" title="supprimer la dernière prestation principale entrée" onClick="removePrestationInput()" value="Suppression prestation principale">
+                
+        <div id="prestation_secondaire"  name = "prestation_secondaire" class = "prestation_secondaire d-inline-block">
+            <div class = "prestationsecondaire">
+
+                <?php //if(isset($prestation)){
+                //ajouter des séparations
+                //ajouter bouton pour supprimer
+                ?>
+
+                <div class="form-group">
+                    <label class="col-md-2 control-label" for="textinput">Prestation<span class="important">*</span> :</label>
+
+                    <div class="col-md-4">
+                        <input id="LibelleSecondaire" title ="Entrez l'intitulé de la prestation, donner un nom qui indique clairement et facilement son contenu" name="LibelleSecondaire[]" placeholder="Intitulé de la prestation" class="libelle"
+                               type="textinput" value="<?= (isset($activite->prestation) ? $activite->prestation : '') ?>"required>
+                    </div>
+
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label" for="textinput">Coût<span class="important">*</span> :</label>
+
+                    <div class="col-md-4">
+                        <input id="COUTSecondaire" name="COUTSecondaire[]" title="Entrez le coût de la prestation" placeholder="Coût" class="form-control input-md"
+                               type="number" value="<?= (isset($activite->COUT) ? $activite->COUT : '') ?>"required>
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-2 control-label" for="textinput">Âge minimum :</label>
+
+                    <div class="col-md-4">
+                        <input id="AGE_MINSecondaire" name="AGE_MINSecondaire[]" title="Entrez l'âge minimum requis pour participer à la prestation (0 signifie qu'il n'y a pas d'age minimum limite)" placeholder="Âge minimum" class="form-control input-md"
+                               type="number" value="<?= (isset($activite->AGE_MIN) ? $activite->AGE_MIN : '0') ?>">
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label class="col-md-2 control-label" for="textinput">Âge maximum :</label>
+                    <div class="col-md-4">
+                        <input id="AGE_MAXSecondaire" name="AGE_MAXSecondaire[]" title="Entrez l'âge maximum requis pour participer à la prestation (99 signifie qu'il n'y a pas d'age maximum limite)" placeholder="Âge maximum" class="form-control input-md"
+                               type="number" value="<?= (isset($activite->AGE_MAX) ? $activite->AGE_MAX : '99') ?>">
+                    </div>
+
+                </div>
+            </div>
+
+        
+            <?php //} ?>
+        </div>
+                <div>
+        <br>
+        <p>pouet pouet</p>
+                </div>
+        <input type="button" title="ajouter une prestation secondaire qui pourra être supprimée plus tard si besoin" onClick="addPrestationSecondaire()" value="Ajout prestation secondaire">
+        <input type="button" title="supprimer la dernière prestation secondaire entrée" onClick="removePrestationSecondaire()" value="Suppression prestation secondaire">
 
         <!-- Button -->
         <div class="form-group">
@@ -198,6 +257,7 @@
 </form>
 
 <p>Clicks: <a id="clicks">0</a></p>
+<p>Clicksecond: <a id="clicksecond">0</a></p>
 
 <script>
 
@@ -217,6 +277,10 @@
     // parce que la recherche de prestations associées à une activité passera par une requete où les 2 id seront demandés
 
     var clicks = 2;
+    var clicksecond = 1;
+    let baseSelectInput = document.getElementsByClassName("prestationsecondaire");
+    var secondaire = baseSelectInput[baseSelectInput.length-1];
+    secondaire.remove();
 
     function onClick(s) {
         if(s == "+") {
@@ -231,14 +295,7 @@
     function addPrestationInput() {
         let formContainer = document.getElementById("prestation_principale");
         let baseSelectInput = document.getElementsByClassName("prestation");
-        let init="";
-        if(clicks%2===0){
-            init = "";
-        }
-        else{
-            init = "<div class='d-inline-block p-2'>";
-        }
-        let base = init+"<div class='prestationajoutee'><hr><br>Prestation principale n°"+clicks+
+        let base = "<div class='prestationajoutee'><hr><br>Prestation principale n°"+clicks+
             baseSelectInput[0].innerHTML +
             "<div class='form-group'>" +
             "<label class='col-md-2 control-label' for='textinput'>adhérent / externe <span class='important'>*</span>:</label> " +
@@ -267,6 +324,46 @@
             document.getElementById("clicks").innerHTML = clicks;
         }
     }
+
+    function addPrestationSecondaire(){
+        let formContainer = document.getElementById("prestation_secondaire");
+        let base = "<div class='prestationsecondaire'><hr><br>Prestation secondaire n°"+clicksecond+
+            secondaire.innerHTML+
+            "<div class='form-group'>" +
+            "<label class='col-md-2 control-label' for='textinput'>adhérent / externe <span class='important'>*</span>:</label> " +
+            "<div class='col-md-1'> " +
+            "<input id='OUVERT_EXTERNESecondaire"+(clicksecond-1)+"' name='OUVERT_EXTERNESecondaire"+(clicksecond-1)+"' title='Si la prestation n est ouverte qu aux adhérents d Alstom et leur famille' type='radio' value='0' checked onclick='ouvertEnfants();'> " +
+            "<label for='OUVERT_EXTERNESecondaire'>adhérent (+famille)</label> " +
+            "</div> " +
+            "<div class='col-md-1'>" +
+            "<input id='OUVERT_EXTERNESecondaire"+(clicksecond-1)+"' name='OUVERT_EXTERNESecondaire"+(clicksecond-1)+"' title='Si la prestation est ouverte aux personnes externes à Alstom' type='radio' value='1' onclick='ouvertEnfants();'> " +
+            "<label for='OUVERT_EXTERNESecondaire'>externe</label>" +
+            "</div>" +
+            "</fieldset>"+
+            "</div>";
+
+        clicksecond +=1;
+        document.getElementById("clicksecond").innerHTML = clicksecond;
+        formContainer.insertAdjacentHTML('beforeend', base);
+    }
+
+    function removePrestationSecondaire(){
+        let baseSelectInput = document.getElementsByClassName("prestationsecondaire")
+            let latestInput = baseSelectInput[baseSelectInput.length-1];
+            latestInput.remove();
+            clicksecond-=1;
+            document.getElementById("clicksecond").innerHTML = clicksecond;
+        
+    }
+
+    
+    //function InitSecondaire(){
+        //let baseSelectInput = document.getElementsByClassName("prestationsecondaire");
+        //secondaire = document.getElementsByClassName("prestationsecondaire");
+        //let latestInput = baseSelectInput[baseSelectInput.length-1];
+        //latestInput.remove();
+        
+    //}
 
     function createDiv() {
         let formContainer = document.getElementById("getText");
