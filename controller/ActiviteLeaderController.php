@@ -286,7 +286,6 @@ class ActiviteLeaderController extends Controller
         $modInscription = $this->loadModel('ActiviteParticipantsLeader');
         $projection['projection'] = 'INSCRIPTION.DATE_INSCRIPTION, INSCRIPTION.DATE_PAIEMENT, INSCRIPTION.ID,CRENEAU.NUM_CRENEAU, CRENEAU.DATE_CRENEAU, CRENEAU.HEURE_CRENEAU,INSCRIPTION.PAYE, INSCRIPTION.CRENEAU, INSCRIPTION.ID_ADHERENT, MONTANT, AUTO_PARTICIPATION, INSCRIPTION.ID_ACTIVITE, ADHERENT.NOM as ADN, ADHERENT.PRENOM as ADP, GROUP_CONCAT(INVITE.NOM, " ", INVITE.PRENOM separator "<br>") as INN, INSCRIPTION.ATTENTE as ATTENTE';
         $projection['conditions'] = "INSCRIPTION.ID_ACTIVITE = {$id} AND INSCRIPTION.ATTENTE = 0";
-//        $projection['groupby'] = "CRENEAU.DATE_CRENEAU";
         $projection['groupby'] = "INSCRIPTION.DATE_INSCRIPTION ";
         $projection['orderby'] = "INSCRIPTION.CRENEAU";
 
@@ -338,9 +337,9 @@ class ActiviteLeaderController extends Controller
         //prestations
         $modPresta = $this->loadModel('Prestation');
         $projection['projection'] = "COUT, AGEMIN, AGEMAX, LIBELLE, OUVERT_EXT";
-        $projection['conditions'] = "ID_ACTIVITE = $ID_ACTIVITE, SECONDAIRE = 0";
-        $d['prestationsPrincipales'] = $modPresta->find($projection);
-        $projection['conditions'] = "ID_ACTIVITE = $ID_ACTIVITE, SECONDAIRE = 1";
+        $projection['conditions'] = "ID_ACTIVITE = $ID_ACTIVITE AND SECONDAIRE = 0";
+        $d['prestationsPrincipales'] = $modPresta->find($projection, true);
+        $projection['conditions'] = "ID_ACTIVITE = $ID_ACTIVITE AND SECONDAIRE = 1";
         $d['prestationsSecondaires'] = $modPresta->find($projection);
         // prestataires
         $modPrestataire = $this->loadModel('Prestataire');
@@ -407,12 +406,14 @@ class ActiviteLeaderController extends Controller
         $nombreinscription = intval($resultA->ap) + intval($resultA->INN);
 
 
+        //compte les personnes qui ne sont pas en auto-participation
         $modEffectifInvite= $this->loadModel('ActiviteParticipantsAdherent');
         $projectionC['projection'] = "COUNT(i.ID) as effectif";
         $projectionC['conditions'] = "c.ID_ACTIVITE = {$id} AND c.NUM_CRENEAU = {$_POST['creneau']} AND i.ATTENTE = 0 AND i.AUTO_PARTICIPATION=0";
         $resultEI = $modEffectifInvite->findfirst($projectionC, true);
+
         $inscrits = $effectifc->inscrits-$resultEI->effectif;
-        var_dump($inscrits);
+        //var_dump($inscrits);
 
         if (!($nombreinscription > $effectifc->places - $inscrits)) {
             $donnees['ATTENTE'] = 0;

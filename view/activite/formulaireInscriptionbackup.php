@@ -20,23 +20,12 @@
             Séléctionnez les participants
             <hr>
 
-            <div class="prestation form-group">
+            <div class="form-group">
                 <label class="col-md-2 control-label" for="textinput">Participants : Adhérent</label>
                 <div class="col-md-3">
                     <select onchange="calculMontantLive()" id="AUTO_PARTICIPATION" name="AUTO_PARTICIPATION" value="1">
                         <option value="1"><?= $_SESSION['NOM'] . ' ' . $_SESSION['PRENOM'] ?></option>
                         <option value="0">Je souhaite seulement inscrire des invités.</option>
-                        <?php if (isset($invitesfamille)) {
-                            foreach ($invitesfamille as $invite) {
-
-                                // Vérification Enfant
-                                if (!(ActiviteController::getAge($invite->DATE_NAISSANCE) <= $donnees->AGE_MINIMUM)) {
-
-                                    ?>
-                                    <option id="<?= ActiviteController::getAge($invite->DATE_NAISSANCE) < 18 ? 'enfant' : 'adulte' ?>"  value=<?= $invite->ID_PERS_EXTERIEUR; ?>><?= $invite->NOM ?> <?= $invite->PRENOM ?></option>
-                                <?php }
-                            };
-                        } ?>
                     </select>
                 </div>
 
