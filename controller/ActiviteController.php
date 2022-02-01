@@ -199,6 +199,11 @@ class ActiviteController extends Controller
         $projection['orderby'] = "DATE_CRENEAU, HEURE_CRENEAU";
         $d['creneaux'] = $modCreneau->find($projection);
 
+        //Récupération des prestations
+        $modPresta=$this->loadModel('Prestation');
+        $projPresta['conditions'] = "ID_ACTIVITE = {$id}";
+        $d['prestation'] = $modPresta->find($projPresta);
+
         $this->set($d);
     }
 
