@@ -34,7 +34,10 @@ class ActiviteAdminController extends Controller {
         //prestations
         $modPresta = $this->loadModel('Prestation');
         $projection['projection'] = "COUT, AGEMIN, AGEMAX, LIBELLE, OUVERT_EXT";
-        $d['prestations'] = $modPresta->find($projection);
+        $projection['conditions'] = "ID_ACTIVITE = $ID_ACTIVITE AND SECONDAIRE = 0";
+        $d['prestationsPrincipales'] = $modPresta->find($projection, true);
+        $projection['conditions'] = "ID_ACTIVITE = $ID_ACTIVITE AND SECONDAIRE = 1";
+        $d['prestationsSecondaires'] = $modPresta->find($projection);
 
         // prestataires
         $modPrestataire = $this->loadModel('Prestataire');
@@ -130,7 +133,7 @@ class ActiviteAdminController extends Controller {
 
         //préparation de la récup des prestations
         $modPresta = $this->loadModel('Prestation');
-        $colonnesPresta=array('ID_ACTIVITE', 'ID_PRESTATION', 'COUT', 'AGEMIN', 'AGEMAX', 'LIBELLE', 'OUVERT_EXT', 'PRIX');
+        $colonnesPresta=array('ID_ACTIVITE', 'ID_PRESTATION', 'COUT', 'AGEMIN', 'AGEMAX', 'LIBELLE', 'OUVERT_EXT','SECONDAIRE', 'PRIX');
         $count=0;
         $modPresta->delete(array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE)));
 
@@ -152,6 +155,45 @@ class ActiviteAdminController extends Controller {
             $donneesPresta['AGE_MAX'] = $agemax;
             $donneesPresta['LIBELLE'] = $libelle;
             $donneesPresta['OUVERT_EXT'] = $ouvertext;
+            $donneesPresta['SECONDAIRE'] = 0;
+            $donneesPresta['PRIX'] = $prix;
+
+            /*if(isset($_POST["PRIX"])) {
+                $donnees["PRIX"] = $_POST["PRIX"];
+                var_dump($_POST["PRIX"]);
+            }
+            else{
+                $donnees["PRIX"] = $_POST["COUT"];
+            }*/
+
+            //insertion dans la base de données
+            $modPresta->insert($colonnesPresta, $donneesPresta);
+
+            //ajout d'une valeur du count pour selectionner la prestation suivante de l'activité
+            $count+=1;
+
+        }
+        $count=0;
+
+        foreach ($_POST['LibelleSecondaire'] as $libelle){
+            //récupération de chaque valeur dans des variables pour facilité la compréhension
+            $post = "OUVERT_EXTERNESecondaire".($count+1);
+            $cout = $_POST['COUTSecondaire'][$count];
+            $agemin = $_POST['AGE_MINSecondaire'][$count];
+            $agemax = $_POST['AGE_MAXSecondaire'][$count];
+            $ouvertext = $_POST["$post"];
+            $prix = $_POST['PRIXSecondaire'][$count];
+
+
+            //ajout des données dans pour l'insertion
+            $donneesPresta['ID_ACTIVITE']=$ID_ACTIVITE;
+            $donneesPresta['ID_PRESTATION'] = $count+1;
+            $donneesPresta['COUT'] = $cout;
+            $donneesPresta['AGE_MIN'] = $agemin;
+            $donneesPresta['AGE_MAX'] = $agemax;
+            $donneesPresta['LIBELLE'] = $libelle;
+            $donneesPresta['OUVERT_EXT'] = $ouvertext;
+            $donneesPresta['SECONDAIRE'] = 1;
             $donneesPresta['PRIX'] = $prix;
 
             /*if(isset($_POST["PRIX"])) {

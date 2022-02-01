@@ -521,6 +521,37 @@ class ActiviteLeaderController extends Controller
 
         }
 
+        $count=0;
+
+        foreach ($_POST['LibelleSecondaire'] as $libelle){
+            //récupération de chaque valeur dans des variables pour facilité la compréhension
+            $post = "OUVERT_EXTERNESecondaire".($count+1);
+            $cout = $_POST['COUTSecondaire'][$count];
+            $agemin = $_POST['AGE_MINSecondaire'][$count];
+            $agemax = $_POST['AGE_MAXSecondaire'][$count];
+            $ouvertext = $_POST["$post"];
+            $prix = $_POST['PRIXSecondaire'][$count];
+
+
+            //ajout des données dans pour l'insertion
+            $donneesPresta['ID_ACTIVITE']=$ID_ACTIVITE;
+            $donneesPresta['ID_PRESTATION'] = $count+1;
+            $donneesPresta['COUT'] = $cout;
+            $donneesPresta['AGE_MIN'] = $agemin;
+            $donneesPresta['AGE_MAX'] = $agemax;
+            $donneesPresta['LIBELLE'] = $libelle;
+            $donneesPresta['OUVERT_EXT'] = $ouvertext;
+            $donneesPresta['SECONDAIRE'] = 1;
+            $donneesPresta['PRIX'] = $prix;
+
+            //insertion dans la base de données
+            $modPresta->insert($colonnesPresta, $donneesPresta);
+
+            //ajout d'une valeur du count pour selectionner la prestation suivante de l'activité
+            $count+=1;
+
+        }
+
         $tab = array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE), 'donnees' => $donnees);
         //appeler la methode update
         $modActivite->update($tab);

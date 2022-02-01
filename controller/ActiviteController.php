@@ -541,25 +541,25 @@ class ActiviteController extends Controller
             //            $donnees['ID_ACTIVITE'] = $id;
             //            $donnees['ID_ADHERENT'] = $_SESSION['ID_ADHERENT'];
             //            if ($_POST['AUTO_PARTICIPATION'] == 1) {
-                //                $adh = Session::get('ID_ADHERENT');
-                //
-                //            } else {
-                    //                $adh = "non"; // l'adhérent ne participe pas
-                    //            }
-                    //            $donnees['AUTO_PARTICIPATION'] = $_POST['AUTO_PARTICIPATION'];
-                    //            $donnees['CRENEAU'] = $_POST['CRENEAU'];
-                    //            $donnees['DATE_INSCRIPTION'] = date('Y-m-d');
-                    //            if(isset($_POST['famille'])) {
-                        //                $donnees['MONTANT'] = $this->calculMontant($id, $adh, $_POST['famille']);
-                        //            }
-                        //            elseif (isset($_POST['ext'])){
-                            //                $donnees['MONTANT'] = $this->calculMontant($id, $adh, $_POST['ext']);
-                            //            }
-                            //            else{
-                                //                $donnees['MONTANT'] = $this->calculMontant($id, $adh, NULL);
-                                //            }
-                                            //$donnees['DATE_PAIEMENT'] = date_create('0000-00-00');
-                                                        //$donnees['DATE_DESINSCRIPTION'] = date_create('0000-00-00');
+            //                $adh = Session::get('ID_ADHERENT');
+            //
+            //            } else {
+            //                $adh = "non"; // l'adhérent ne participe pas
+            //            }
+            //            $donnees['AUTO_PARTICIPATION'] = $_POST['AUTO_PARTICIPATION'];
+            //            $donnees['CRENEAU'] = $_POST['CRENEAU'];
+            //            $donnees['DATE_INSCRIPTION'] = date('Y-m-d');
+            //            if(isset($_POST['famille'])) {
+            //                $donnees['MONTANT'] = $this->calculMontant($id, $adh, $_POST['famille']);
+            //            }
+            //            elseif (isset($_POST['ext'])){
+            //                $donnees['MONTANT'] = $this->calculMontant($id, $adh, $_POST['ext']);
+            //            }
+            //            else{
+            //                $donnees['MONTANT'] = $this->calculMontant($id, $adh, NULL);
+            //            }
+            //$donnees['DATE_PAIEMENT'] = date_create('0000-00-00');
+            //$donnees['DATE_DESINSCRIPTION'] = date_create('0000-00-00');
                                                         
             $modInscription = $this->loadModel('Inscription');
             // Test si l'on est pas déjà inscrit !
