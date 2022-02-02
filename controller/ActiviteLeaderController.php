@@ -146,34 +146,25 @@ class ActiviteLeaderController extends Controller
                 $count+=1;
 
             }
-            var_dump($_POST["LibelleSecondaire"]);
-            foreach ($_POST['LibelleSecondaire'] as $libelle){
-                $count =0;
-                //récupération de chaque valeur dans des variables pour facilité la compréhension
-                $post = "OUVERT_EXTERNESecondaire".$count;
-                var_dump($libelle);
-                var_dump($_POST['COUTSecondaire'][$count]);
-                var_dump($_POST['AGE_MINSecondaire'][$count]);
-                var_dump($_POST['AGE_MAXSecondaire'][$count]);
-                var_dump($_POST["$post"]);
-                $count+=1;
-            }
 
             //verification de la présence de prestations secondaires et ajout dans la BDD
             if(isset($_POST["LibelleSecondaire"])){
                 echo "isset valide";
-                $count =0;
+                $countsec =0;
                 $colonnesPrestaSecondaire=array('ID_ACTIVITE', 'ID_PRESTATION', 'COUT', 'AGEMIN', 'AGEMAX', 'LIBELLE', 'OUVERT_EXT', 'SECONDAIRE');
-
+                var_dump($_POST['COUTSecondaire']);
+                foreach(range(0, 3) as $n){
+                    var_dump($_POST['COUTSecondaire'][$n]);
+                }
                 foreach ($_POST['LibelleSecondaire'] as $libelle){
                     //récupération de chaque valeur dans des variables pour facilité la compréhension
-                    $post = "OUVERT_EXTERNESecondaire".$count;
-                    $cout = $_POST['COUTSecondaire'][$count];
-                    $agemin = $_POST['AGE_MINSecondaire'][$count];
-                    $agemax = $_POST['AGE_MAXSecondaire'][$count];
+                    $post = "OUVERT_EXTERNESecondaire".$countsec;
+                    $cout = $_POST['COUTSecondaire'][$countsec];
+                    $agemin = $_POST['AGE_MINSecondaire'][$countsec];
+                    $agemax = $_POST['AGE_MAXSecondaire'][$countsec];
                     $ouvertext = $_POST["$post"];
-    
-    
+
+
                     //ajout des données dans pour l'insertion
                     $donneesPrestaSecondaire['ID_ACTIVITE']=$ID_ACTIVITE;
                     $donneesPrestaSecondaire['ID_PRESTATION'] = $count+1;
@@ -183,17 +174,18 @@ class ActiviteLeaderController extends Controller
                     $donneesPrestaSecondaire['LIBELLE'] = $libelle;
                     $donneesPrestaSecondaire['OUVERT_EXT'] = $ouvertext;
                     $donneesPrestaSecondaire['SECONDAIRE'] = 1;
-                    
+
                     var_dump($colonnesPrestaSecondaire);
                     var_dump($donneesPrestaSecondaire);
 
-    
+
                     //insertion dans la base de données
                     $modPresta->insert($colonnesPrestaSecondaire, $donneesPrestaSecondaire);
-    
+
                     //ajout d'une valeur du count pour selectionner la prestation suivante de l'activité
                     $count+=1;
-    
+                    $countsec+=1;
+
                 }
             }
 
@@ -473,7 +465,7 @@ class ActiviteLeaderController extends Controller
 
         //préparation de la récup des prestations
         $modPresta = $this->loadModel('Prestation');
-        $colonnesPresta=array('ID_ACTIVITE', 'ID_PRESTATION', 'COUT', 'AGEMIN', 'AGEMAX', 'LIBELLE', 'OUVERT_EXT');
+        $colonnesPresta=array('ID_ACTIVITE', 'ID_PRESTATION', 'COUT', 'AGEMIN', 'AGEMAX', 'LIBELLE', 'OUVERT_EXT', 'SECONDAIRE');
         $count=0;
 
         //recup les données du form
@@ -491,13 +483,13 @@ class ActiviteLeaderController extends Controller
         $donnees["ID_PRESTATAIRE"] = $_POST["ID_PRESTATAIRE"];
         $donnees["FORFAIT"] = $_POST["TYPE_FORFAIT"];
 
-       // $req['conditions'] = 'ID_ACTIVITE' => $ID_ACTIVITE;
-       // $tabPresta = array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE));
+        // $req['conditions'] = 'ID_ACTIVITE' => $ID_ACTIVITE;
+        // $tabPresta = array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE));
         $modPresta->delete(array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE)));
 
         foreach ($_POST['Libelle'] as $libelle){
             //récupération de chaque valeur dans des variables pour facilité la compréhension
-            $post = "OUVERT_EXTERNE".($count+1);
+            $post = "OUVERT_EXTERNE".($count);
             $cout = $_POST['COUT'][$count];
             $agemin = $_POST['AGE_MIN'][$count];
             $agemax = $_POST['AGE_MAX'][$count];
@@ -512,6 +504,8 @@ class ActiviteLeaderController extends Controller
             $donneesPresta['AGE_MAX'] = $agemax;
             $donneesPresta['LIBELLE'] = $libelle;
             $donneesPresta['OUVERT_EXT'] = $ouvertext;
+            $donneesPresta['SECONDAIRE'] = 0;
+
 
             //insertion dans la base de données
             $modPresta->insert($colonnesPresta, $donneesPresta);
@@ -521,35 +515,35 @@ class ActiviteLeaderController extends Controller
 
         }
 
-        $count=0;
+        if(isset($_POST['LibelleSecondaire'])){
+            $countsec = 0;
 
-        foreach ($_POST['LibelleSecondaire'] as $libelle){
-            //récupération de chaque valeur dans des variables pour facilité la compréhension
-            $post = "OUVERT_EXTERNESecondaire".($count+1);
-            $cout = $_POST['COUTSecondaire'][$count];
-            $agemin = $_POST['AGE_MINSecondaire'][$count];
-            $agemax = $_POST['AGE_MAXSecondaire'][$count];
-            $ouvertext = $_POST["$post"];
-            $prix = $_POST['PRIXSecondaire'][$count];
+            foreach ($_POST['LibelleSecondaire'] as $libelle){
+                //récupération de chaque valeur dans des variables pour facilité la compréhension
+                $post = "OUVERT_EXTERNESecondaire".($countsec+1);
+                $cout = $_POST['COUTSecondaire'][$countsec];
+                $agemin = $_POST['AGE_MINSecondaire'][$countsec];
+                $agemax = $_POST['AGE_MAXSecondaire'][$countsec];
+                $ouvertext = $_POST["$post"];
 
 
-            //ajout des données dans pour l'insertion
-            $donneesPresta['ID_ACTIVITE']=$ID_ACTIVITE;
-            $donneesPresta['ID_PRESTATION'] = $count+1;
-            $donneesPresta['COUT'] = $cout;
-            $donneesPresta['AGE_MIN'] = $agemin;
-            $donneesPresta['AGE_MAX'] = $agemax;
-            $donneesPresta['LIBELLE'] = $libelle;
-            $donneesPresta['OUVERT_EXT'] = $ouvertext;
-            $donneesPresta['SECONDAIRE'] = 1;
-            $donneesPresta['PRIX'] = $prix;
+                //ajout des données dans pour l'insertion
+                $donneesPresta['ID_ACTIVITE']=$ID_ACTIVITE;
+                $donneesPresta['ID_PRESTATION'] = $count+1;
+                $donneesPresta['COUT'] = $cout;
+                $donneesPresta['AGE_MIN'] = $agemin;
+                $donneesPresta['AGE_MAX'] = $agemax;
+                $donneesPresta['LIBELLE'] = $libelle;
+                $donneesPresta['OUVERT_EXT'] = $ouvertext;
+                $donneesPresta['SECONDAIRE'] = 1;
 
-            //insertion dans la base de données
-            $modPresta->insert($colonnesPresta, $donneesPresta);
+                //insertion dans la base de données
+                $modPresta->insert($colonnesPresta, $donneesPresta);
 
-            //ajout d'une valeur du count pour selectionner la prestation suivante de l'activité
-            $count+=1;
+                //ajout d'une valeur du count pour selectionner la prestation suivante de l'activité
+                $count+=1;
 
+            }
         }
 
         $tab = array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE), 'donnees' => $donnees);

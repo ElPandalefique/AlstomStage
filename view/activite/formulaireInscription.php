@@ -22,11 +22,13 @@
 //        var_dump($invitesfamille);
 //        var_dump($prestation);
         ?>
-        <hr>
+
 
         <div class="prestation form-group" id="participations">
             <div class="participation">
+                <hr>
                 <label class="control-label" for="textinput">Participation:</label>
+                <br>
                 <select onchange="calculMontantLive()"  name="participation[]">
                     <option id="AUTO_PARTICIPATION" value="1"><?= $_SESSION['NOM'] . ' ' . $_SESSION['PRENOM'] ?></option>
                     <?php if (isset($invitesfamille)) {
@@ -54,13 +56,48 @@
                     }
                     }?>
                 </select>
-                <select name="prestation[]">
+
+                <?php
+                foreach ($prestationP as $presta) {
+                    echo "<div>
+                    <input type=\"radio\" id=\"$presta->LIBELLE\" name=\"prestationPrimaire\" value=\"$presta->LIBELLE\" required>
+                    <label for=\"$presta->LIBELLE\">$presta->LIBELLE</label>
+                </div>";
+                }
+                foreach($prestationS as $presta){
+                    echo "<div>
+                    <input type=\"checkbox\" id=\"$presta->LIBELLE\" name=\"prestationSecondaire\" value=\"$presta->LIBELLE\">
+                    <label for=\"$presta->LIBELLE\">$presta->LIBELLE</label>
+                </div>";
+                }
+                ?>
+
+                <!--<select name="prestation[]">
+                    <option id=\"prestation\" value=\"$value\">aucun</option>
                     <?php
-                    foreach($prestation as $presta){
-                        echo "<option id=\"prestation\" value=\"$presta->ID_PRESTATION\">$presta->LIBELLE</option> ";
+                    /*foreach($prestation as $presta){
+                        $value = "$presta->ID_PRESTATION"."_"."$presta->SECONDAIRE";
+                        echo "<option id=\"prestation\" value=\"$value\">$presta->LIBELLE</option> ";
                     }
                     ?>
                 </select>
+                <select name="prestation[]">
+                    <?php
+                    foreach($prestation as $presta){
+                        $value = "$presta->ID_PRESTATION"."_"."$presta->SECONDAIRE";
+                        echo "<option id=\"prestation\" value=\"$value\">$presta->LIBELLE</option> ";
+                    }
+                    ?>
+                </select>
+                <select name="prestation[]">
+                    <?php
+                    foreach($prestation as $presta){
+                        $value = "$presta->ID_PRESTATION"."_"."$presta->SECONDAIRE";
+                        echo "<option id=\"prestation\" value=\"$value\">$presta->LIBELLE</option> ";
+                    }
+                    echo "</select>";*/
+                ?>
+-->
             </div>
         </div>
         <input type="button" value="+" onclick="addParticipation()">

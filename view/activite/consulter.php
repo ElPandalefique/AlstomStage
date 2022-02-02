@@ -55,18 +55,19 @@
             </tr>
 
         </table>
-<br>
+        <br>
 
         <h4><strong>Liste des prestations</strong></h4>
         <table class="table table-bordered table-condensed table-striped">
             <td>Nom de la prestation</td>
-            <td>Prix de la prestation</td>
-            <td>Age minimum requis</td>
-            <td>Age maximum</td>
-            <td>Ouvert aux personnes externes</td>
+            <td>Prix</td>
+            <td>Age min</td>
+            <td>Age max</td>
+            <td>Externes</td>
+            <tr><td><strong>Prestations Principales</strong></td></tr>
 
             <?php
-            foreach($prestations as $prestation){
+            foreach($prestationsP as $prestation){
                 if($prestation->OUVERT_EXT==1){
                     $ouvertext = "Oui";
                 }
@@ -78,13 +79,13 @@
 <td>$prestation->PRIX €</td>
 <td>";
                 if($prestation->AGEMIN==0){
-                echo"aucun";
+                    echo"aucun";
                 }
                 else{
                     echo "$prestation->AGEMIN ans";
                 }
 
-                    echo"</td>
+                echo"</td>
 <td>";
                 if($prestation->AGEMAX==99){
                     echo"aucun";
@@ -97,11 +98,42 @@
 <td>$ouvertext</td>
 </tr>";
             }
+            if(isset($prestationsS)) {
+                echo "<tr><td><strong>Prestations secondaires</strong></td></tr>";
+                foreach ($prestationsS as $prestation) {
+                    if ($prestation->OUVERT_EXT == 1) {
+                        $ouvertext = "Oui";
+                    } else {
+                        $ouvertext = "Non";
+                    };
+                    echo "<tr>
+<td>$prestation->LIBELLE</td>
+<td>$prestation->PRIX €</td>
+<td>";
+                    if ($prestation->AGEMIN == 0) {
+                        echo "aucun";
+                    } else {
+                        echo "$prestation->AGEMIN ans";
+                    }
 
+                    echo "</td>
+<td>";
+                    if ($prestation->AGEMAX == 99) {
+                        echo "aucun";
+                    } else {
+                        echo "$prestation->AGEMAX ans";
+                    }
+
+                    echo "</td>
+<td>$ouvertext</td>
+</tr>";
+
+                }
+            }
             ?>
 
         </table>
-
+<!--
         <table id="liste_tournoi" class="table table-bordered table-condensed table-striped">
 
             <div class="form-group">
@@ -118,9 +150,17 @@
                     </tr>
                 </table>
             </div>
+            -->
 
             <br>
             Liste des Créneaux
+        <?php
+            if(isset($creneaux)){
+                foreach ($creneaux as $cre){
+                    echo"<p>$cre->DATE_CRENEAU, $cre->HEURE_CRENEAU</p>";
+                }
+            }
+        ?>
             <hr>
             <div class="form-group">
                 <table class="table table-bordered table-condensed table-striped">
@@ -153,13 +193,13 @@
                             }
                             echo"<tr><td>$date</td><td>$heure</td><td>";
                             if (!empty($eff->adh)) {
-                                        if (!empty($eff->listeinv)) {
-                                            echo $eff->listeinv . '<br>';
-                                        }
-                                        echo $eff->adh;
-                                    } else {
-                                        echo $eff->listeinv;
-                                    }
+                                if (!empty($eff->listeinv)) {
+                                    echo $eff->listeinv . '<br>';
+                                }
+                                echo $eff->adh;
+                            } else {
+                                echo $eff->listeinv;
+                            }
                             echo"</td><td>$effectif / $eff->EFFECTIF_CRENEAU</td><td>$attentes</td></tr>";
                         }
                     }

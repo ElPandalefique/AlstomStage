@@ -173,43 +173,38 @@ class ActiviteAdminController extends Controller {
             $count+=1;
 
         }
-        $count=0;
 
-        foreach ($_POST['LibelleSecondaire'] as $libelle){
-            //récupération de chaque valeur dans des variables pour facilité la compréhension
-            $post = "OUVERT_EXTERNESecondaire".($count+1);
-            $cout = $_POST['COUTSecondaire'][$count];
-            $agemin = $_POST['AGE_MINSecondaire'][$count];
-            $agemax = $_POST['AGE_MAXSecondaire'][$count];
-            $ouvertext = $_POST["$post"];
-            $prix = $_POST['PRIXSecondaire'][$count];
+        if(isset($_POST['LibelleSecondaire'])){
+            $countsec = 0;
+
+            foreach ($_POST['LibelleSecondaire'] as $libelle){
+                //récupération de chaque valeur dans des variables pour facilité la compréhension
+                $post = "OUVERT_EXTERNESecondaire".($countsec+1);
+                $cout = $_POST['COUTSecondaire'][$countsec];
+                $agemin = $_POST['AGE_MINSecondaire'][$countsec];
+                $agemax = $_POST['AGE_MAXSecondaire'][$countsec];
+                $ouvertext = $_POST["$post"];
+                $prix = $_POST['PRIXSecondaire'][$countsec];
 
 
-            //ajout des données dans pour l'insertion
-            $donneesPresta['ID_ACTIVITE']=$ID_ACTIVITE;
-            $donneesPresta['ID_PRESTATION'] = $count+1;
-            $donneesPresta['COUT'] = $cout;
-            $donneesPresta['AGE_MIN'] = $agemin;
-            $donneesPresta['AGE_MAX'] = $agemax;
-            $donneesPresta['LIBELLE'] = $libelle;
-            $donneesPresta['OUVERT_EXT'] = $ouvertext;
-            $donneesPresta['SECONDAIRE'] = 1;
-            $donneesPresta['PRIX'] = $prix;
+                //ajout des données dans pour l'insertion
+                $donneesPresta['ID_ACTIVITE']=$ID_ACTIVITE;
+                $donneesPresta['ID_PRESTATION'] = $count+1;
+                $donneesPresta['COUT'] = $cout;
+                $donneesPresta['AGE_MIN'] = $agemin;
+                $donneesPresta['AGE_MAX'] = $agemax;
+                $donneesPresta['LIBELLE'] = $libelle;
+                $donneesPresta['OUVERT_EXT'] = $ouvertext;
+                $donneesPresta['SECONDAIRE'] = 1;
+                $donneesPresta['PRIX'] = $prix;
 
-            /*if(isset($_POST["PRIX"])) {
-                $donnees["PRIX"] = $_POST["PRIX"];
-                var_dump($_POST["PRIX"]);
+                //insertion dans la base de données
+                $modPresta->insert($colonnesPresta, $donneesPresta);
+
+                //ajout d'une valeur du count pour selectionner la prestation suivante de l'activité
+                $count+=1;
+
             }
-            else{
-                $donnees["PRIX"] = $_POST["COUT"];
-            }*/
-
-            //insertion dans la base de données
-            $modPresta->insert($colonnesPresta, $donneesPresta);
-
-            //ajout d'une valeur du count pour selectionner la prestation suivante de l'activité
-            $count+=1;
-
         }
 
 

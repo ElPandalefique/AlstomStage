@@ -88,6 +88,7 @@ class ActiviteController extends Controller
         $modListeCreneau = $this->loadModel('ListeCreneau');
         $projection ['projection'] = "CRENEAU.NUM_CRENEAU, CRENEAU.DATE_CRENEAU, HEURE_CRENEAU, EFFECTIF_CRENEAU";
         $projection['conditions'] = "ID_ACTIVITE = " . $ID_ACTIVITE;
+        $d['creneaux'] = $modListeCreneau->find($projection);
 
         // requete 4 pour récupérer la liste des participants par créneau
 
@@ -132,8 +133,10 @@ class ActiviteController extends Controller
         $d['effectifInviteattente'] = $resultEI;
 
         $modPresta = $this->loadModel('Prestation');
-        $projPresta["conditions"] = "ID_ACTIVITE = $id";
-        $d['prestations'] = $modPresta->find($projPresta);
+        $projPresta["conditions"] = "ID_ACTIVITE = $id AND SECONDAIRE = 0";
+        $d['prestationsP'] = $modPresta->find($projPresta);
+        $projPresta["conditions"] = "ID_ACTIVITE = $id AND SECONDAIRE = 1";
+        $d['prestationsS'] = $modPresta->find($projPresta);
 
         $this->set($d);
 
@@ -201,8 +204,10 @@ class ActiviteController extends Controller
 
         //Récupération des prestations
         $modPresta=$this->loadModel('Prestation');
-        $projPresta['conditions'] = "ID_ACTIVITE = {$id}";
-        $d['prestation'] = $modPresta->find($projPresta);
+        $projPresta['conditions'] = "ID_ACTIVITE = {$id} AND SECONDAIRE = 0";
+        $d['prestationP'] = $modPresta->find($projPresta);
+        $projPresta['conditions'] = "ID_ACTIVITE = {$id} AND SECONDAIRE = 1";
+        $d['prestationS'] = $modPresta->find($projPresta);
 
         $this->set($d);
     }
@@ -298,7 +303,6 @@ class ActiviteController extends Controller
 
         return $montant;
     }
-
 
     public function modificationActivite($id)
     {
@@ -442,9 +446,7 @@ class ActiviteController extends Controller
 
     }
 
-
-    public
-    function inscriptionActivite($id)
+    public function inscriptionActivite($id)
     {
 
 
