@@ -23,14 +23,14 @@
 //        var_dump($prestation);
         ?>
 
-
         <div class="prestation form-group" id="participations">
             <div class="participation">
                 <hr>
-                <label class="control-label" for="textinput">Participation:</label>
+                <label class="control-label" for="textinput">Participation</label>
                 <br>
-                <select onchange="calculMontantLive()"  name="participation[]">
-                    <option id="AUTO_PARTICIPATION" value="1"><?= $_SESSION['NOM'] . ' ' . $_SESSION['PRENOM'] ?></option>
+                <strong>Participant:</strong>
+                <select onchange="calculMontantLive()"  name="participant[]">
+                    <option id="AUTO_PARTICIPATION" value="AUTO_PARTICIPATION"><?= $_SESSION['NOM'] . ' ' . $_SESSION['PRENOM'] ?></option>
                     <?php if (isset($invitesfamille)) {
 
                         foreach ($invitesfamille as $invite) {
@@ -56,19 +56,28 @@
                     }
                     }?>
                 </select>
-
+                <br>
+                <strong>Prestation principale:</strong>
+                <select onchange="calculMontantLive()"  name="prestationprincipale[]">
                 <?php
                 foreach ($prestationP as $presta) {
-                    echo "<div>
-                    <input type=\"radio\" id=\"$presta->LIBELLE\" name=\"prestationPrimaire\" value=\"$presta->LIBELLE\" required>
-                    <label for=\"$presta->LIBELLE\">$presta->LIBELLE</label>
-                </div>";
+                    echo "<option id=\"$presta->ID_PRESTATION\" value=\"$presta->ID_PRESTATION\">$presta->LIBELLE</option>";
                 }
-                foreach($prestationS as $presta){
-                    echo "<div>
-                    <input type=\"checkbox\" id=\"$presta->LIBELLE\" name=\"prestationSecondaire\" value=\"$presta->LIBELLE\">
-                    <label for=\"$presta->LIBELLE\">$presta->LIBELLE</label>
-                </div>";
+                echo "</select>";
+                if(isset($prestationS)) {
+                    echo "
+<div class = \"PrestationSecondaire\">
+<strong>Prestation(s) Secondaire(s)</strong>
+<select name =\"prestationSecondaire0[]\">
+<option value=\"none\">--aucune--</option>
+";
+                    foreach ($prestationS as $presta) {
+                        echo "<option id=\"$presta->ID_PRESTATION\" value=\"$presta->ID_PRESTATION\">$presta->LIBELLE</option>";
+                    }
+                    echo"</select>
+<input type=\"button\" value=\"Ajouter\" onclick=\"addPrestationSecondaire()\">
+            <input type=\"button\" value=\"Supprimer\" onclick=\"removePrestationSecondaire();\"></div>
+";
                 }
                 ?>
 
@@ -100,8 +109,12 @@
 -->
             </div>
         </div>
-        <input type="button" value="+" onclick="addParticipation()">
-        <input type="button" value="-" onclick="removeParticipation();">
+
+
+
+        <!--</div>-->
+        <input type="button" value="Ajouter une participation" onclick="addParticipation()">
+        <input type="button" value="Supprimer une participation" onclick="removeParticipation();">
 
 
         <div id="live_montant">Montant : <?= $donnees->PRIX_ADULTE ?> €</div>
@@ -191,6 +204,8 @@
 
     </fieldset>
 </form>
+
+    <div class="click" id="click">Clicks =</div>
 
 <?php } else { ?>
 
@@ -291,6 +306,7 @@
 </td>
 
 <script>
+    var count = 1;
     function addInscriptionInput(type) {
         // type sera égal à "famille" où à "ext"
         let formContainer = document.getElementById("invites" + type);
@@ -298,6 +314,31 @@
         let base = baseSelectInput[0];
         formContainer.insertAdjacentHTML('beforeend', base.outerHTML);
 
+    }
+
+    function addPrestationSecondaire() {
+        // type sera égal à "famille" où à "ext"
+        let formContainer = document.getElementById("participations");
+        let baseSelectInput = document.getElementsByClassName("PrestationSecondaire");
+        let base = baseSelectInput[0];
+        // alert(base);
+        formContainer.insertAdjacentHTML('beforeend', base.outerHTML);
+        count +=1;
+        document.getElementById("click").innerHTML = count;
+    }
+
+    function removePrestationSecondaire(){
+        // type sera égal à "famille" où à "ext"
+        let baseSelectInput = document.getElementsByClassName("PrestationSecondaire")
+        if(baseSelectInput.length < 2){
+           // baseSelectInput[0].value = 'none';
+        }else{
+            let latestInput = baseSelectInput[baseSelectInput.length - 1];
+            latestInput.remove();
+            count-=1;
+        }
+        document.getElementById("click").innerHTML = count;
+        //calculMontantLive();
     }
 
     function addParticipation() {

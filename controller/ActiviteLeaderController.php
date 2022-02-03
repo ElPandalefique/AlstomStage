@@ -280,10 +280,10 @@ class ActiviteLeaderController extends Controller
         $projection['conditions'] = "INSCRIPTION.ID_ACTIVITE = {$id} AND INSCRIPTION.ATTENTE = 0";
         $projection['groupby'] = "INSCRIPTION.DATE_INSCRIPTION ";
         $projection['orderby'] = "INSCRIPTION.CRENEAU";
-
         //$projection['order by'] = "INSCRIPTION.DATE_INSCRIPTION";
         //var_dump($projection);
         $result = $modInscription->find($projection);
+
         $projection['groupby'] = "INSCRIPTION.DATE_INSCRIPTION ";
         $projection['conditions'] = "INSCRIPTION.ID_ACTIVITE = {$id} AND INSCRIPTION.ATTENTE = 1";
         $projection['orderby'] = "INSCRIPTION.DATE_INSCRIPTION";

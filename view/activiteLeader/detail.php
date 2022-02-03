@@ -199,7 +199,7 @@
 
         <input type="button" onClick="addPrestationInput()" value="Ajout prestation principale">
         <input type="button" onClick="removePrestationInput()" value="Suppression prestation principale">
-        
+
         <div id="prestation_secondaire"  name = "prestation_secondaire" class = "prestation_secondaire d-inline-block">
             <div class = "prestationsecondaire">
 
