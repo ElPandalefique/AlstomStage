@@ -1,0 +1,12 @@
+leader voir activite:
+creneau
+participant
+adhérent lié
+prestation
+numéro de téléphone
+montant
+gerer
+
+Faire les prestations secondaires
+
+Voir pour gérer la BDD actuelle (inscriptions)

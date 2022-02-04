@@ -726,13 +726,13 @@ class ActiviteController extends Controller
 
         //SI il reste de la place dans la liste principale
         if (!($nombreinscription > $effectifc->places - $effectifc->inscrits)) {
-            $colonnes = array('ID_ACTIVITE', 'ID_ADHERENT', 'AUTO_PARTICIPATION', 'CRENEAU', 'DATE_INSCRIPTION', 'MONTANT');
+            $colonnes = array('ID_ACTIVITE', 'ID_ADHERENT', 'AUTO_PARTICIPATION', 'CRENEAU', 'DATE_INSCRIPTION', 'MONTANT', 'ID_PRESTATION');
             $this->mailAdherent($donnees['ID_ADHERENT'], "principale", $id);
         }
 
         //SI il reste de la place dans la liste d'attente
         elseif(!($nombreinscription > ($effectifc->places*3) - $effectifca->inscrits)){
-            $colonnes = array('ID_ACTIVITE', 'ID_ADHERENT', 'AUTO_PARTICIPATION', 'CRENEAU', 'DATE_INSCRIPTION', 'MONTANT', 'ATTENTE');
+            $colonnes = array('ID_ACTIVITE', 'ID_ADHERENT', 'AUTO_PARTICIPATION', 'CRENEAU', 'DATE_INSCRIPTION', 'MONTANT', 'ATTENTE', 'ID_PRESTATION');
             $donnees['ATTENTE'] = 1;
             $d['info'] = "L'effectif de cette activité étant complet, vous avez été placé en liste d'attente";
             $this->mailAdherent($donnees['ID_ADHERENT'], "attente", $id);
@@ -761,21 +761,36 @@ class ActiviteController extends Controller
             //var_dump($donnees);
             $projection['conditions'] = "ID_ADHERENT = " . $_SESSION['ID_ADHERENT'];
 
-//            $IDInscription = $modInscription->insertAI($colonnes, $donnees);
+            //on cherche la prestation de l'adhérent
+           // $donnees['ID_PRESTATION'] = null;
+            $count = 0;
+            foreach ($_POST['participant'] as $key) {
+                if ($key=='AUTO_PARTICIPATION') {
+                    $donnees['ID_PRESTATION'] = $_POST['prestationprincipale'][$count];
+                    $count+=1;
+                } else {
+                    $count+=1;
+                }
+            }
+
+            $IDInscription = $modInscription->insertAI($colonnes, $donnees);
 //            var_dump($IDInscription);
             //// Liste des invités ////
             $modListeInvite = $this->loadModel('ListeInvite');
-            $colonnes = array('ID_INSCRIPTION', 'ID_INVITE');
-//            $donneesInvite['ID_INSCRIPTION'] = $IDInscription;
+            $colonnes = array('ID_INSCRIPTION', 'ID_INVITE', 'ID_PRESTATION');
+            $donneesInvite['ID_INSCRIPTION'] = $IDInscription;
+            $count = 0;
             foreach ($_POST['participant'] as $key) {
                 if ($key == 'none' or $key=='AUTO_PARTICIPATION') {
                     // ne rien faire
+                    $count+=1;
                 } else {
                     $donneesInvite['ID_INVITE'] = $key;
+                    $donneesInvite['ID_PRESTATION'] = $_POST['prestationprincipale'][$count];
                     var_dump($donneesInvite);
-//                    $modListeInvite->insert($colonnes, $donneesInvite);
+                    $modListeInvite->insert($colonnes, $donneesInvite);
+                    $count+=1;
                 }
-
             }
 
             //si le code id est numerique c'est ok
@@ -788,7 +803,7 @@ class ActiviteController extends Controller
                 $data['MONTANT'] = $this->calculMontant($id, $adh, $modListeInviteNom->find($proj));
                 $tab = array('conditions' => array('ID' => $IDInscription), 'donnees' => $data);
                 var_dump($tab);
-//                $modInscription->update($tab);
+                $modInscription->update($tab);
                 if(!isset($d['info'])){
                     $d['info'] = "L'inscription à l'activité a été effectuée";
                 }

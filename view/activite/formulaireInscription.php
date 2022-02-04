@@ -317,14 +317,10 @@
     }
 
     function addPrestationSecondaire() {
-        // type sera égal à "famille" où à "ext"
         let formContainer = document.getElementById("participations");
         let baseSelectInput = document.getElementsByClassName("PrestationSecondaire");
         let base = baseSelectInput[0];
-        // alert(base);
         formContainer.insertAdjacentHTML('beforeend', base.outerHTML);
-        count +=1;
-        document.getElementById("click").innerHTML = count;
     }
 
     function removePrestationSecondaire(){

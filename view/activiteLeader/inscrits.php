@@ -37,10 +37,21 @@
 
         <?php if (!empty($inscrits)) {
 //            var_dump($inscrits);
+            $count = 0;
             foreach ($inscrits as $i){
+                var_dump($i);
                 $date = date_create($i->DATE_CRENEAU);
                 $redirect=BASE_URL . '/activiteLeader/gerer/' . $i->ID;
-
+                $c=0;
+                $libelle = $prestation[($i->PRESTATION-1)]->LIBELLE;
+                var_dump($prestation);
+//                foreach ($prestationI as $presta){
+//                    if($c==$count){
+//                        $libelleI = $presta->LIBELLE;
+//                    }
+//                    var_dump($count);
+//                    $c+=1;
+//                }
 
 
                 ?>
@@ -50,13 +61,42 @@
                         <?= date_format($date, 'd-m-Y').' - '.substr($i->HEURE_CRENEAU, 0, -3) ?>
                     </td>
                     <td>
-                        <?= "{$i->ADN} {$i->ADP}" ?>
+                        <?= "{$i->ADN} {$i->ADP}, ($libelle)" ?>
                     </td>
                     <td>
                         <?= $i->AUTO_PARTICIPATION == 1 ? 'Oui' : 'Non' ;?>
                     </td>
                     <td>
-                        <?= $i->INN ?>
+                        <?php
+//                        var_dump($i->INN);
+//                        $test = count(explode("<br>",$i->INN));
+//                        var_dump($test);
+//                        echo"prestationI";
+//                        var_dump($prestationI);
+                        var_dump($prestationI);
+                        foreach(range(0,(count(explode("<br>",$i->INN))-1)) as $n) {
+                            $c=0;
+
+                            foreach ($prestationI as $presta){
+                                echo 'n';
+                                var_dump($n);
+                                echo 'c';
+                                var_dump($c);
+
+
+                                if($c==$n && isset(explode("<br>",$i->INN)[$n])){
+                                    echo "presta n°$c";
+                                    $libelleI=$prestation[($presta->PRESTATION-1)]->LIBELLE;
+                                    var_dump($presta);
+                                    $nom=explode("<br>",$i->INN)[$n];
+                                    echo "$nom ($libelleI)<br>";
+                                }
+//                                var_dump($n);
+//                                var_dump($c);
+                                $c+=1;
+                            }
+                        }
+                        ?>
                     </td>
                     <td>
                         <?= "{$i->MONTANT}€"?>
@@ -67,7 +107,7 @@
                         ?>"><button class="btn btn-primary">Gérer</button></a></td>
 
                 </tr>
-            <?php }} ?>
+                <?php $count+=1;}} ?>
     </table>
     <?php if (!empty($inscritsA)) { ?>
     <table class="table table-bordered table-condensed table-striped">
