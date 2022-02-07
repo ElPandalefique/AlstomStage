@@ -277,20 +277,21 @@ class ActiviteLeaderController extends Controller
           $d['donnees'] = $participants;*/
         //PRESTATION.LIBELLE as LIBELLE,
         $modInscription = $this->loadModel('ActiviteParticipantsLeader');
-        $projection['projection'] = 'INSCRIPTION.DATE_INSCRIPTION, INSCRIPTION.DATE_PAIEMENT, INSCRIPTION.ID,CRENEAU.NUM_CRENEAU, CRENEAU.DATE_CRENEAU, CRENEAU.HEURE_CRENEAU,INSCRIPTION.PAYE, INSCRIPTION.CRENEAU, INSCRIPTION.ID_ADHERENT, MONTANT, AUTO_PARTICIPATION, INSCRIPTION.ID_ACTIVITE, ADHERENT.NOM as ADN, ADHERENT.PRENOM as ADP, GROUP_CONCAT(INVITE.NOM, " ", INVITE.PRENOM separator "<br>") as INN,  INSCRIPTION.ATTENTE as ATTENTE, INSCRIPTION.ID_PRESTATION as PRESTATION';
+        $projection['projection'] = 'INSCRIPTION.DATE_INSCRIPTION, INSCRIPTION.DATE_PAIEMENT, INSCRIPTION.ID,CRENEAU.NUM_CRENEAU, CRENEAU.DATE_CRENEAU, CRENEAU.HEURE_CRENEAU,INSCRIPTION.PAYE, INSCRIPTION.CRENEAU, INSCRIPTION.ID_ADHERENT, MONTANT, AUTO_PARTICIPATION, INSCRIPTION.ID_ACTIVITE, ADHERENT.NOM as ADN, ADHERENT.PRENOM as ADP,ADHERENT.TELEPHONE, GROUP_CONCAT(INVITE.NOM, " ", INVITE.PRENOM separator "<br>") as INN,  INSCRIPTION.ATTENTE as ATTENTE, INSCRIPTION.ID_PRESTATION as PRESTATION';
         $projection['conditions'] = "INSCRIPTION.ID_ACTIVITE = {$id} AND INSCRIPTION.ATTENTE = 0";
         $projection['groupby'] = "INSCRIPTION.DATE_INSCRIPTION ";
         $projection['orderby'] = "INSCRIPTION.CRENEAU";
         //$projection['order by'] = "INSCRIPTION.DATE_INSCRIPTION";
         //var_dump($projection);
-        $result = $modInscription->find($projection, true);
+        $result = $modInscription->find($projection);
+
 
         $modPresta = $this->loadModel('InvitePrestation');
-        $proj['projection'] = 'LISTE_INVITES.ID_PRESTATION as PRESTATION';
+        $proj['projection'] = 'LISTE_INVITES.ID_PRESTATION as PRESTATION, INVITE.NOM, INVITE.PRENOM';
         $proj['conditions'] = "INSCRIPTION.ID_ACTIVITE = {$id} AND INSCRIPTION.ATTENTE = 0";
-        //$projection['order by'] = "INSCRIPTION.DATE_INSCRIPTION";
+//        $proj['groupby'] = "INSCRIPTION.ID ";
         //var_dump($projection);
-        $resultPI = $modPresta->find($proj, true);
+        $resultPI = $modPresta->find($proj);
 
         //récupération du nom des prestations des adherents
         $modPrestation = $this->loadModel('InscriptionPrestation');

@@ -332,8 +332,8 @@
         </div>
 
 
-        <input type="button" onClick="addPrestationSecondaire()" value="Ajout prestation secondaire">
-        <input type="button" onClick="removePrestationSecondaire()" value="Suppression prestation secondaire">
+        <!--<input type="button" onClick="addPrestationSecondaire()" value="Ajout prestation secondaire">
+        <input type="button" onClick="removePrestationSecondaire()" value="Suppression prestation secondaire">-->
 
         <!-- Button -->
         <div class="form-group">
@@ -377,7 +377,7 @@
     }
 
     function removePrestationInput(){
-        let baseSelectInput = document.getElementsByClassName("prestation_principale")
+        let baseSelectInput = document.getElementsByClassName("prestationajoutee")
         if(baseSelectInput.length >= 1){
             let latestInput = baseSelectInput[baseSelectInput.length-1];
             latestInput.remove();

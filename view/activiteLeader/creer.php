@@ -241,10 +241,9 @@
         </div>
                 <div>
         <br>
-        <p>pouet pouet</p>
                 </div>
-        <input type="button" title="ajouter une prestation secondaire qui pourra être supprimée plus tard si besoin" onClick="addPrestationSecondaire()" value="Ajout prestation secondaire">
-        <input type="button" title="supprimer la dernière prestation secondaire entrée" onClick="removePrestationSecondaire()" value="Suppression prestation secondaire">
+        <!--<input type="button" title="ajouter une prestation secondaire qui pourra être supprimée plus tard si besoin" onClick="addPrestationSecondaire()" value="Ajout prestation secondaire">
+        <input type="button" title="supprimer la dernière prestation secondaire entrée" onClick="removePrestationSecondaire()" value="Suppression prestation secondaire">-->
 
         <!-- Button -->
         <div class="form-group">
@@ -256,8 +255,6 @@
 
 </form>
 
-<p>Clicks: <a id="clicks">0</a></p>
-<p>Clicksecond: <a id="clicksecond">0</a></p>
 
 <script>
 

@@ -1,191 +1,165 @@
 <?php if (empty($inscription)) { ?>
-<form class="form-horizontal" method="post"
-      action="<?= BASE_URL ?>/activite/inscriptionActivite/<?= $donnees->ID_ACTIVITE ?>">
-    <fieldset>
+    <form class="form-horizontal" method="post"
+          action="<?= BASE_URL ?>/activite/inscriptionActivite/<?= $donnees->ID_ACTIVITE ?>">
+        <fieldset>
 
-        <!-- Form Name -->
-        <legend>Formulaire d'Inscription à une Activité</legend>
-        <!-- Text input-->
-        <div class="form-group">
-            <label class="col-md-2 control-label" for="textinput">Nom de l'activité</label>
-            <div class="col-md-3">
-                <input id="NOM" name="NOM" placeholder="NOM" readonly="yes" class="form-control input-md"
-                       type="text"
-                       value="<?= (isset($donnees->NOM) ? $donnees->NOM : '') ?>">
+            <!-- Form Name -->
+            <legend>Formulaire d'Inscription à une Activité</legend>
+            <!-- Text input-->
+            <div class="form-group">
+                <label class="col-md-2 control-label" for="textinput">Nom de l'activité</label>
+                <div class="col-md-3">
+                    <input id="NOM" name="NOM" placeholder="NOM" readonly="yes" class="form-control input-md"
+                           type="text"
+                           value="<?= (isset($donnees->NOM) ? $donnees->NOM : '') ?>">
+                </div>
             </div>
-        </div>
 
 
-        <br>
-        Séléctionnez les participants
-        <?php
-//        var_dump($invitesfamille);
-//        var_dump($prestation);
-        ?>
+            <br>
+            Séléctionnez les participants
+            <?php
+            //        var_dump($invitesfamille);
+            //        var_dump($prestation);
+            ?>
 
-        <div class="prestation form-group" id="participations">
-            <div class="participation">
-                <hr>
-                <label class="control-label" for="textinput">Participation</label>
-                <br>
-                <strong>Participant:</strong>
-                <select onchange="calculMontantLive()"  name="participant[]">
-                    <option id="AUTO_PARTICIPATION" value="AUTO_PARTICIPATION"><?= $_SESSION['NOM'] . ' ' . $_SESSION['PRENOM'] ?></option>
-                    <?php if (isset($invitesfamille)) {
+            <div class="prestation form-group" id="participations">
+                <div class="participation">
+                    <hr>
+                    <label class="control-label" for="textinput">Participation</label>
+                    <br>
+                    <strong>Participant:</strong>
+                    <select onchange="calculMontantLive()"  name="participant[]">
+                        <option id="AUTO_PARTICIPATION" value="AUTO_PARTICIPATION"><?= $_SESSION['NOM'] . ' ' . $_SESSION['PRENOM'] ?></option>
+                        <?php if (isset($invitesfamille)) {
 
-                        foreach ($invitesfamille as $invite) {
+                            foreach ($invitesfamille as $invite) {
 
-                            // Vérification Enfant
-                            //if (!(ActiviteController::getAge($invite->DATE_NAISSANCE) <= $donnees->AGE_MINIMUM)) {
-
-                            ?>
-                            <option id="<?= ActiviteController::getAge($invite->DATE_NAISSANCE) < 18 ? 'enfant' : 'adulte' ?>"  value=<?= $invite->ID_PERS_EXTERIEUR; ?>><?= $invite->NOM ?> <?= $invite->PRENOM ?></option>
-                            <?php //}
-                        }
-                    }
-                    if ($donnees->OUVERT_EXT == 1) {
-                    if (isset($invitesext)) {
-
-                        foreach ($invitesext as $invite) {
-                            //if (!(ActiviteController::getAge($invite->DATE_NAISSANCE) <= $donnees->AGE_MINIMUM)) {
+                                // Vérification Enfant
+                                //if (!(ActiviteController::getAge($invite->DATE_NAISSANCE) <= $donnees->AGE_MINIMUM)) {
 
                                 ?>
                                 <option id="<?= ActiviteController::getAge($invite->DATE_NAISSANCE) < 18 ? 'enfant' : 'adulte' ?>"  value=<?= $invite->ID_PERS_EXTERIEUR; ?>><?= $invite->NOM ?> <?= $invite->PRENOM ?></option>
-                            <?php //}
+                                <?php //}
+                            }
                         }
-                    }
-                    }?>
-                </select>
-                <br>
-                <strong>Prestation principale:</strong>
-                <select onchange="calculMontantLive()"  name="prestationprincipale[]">
-                <?php
-                foreach ($prestationP as $presta) {
-                    echo "<option id=\"$presta->ID_PRESTATION\" value=\"$presta->ID_PRESTATION\">$presta->LIBELLE</option>";
-                }
-                echo "</select>";
-                if(isset($prestationS)) {
-                    echo "
+                        if ($donnees->OUVERT_EXT == 1) {
+                            if (isset($invitesext)) {
+
+                                foreach ($invitesext as $invite) {
+                                    //if (!(ActiviteController::getAge($invite->DATE_NAISSANCE) <= $donnees->AGE_MINIMUM)) {
+
+                                    ?>
+                                    <option id="<?= ActiviteController::getAge($invite->DATE_NAISSANCE) < 18 ? 'enfant' : 'adulte' ?>"  value=<?= $invite->ID_PERS_EXTERIEUR; ?>><?= $invite->NOM ?> <?= $invite->PRENOM ?></option>
+                                    <?php //}
+                                }
+                            }
+                        }?>
+                    </select>
+                    <br>
+                    <strong>Prestation principale:</strong>
+                    <select onchange="calculMontantLive()"  name="prestationprincipale[]">
+                        <?php
+                        foreach ($prestationP as $presta) {
+                            echo "<option id=\"$presta->ID_PRESTATION\" value=\"$presta->ID_PRESTATION\">$presta->LIBELLE</option>";
+                        }
+                        echo "</select>";
+                        if(isset($prestationS)) {
+                            echo "
 <div class = \"PrestationSecondaire\">
 <strong>Prestation(s) Secondaire(s)</strong>
 <select name =\"prestationSecondaire0[]\">
 <option value=\"none\">--aucune--</option>
 ";
-                    foreach ($prestationS as $presta) {
-                        echo "<option id=\"$presta->ID_PRESTATION\" value=\"$presta->ID_PRESTATION\">$presta->LIBELLE</option>";
-                    }
-                    echo"</select>
+                            foreach ($prestationS as $presta) {
+                                echo "<option id=\"$presta->ID_PRESTATION\" value=\"$presta->ID_PRESTATION\">$presta->LIBELLE</option>";
+                            }
+                            echo"</select>
 <input type=\"button\" value=\"Ajouter\" onclick=\"addPrestationSecondaire()\">
             <input type=\"button\" value=\"Supprimer\" onclick=\"removePrestationSecondaire();\"></div>
 ";
-                }
-                ?>
-
-                <!--<select name="prestation[]">
-                    <option id=\"prestation\" value=\"$value\">aucun</option>
-                    <?php
-                    /*foreach($prestation as $presta){
-                        $value = "$presta->ID_PRESTATION"."_"."$presta->SECONDAIRE";
-                        echo "<option id=\"prestation\" value=\"$value\">$presta->LIBELLE</option> ";
-                    }
-                    ?>
-                </select>
-                <select name="prestation[]">
-                    <?php
-                    foreach($prestation as $presta){
-                        $value = "$presta->ID_PRESTATION"."_"."$presta->SECONDAIRE";
-                        echo "<option id=\"prestation\" value=\"$value\">$presta->LIBELLE</option> ";
-                    }
-                    ?>
-                </select>
-                <select name="prestation[]">
-                    <?php
-                    foreach($prestation as $presta){
-                        $value = "$presta->ID_PRESTATION"."_"."$presta->SECONDAIRE";
-                        echo "<option id=\"prestation\" value=\"$value\">$presta->LIBELLE</option> ";
-                    }
-                    echo "</select>";*/
-                ?>
--->
-            </div>
-        </div>
-
-
-
-        <!--</div>-->
-        <input type="button" value="Ajouter une participation" onclick="addParticipation()">
-        <input type="button" value="Supprimer une participation" onclick="removeParticipation();">
-
-
-        <div id="live_montant">Montant : <?= $donnees->PRIX_ADULTE ?> €</div>
-
-        <br>
-        Choix du créneau
-        <hr>
-
-        <p style="color:#FF0000"><strong>Si un créneau ne s'affiche pas dans le tableau, c'est que l'effectif de ce dernier est vide</strong></p>
-        <table class="table table-bordered table-condensed table-striped">
-            <th>Effectifs des créneaux</th>
-            <tr>
-                <td>Créneau</td>
-                <td>Effectif actuel</td>
-                <td>Personnes en liste d'attente</td>
-            </tr>
-            <?php
-            if(!empty($effectifs)){
-//            var_dump($effectifs);
-                foreach ($effectifs as $eff){
-                    $format = date_create($eff->DATE_CRENEAU);
-                    $date = date_format($format, 'd-m-Y');
-                    $heure = substr($eff->HEURE_CRENEAU, 0, -3);
-                    $effectif=$effectif=$eff->effectif;
-                    foreach ($effectifInvite as $invite){
-                        if($eff->NUM_CRENEAU==$invite->NUM_CRENEAU){
-                            $effectif-=$invite->effectif;
                         }
-                    }
-                    $attentes=0;
-                    foreach ($effectifsattente as $attente){
-                        $attentes = $attente->effectif;
-                        foreach ($effectifInviteattente as $attenteinv){
-                            if($eff->NUM_CRENEAU==$attente->NUM_CRENEAU && $eff->NUM_CRENEAU==$attenteinv->NUM_CRENEAU){
-                                $attentes-=$attenteinv->effectif;
+                        ?>
+
+                </div>
+            </div>
+
+
+
+            <!--</div>-->
+            <input type="button" value="Ajouter une participation" onclick="addParticipation()">
+            <input type="button" value="Supprimer une participation" onclick="removeParticipation();">
+
+
+            <div id="live_montant">Montant : <?= $donnees->PRIX_ADULTE ?> €</div>
+
+            <br>
+            Choix du créneau
+            <hr>
+
+            <p style="color:#FF0000"><strong>Si un créneau ne s'affiche pas dans le tableau, c'est que l'effectif de ce dernier est vide</strong></p>
+            <table class="table table-bordered table-condensed table-striped">
+                <th>Effectifs des créneaux</th>
+                <tr>
+                    <td>Créneau</td>
+                    <td>Effectif actuel</td>
+                    <td>Personnes en liste d'attente</td>
+                </tr>
+                <?php
+                if(!empty($effectifs)){
+//            var_dump($effectifs);
+                    foreach ($effectifs as $eff){
+                        $format = date_create($eff->DATE_CRENEAU);
+                        $date = date_format($format, 'd-m-Y');
+                        $heure = substr($eff->HEURE_CRENEAU, 0, -3);
+                        $effectif=$effectif=$eff->effectif;
+                        foreach ($effectifInvite as $invite){
+                            if($eff->NUM_CRENEAU==$invite->NUM_CRENEAU){
+                                $effectif-=$invite->effectif;
                             }
                         }
+                        $attentes=0;
+                        foreach ($effectifsattente as $attente){
+                            $attentes = $attente->effectif;
+                            foreach ($effectifInviteattente as $attenteinv){
+                                if($eff->NUM_CRENEAU==$attente->NUM_CRENEAU && $eff->NUM_CRENEAU==$attenteinv->NUM_CRENEAU){
+                                    $attentes-=$attenteinv->effectif;
+                                }
+                            }
+                        }
+                        echo"<tr><td> Le $date à $heure</td><td>$effectif / $eff->EFFECTIF_CRENEAU</td><td>$attentes</td>";
                     }
-                    echo"<tr><td> Le $date à $heure</td><td>$effectif / $eff->EFFECTIF_CRENEAU</td><td>$attentes</td>";
                 }
-            }
-            ?>
-        </table>
+                ?>
+            </table>
 
-        <div class="form-group">
-            <label class="col-md-2 control-label" for="textinput">Créneau :</label>
-            <div class="col-md-3" id="creneau">
+            <div class="form-group">
+                <label class="col-md-2 control-label" for="textinput">Créneau :</label>
+                <div class="col-md-3" id="creneau">
 
-                <select name="CRENEAU" id="creneau">
+                    <select name="CRENEAU" id="creneau">
 
-                    <?php if (!empty($creneaux)) {
-                        foreach ($creneaux as $creneau):
-                            $date = date_create($creneau->DATE_CRENEAU);
+                        <?php if (!empty($creneaux)) {
+                            foreach ($creneaux as $creneau):
+                                $date = date_create($creneau->DATE_CRENEAU);
+                                ?>
+
+                                <option value="<?= $creneau->NUM_CRENEAU ?>"><?= 'Le ' . date_format($date, 'd-m-Y') . ' à ' . substr($creneau->HEURE_CRENEAU, 0, -3) ?></option>
+                            <?php endforeach;
+                        } else {
                             ?>
+                            <option selected disabled value="">Il n'y a pas de créneau pour le moment.</option>
+                            <?php
 
-                            <option value="<?= $creneau->NUM_CRENEAU ?>"><?= 'Le ' . date_format($date, 'd-m-Y') . ' à ' . substr($creneau->HEURE_CRENEAU, 0, -3) ?></option>
-                        <?php endforeach;
-                    } else {
-                        ?>
-                        <option selected disabled value="">Il n'y a pas de créneau pour le moment.</option>
-                        <?php
+                        } ?>
+                    </select>
+                </div>
 
-                    } ?>
-                </select>
             </div>
 
-        </div>
 
-
-        <td>
-            <?php if (!empty($creneaux)) {
+            <td>
+                <?php if (!empty($creneaux)) {
 //                    echo "creneaux";
 //                    var_dump($creneaux);
 //                    echo "prix adulte";
@@ -196,21 +170,20 @@
 //                    var_dump($invitesext);
 //                    echo "id activité";
 //                    var_dump($donnees->ID_ACTIVITE);?>
-                <button id="singlebutton" name="singlebutton" class="btn btn-info">S'inscrire</button>
-            <?php } else { ?>
-                <button disabled id="singlebutton" name="singlebutton" class="btn btn-info">S'inscrire</button>
-            <?php } ?>
-        </td>
+                    <button id="singlebutton" name="singlebutton" class="btn btn-info">S'inscrire</button>
+                <?php } else { ?>
+                    <button disabled id="singlebutton" name="singlebutton" class="btn btn-info">S'inscrire</button>
+                <?php } ?>
+            </td>
 
-    </fieldset>
-</form>
+        </fieldset>
+    </form>
 
-    <div class="click" id="click">Clicks =</div>
 
 <?php } else { ?>
 
     <form class="form-horizontal" method="post"
-          action="<?= BASE_URL ?>/activite/modificationActivite/<?= $inscription->ID ?>">
+          action="<?= BASE_URL ?>/activite/modificationActivite/<?= $donnees->ID_ACTIVITE ?>">
         <fieldset>
 
             <!-- Form Name -->
@@ -228,75 +201,247 @@
 
             <br>
             <h4>Vous êtes déjà inscrit. Vous pouvez tout de même choisir de participer à l'activité, ou ajouter des participants</h4>
-            <hr>
+            Séléctionnez les participants
+            <?php
+            //        var_dump($invitesfamille);
+            //        var_dump($prestation);
+            ?>
 
-            <div class="form-group">
-                <label class="col-md-2 control-label" for="textinput">Participants : Adhérent</label>
-                <div class="col-md-3">
-                    <select id="AUTO_PARTICIPATION" name="AUTO_PARTICIPATION" onchange="calculMontantLive()" >
-                        <option value="1" id="<?= $inscription->AUTO_PARTICIPATION == 1 ? 'ap' : '' ?>" <?= $inscription->AUTO_PARTICIPATION == 1 ? 'selected' : '' ?>><?= $_SESSION['NOM'] . ' ' . $_SESSION['PRENOM'] ?></option>
-                        <option value="0" <?= $inscription->AUTO_PARTICIPATION == 0 ? 'selected' : '' ?> <?= $inscription->AUTO_PARTICIPATION == 1 ? 'disabled' : '' ?>>Je souhaite seulement inscrire des invités.</option>
-                    </select>
-                </div>
+            <div class="prestation form-group" id="participations">
+                <?php
+                if(!empty($inscrits)) {
+                $count = 0;
+                var_dump($inscrits);
+                foreach ($inscrits as $i) {
+//                var_dump($i);
 
-            </div>
-            <div class="form-group">
-                <p>Pas encore d'invités ? <a href="<?= BASE_URL ?>/invite/creer">Créez en un ici.</a></p>
-                <label class="col-md-2 control-label" for="textinput">Partitipants : Famille</label>
-                <div class="col-md-3" id="invitesfamille">
-
-                    <select name="famille[]" class="participantfamille" onchange="calculMontantLive()">
-                        <option disabled selected value="none"> -- choisissez un invité --</option>
+                ?>
+                <div class="participation">
+                    <hr>
+                    <label class="control-label" for="textinput">Participation</label>
+                    <br>
+                    <strong>Participant:</strong>
+                    <select onchange="calculMontantLive()"  name="participant[]">
+                        <option id="AUTO_PARTICIPATION" value="AUTO_PARTICIPATION"><?= $_SESSION['NOM'] . ' ' . $_SESSION['PRENOM'] ?></option>
                         <?php if (isset($invitesfamille)) {
+
                             foreach ($invitesfamille as $invite) {
 
-                                // Vérification Enfant
-                                if (!(ActiviteController::getAge($invite->DATE_NAISSANCE) < $donnees->AGE_MINIMUM)) {
+                                ?>
+                                <option id="<?= ActiviteController::getAge($invite->DATE_NAISSANCE) < 18 ? 'enfant' : 'adulte' ?>"  value=<?= $invite->ID_PERS_EXTERIEUR; ?>><?= $invite->NOM ?> <?= $invite->PRENOM ?></option>
+                                <?php
+                            }
+                        }
+                        if ($donnees->OUVERT_EXT == 1) {
+                            if (isset($invitesext)) {
+
+                                foreach ($invitesext as $invite) {
 
                                     ?>
-                                    <option id="<?= ActiviteController::getAge($invite->DATE_NAISSANCE) < 18 ? 'enfant' : 'adulte' ?>" value=<?= $invite->ID_PERS_EXTERIEUR; ?>><?= $invite->NOM ?> <?= $invite->PRENOM ?></option>
-                                <?php }
-                            };
+                                    <option id="<?= ActiviteController::getAge($invite->DATE_NAISSANCE) < 18 ? 'enfant' : 'adulte' ?>"  value=<?= $invite->ID_PERS_EXTERIEUR; ?>><?= $invite->NOM ?> <?= $invite->PRENOM ?></option>
+                                    <?php
+                                }
+                            }
+                        }?>
+                    </select>
+                    <br>
+                    <strong>Prestation principale:</strong>
+                    <select onchange="calculMontantLive()" value="0" name="prestationprincipale[]">
+                        <?php
+                        foreach ($prestationP as $presta) {
+                            if($presta->ID_PRESTATION==$i->PRESTATION)
+                                echo "<option selected=\"selected\" id=\"$presta->ID_PRESTATION\" value=\"$presta->ID_PRESTATION\">$presta->LIBELLE</option>";
+                            else
+                                echo "<option id=\"$presta->ID_PRESTATION\" value=\"$presta->ID_PRESTATION\">$presta->LIBELLE</option>";
+                        }
+                        echo "</select>";
+                        if(isset($prestationS)) {
+                            echo "
+<div class = \"PrestationSecondaire\">
+<strong>Prestation(s) Secondaire(s)</strong>
+<select name =\"prestationSecondaire0[]\">
+<option value=\"none\">--aucune--</option>
+";
+                            foreach ($prestationS as $presta) {
+                                echo "<option id=\"$presta->ID_PRESTATION\" value=\"$presta->ID_PRESTATION\">$presta->LIBELLE</option>";
+                            }
+                            echo"</select>
+<input type=\"button\" value=\"Ajouter\" onclick=\"addPrestationSecondaire()\">
+            <input type=\"button\" value=\"Supprimer\" onclick=\"removePrestationSecondaire();\"></div>
+";
+                        }
+                }
+
+                if($invites[0]->ID_INVITE != null)
+                        foreach ($invites as $i) {
+
+
+                        ?>
+                    </select>
+                </div>
+                        <div class="participation">
+                            <hr>
+                            <label class="control-label" for="textinput">Participation</label>
+                            <br>
+                            <strong>Participant:</strong>
+                            <select onchange="calculMontantLive()"  name="participant[]">
+                                <option id="AUTO_PARTICIPATION" value="AUTO_PARTICIPATION"><?= $_SESSION['NOM'] . ' ' . $_SESSION['PRENOM'] ?></option>
+                                <?php if (isset($invitesfamille)) {
+
+                                    foreach ($invitesfamille as $invite) {
+                                        if(ActiviteController::getAge($invite->DATE_NAISSANCE) < 18)
+                                        $id='enfant';
+                                        else
+                                        $id='adulte';
+
+                                        if($invite->ID_PERS_EXTERIEUR == $i->ID_INVITE)
+                                        echo"<option id=\"$id\" selected='selected' value=$invite->ID_PERS_EXTERIEUR>$invite->NOM $invite->PRENOM</option>";
+                                        else
+                                            echo"<option id=\"$id\" value=$invite->ID_PERS_EXTERIEUR>$invite->NOM $invite->PRENOM</option>";
+
+                                    }
+                                }
+                                if ($donnees->OUVERT_EXT == 1) {
+                                    if (isset($invitesext)) {
+
+                                        foreach ($invitesext as $invite) {
+
+                                            ?>
+                                            <option id="<?= ActiviteController::getAge($invite->DATE_NAISSANCE) < 18 ? 'enfant' : 'adulte' ?>"  value=<?= $invite->ID_PERS_EXTERIEUR; ?>><?= $invite->NOM ?> <?= $invite->PRENOM ?></option>
+                                            <?php
+                                        }
+                                    }
+                                }?>
+                            </select>
+                            <br>
+                            <strong>Prestation principale:</strong>
+                            <select onchange="calculMontantLive()" value="0" name="prestationprincipale[]">
+                                <?php
+                                foreach ($prestationP as $presta) {
+                                    if($presta->ID_PRESTATION==$i->PRESTATION)
+                                        echo "<option selected=\"selected\" id=\"$presta->ID_PRESTATION\" value=\"$presta->ID_PRESTATION\">$presta->LIBELLE</option>";
+                                    else
+                                        echo "<option id=\"$presta->ID_PRESTATION\" value=\"$presta->ID_PRESTATION\">$presta->LIBELLE</option>";
+                                }
+                                echo "</select>";
+                                if(isset($prestationS)) {
+                                    echo "
+<div class = \"PrestationSecondaire\">
+<strong>Prestation(s) Secondaire(s)</strong>
+<select name =\"prestationSecondaire0[]\">
+<option value=\"none\">--aucune--</option>
+";
+                                    foreach ($prestationS as $presta) {
+                                        echo "<option id=\"$presta->ID_PRESTATION\" value=\"$presta->ID_PRESTATION\">$presta->LIBELLE</option>";
+                                    }
+                                    echo"</select>
+<input type=\"button\" value=\"Ajouter\" onclick=\"addPrestationSecondaire()\">
+            <input type=\"button\" value=\"Supprimer\" onclick=\"removePrestationSecondaire();\"></div>
+";
+                                }
+                                }
+                }
+
+                        ?>
+
+                </div>
+            </div>
+
+            <!--</div>-->
+            <input type="button" value="Ajouter une participation" onclick="addParticipation()">
+            <input type="button" value="Supprimer une participation" onclick="removeParticipation();">
+
+
+            <div id="live_montant">Montant : <?= $donnees->PRIX_ADULTE ?> €</div>
+
+            <br>
+            Choix du créneau
+            <hr>
+
+            <p style="color:#FF0000"><strong>Si un créneau ne s'affiche pas dans le tableau, c'est que l'effectif de ce dernier est vide</strong></p>
+            <table class="table table-bordered table-condensed table-striped">
+                <th>Effectifs des créneaux</th>
+                <tr>
+                    <td>Créneau</td>
+                    <td>Effectif actuel</td>
+                    <td>Personnes en liste d'attente</td>
+                </tr>
+                <?php
+                if(!empty($effectifs)){
+//            var_dump($effectifs);
+                    foreach ($effectifs as $eff){
+                        $format = date_create($eff->DATE_CRENEAU);
+                        $date = date_format($format, 'd-m-Y');
+                        $heure = substr($eff->HEURE_CRENEAU, 0, -3);
+                        $effectif=$effectif=$eff->effectif;
+                        foreach ($effectifInvite as $invite){
+                            if($eff->NUM_CRENEAU==$invite->NUM_CRENEAU){
+                                $effectif-=$invite->effectif;
+                            }
+                        }
+                        $attentes=0;
+                        foreach ($effectifsattente as $attente){
+                            $attentes = $attente->effectif;
+                            foreach ($effectifInviteattente as $attenteinv){
+                                if($eff->NUM_CRENEAU==$attente->NUM_CRENEAU && $eff->NUM_CRENEAU==$attenteinv->NUM_CRENEAU){
+                                    $attentes-=$attenteinv->effectif;
+                                }
+                            }
+                        }
+                        echo"<tr><td> Le $date à $heure</td><td>$effectif / $eff->EFFECTIF_CRENEAU</td><td>$attentes</td>";
+                    }
+                }
+                ?>
+            </table>
+
+            <div class="form-group">
+                <label class="col-md-2 control-label" for="textinput">Créneau :</label>
+                <div class="col-md-3" id="creneau">
+
+                    <select name="CRENEAU" id="creneau">
+
+                        <?php if (!empty($creneaux)) {
+                            foreach ($creneaux as $creneau):
+                                $date = date_create($creneau->DATE_CRENEAU);
+                                ?>
+
+                                <option value="<?= $creneau->NUM_CRENEAU ?>"><?= 'Le ' . date_format($date, 'd-m-Y') . ' à ' . substr($creneau->HEURE_CRENEAU, 0, -3) ?></option>
+                            <?php endforeach;
+                        } else {
+                            ?>
+                            <option selected disabled value="">Il n'y a pas de créneau pour le moment.</option>
+                            <?php
+
                         } ?>
                     </select>
                 </div>
-                <input type="button" value="+" onclick="addInscriptionInput('famille');">
-                <input type="button" value="-" onclick="removeInscriptionInput('famille');">
+
             </div>
 
-            <?php if ($donnees->OUVERT_EXT == 1) { ?>
-                <div class="form-group">
-                    <label class="col-md-2 control-label" for="textinput">Partitipants : Externes</label>
-                    <div class="col-md-3" id="invitesext">
 
-                        <select name="ext[]" class="participantext" onchange="calculMontantLive()">
-
-                            <option disabled selected value="none"> -- choisissez un invité --</option>
-                            <?php if (isset($invitesext)) {
-
-                                foreach ($invitesext as $invite) {
-                                    if (!(ActiviteController::getAge($invite->DATE_NAISSANCE) < $donnees->AGE_MINIMUM)) {
-
-                                        ?>
-                                        <option id="<?= ActiviteController::getAge($invite->DATE_NAISSANCE) < 18 ? 'enfant' : 'adulte' ?>" value=<?= $invite->ID_PERS_EXTERIEUR; ?>><?= $invite->NOM ?> <?= $invite->PRENOM ?></option>
-                                    <?php }
-                                }
-                            } ?>
-                        </select>
-                    </div>
-                    <input type="button" value="+" onclick="addInscriptionInput('ext');">
-                    <input type="button" value="-" onclick="removeInscriptionInput('ext');">
-                </div>
-                <div id="live_montant">Montant : <?= $inscription->MONTANT ?> €</div>
-            <?php } ?>
-            <button id="singlebutton" name="singlebutton" class="btn btn-info">Valider les changements</button>
-
+            <td>
+                <?php if (!empty($creneaux)) {
+//                    echo "creneaux";
+//                    var_dump($creneaux);
+//                    echo "prix adulte";
+//                    var_dump( $donnees->PRIX_ADULTE);
+//                    echo "invites famille";
+//                    var_dump($invitesfamille);
+//                    echo "invites externe";
+//                    var_dump($invitesext);
+//                    echo "id activité";
+//                    var_dump($donnees->ID_ACTIVITE);?>
+                    <button id="singlebutton" name="singlebutton" class="btn btn-info">Valider les modifications</button>
+                <?php } else { ?>
+                    <button disabled id="singlebutton" name="singlebutton" class="btn btn-info">Valider les modifications</button>
+                <?php } ?>
             </td>
 
         </fieldset>
     </form>
 
-<?php
+
+    <?php
 }
 //var_dump($creneaux);?>
 <td>
@@ -327,7 +472,7 @@
         // type sera égal à "famille" où à "ext"
         let baseSelectInput = document.getElementsByClassName("PrestationSecondaire")
         if(baseSelectInput.length < 2){
-           // baseSelectInput[0].value = 'none';
+            // baseSelectInput[0].value = 'none';
         }else{
             let latestInput = baseSelectInput[baseSelectInput.length - 1];
             latestInput.remove();
@@ -369,13 +514,13 @@
         calculMontantLive();
     }
     <?php if(isset($donnees->PRIX_ADULTE))
-    echo "let prix_adulte = $donnees->PRIX_ADULTE" ;
-     if(isset($donnees->PRIX_ADULTE_EXT))
-    echo"let prix_adulte_ext = $donnees->PRIX_ADULTE_EXT";
-     if(isset($donnees->PRIX_ENFANT))
-    echo"let prix_enfant = $donnees->PRIX_ENFANT" ;
-     if(isset($donnees->PRIX_ENFANT_EXT))
-    echo"let prix_enfant_ext = $donnees->PRIX_ENFANT_EXT" ;
+        echo "let prix_adulte = $donnees->PRIX_ADULTE" ;
+    if(isset($donnees->PRIX_ADULTE_EXT))
+        echo"let prix_adulte_ext = $donnees->PRIX_ADULTE_EXT";
+    if(isset($donnees->PRIX_ENFANT))
+        echo"let prix_enfant = $donnees->PRIX_ENFANT" ;
+    if(isset($donnees->PRIX_ENFANT_EXT))
+        echo"let prix_enfant_ext = $donnees->PRIX_ENFANT_EXT" ;
     ?>
 
 
