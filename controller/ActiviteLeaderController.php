@@ -295,7 +295,7 @@ class ActiviteLeaderController extends Controller
 
         //récupération du nom des prestations des adherents
         $modPrestation = $this->loadModel('InscriptionPrestation');
-        $proj['projection'] = 'PRESTATION.LIBELLE';
+        $proj['projection'] = 'PRESTATION.LIBELLE, PRESTATION.PRIX';
         $proj['conditions'] = "PRESTATION.ID_ACTIVITE = $id";
         $resultP = $modPrestation->find($proj);
 
@@ -309,11 +309,17 @@ class ActiviteLeaderController extends Controller
 
         //Récuperer les effectifs des créneaux
         $modEffectif = $this->loadModel('ActiviteParticipantsAdherent');
-        $projectionC['projection'] = "c.EFFECTIF_CRENEAU, c.DATE_CRENEAU, c.HEURE_CRENEAU, c.NUM_CRENEAU, COUNT(i.ID_ADHERENT)+COUNT(li.ID_INVITE) as effectif";
+        $projectionC['projection'] = "c.EFFECTIF_CRENEAU, c.DATE_CRENEAU, c.HEURE_CRENEAU, c.NUM_CRENEAU, COUNT(li.ID_INVITE) as effectif";
         $projectionC['conditions'] = "i.ID_ACTIVITE = {$id} AND c.STATUT = 'O' AND i.ATTENTE = 0";
         $projectionC['groupby'] = "c.NUM_CRENEAU, c.ID_ACTIVITE";
         $resultE = $modEffectif->find($projectionC);
         //var_dump($resultE);
+
+        $modEffectif = $this->loadModel('InscriptionCreneau');
+        $projectionC['projection'] = "c.EFFECTIF_CRENEAU, c.DATE_CRENEAU, c.HEURE_CRENEAU, c.NUM_CRENEAU, COUNT(i.ID_ADHERENT) as effectif";
+        $projectionC['conditions'] = "i.ID_ACTIVITE = {$id} AND c.STATUT = 'O' AND i.ATTENTE = 0";
+        $projectionC['groupby'] = "c.NUM_CRENEAU, c.ID_ACTIVITE";
+        $resultEff = $modEffectif->find($projectionC);
 
         //Récuperer les personnes qui ne participent pas mais qui ont inscrit des invités
         $modEffectifInvite= $this->loadModel('ActiviteParticipantsAdherent');
@@ -326,7 +332,8 @@ class ActiviteLeaderController extends Controller
         $d['prestation'] = $resultP;
         $d['prestationI'] = $resultPI;
         $d['inscritsA'] = $resultA;
-        $d['effectifs'] = $resultE;
+        $d['effectifsInvite'] = $resultE;
+        $d['effectifs'] = $resultEff;
         $d['effectifInvite'] = $resultEI;
         $this->set($d);
         $this->render('inscrits');

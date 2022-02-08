@@ -1,5 +1,4 @@
 <form class="form-horizontal" method="post" action="<?= BASE_URL ?>/activiteLeader/nouveau">
-<body onLoad="InitSecondaire()"></body>
 
     <fieldset>
 
@@ -268,8 +267,8 @@
 
     var clicks = 2;
     var clicksecond = 1;
-    let baseSelectInput = document.getElementsByClassName("prestationsecondaire");
-    var secondaire = baseSelectInput[baseSelectInput.length-1];
+    let baseSelectInputSec = document.getElementsByClassName("prestationsecondaire");
+    var secondaire = baseSelectInputSec[baseSelectInputSec.length-1];
     secondaire.remove();
 
     function addPrestationInput() {
@@ -291,7 +290,7 @@
             "</div>";
 
         clicks +=1;
-        document.getElementById("clicks").innerHTML = clicks;
+        // document.getElementById("clicks").innerHTML = clicks;
         formContainer.insertAdjacentHTML('beforeend', base);
     }
 
@@ -305,7 +304,7 @@
         }
     }
 
-    function addPrestationSecondaire(){
+    /*function addPrestationSecondaire(){
         let formContainer = document.getElementById("prestation_secondaire");
         let base = "<div class='prestationsecondaire'><hr><br>Prestation secondaire n°"+clicksecond+
             secondaire.innerHTML+
@@ -325,24 +324,24 @@
         clicksecond +=1;
         document.getElementById("clicksecond").innerHTML = clicksecond;
         formContainer.insertAdjacentHTML('beforeend', base);
-    }
+    }*/
 
-    function removePrestationSecondaire(){
+    /*function removePrestationSecondaire(){
         let baseSelectInput = document.getElementsByClassName("prestationsecondaire")
             let latestInput = baseSelectInput[baseSelectInput.length-1];
             latestInput.remove();
             clicksecond-=1;
             document.getElementById("clicksecond").innerHTML = clicksecond;
         
-    }
+    }*/
 
     
-    //function InitSecondaire(){
-        //let baseSelectInput = document.getElementsByClassName("prestationsecondaire");
-        //secondaire = document.getElementsByClassName("prestationsecondaire");
-        //let latestInput = baseSelectInput[baseSelectInput.length-1];
-        //latestInput.remove();
-        
+    // function InitSecondaire(){
+    //     let baseSelectInput = document.getElementsByClassName("prestationsecondaire");
+    //     secondaire = document.getElementsByClassName("prestationsecondaire");
+    //     let latestInput = baseSelectInput[baseSelectInput.length-1];
+    //     latestInput.remove();
+    //
     //}
 
     function createDiv() {

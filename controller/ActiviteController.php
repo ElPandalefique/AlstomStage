@@ -156,12 +156,19 @@ class ActiviteController extends Controller
 
         //Récuperer les effectifs des créneaux
         $modEffectif = $this->loadModel('ActiviteParticipantsAdherent');
-        $projectionC['projection'] = "c.EFFECTIF_CRENEAU, c.DATE_CRENEAU, c.HEURE_CRENEAU, c.NUM_CRENEAU, COUNT(i.ID_ADHERENT)+COUNT(li.ID_INVITE) as effectif";
+        $projectionC['projection'] = "c.EFFECTIF_CRENEAU, c.DATE_CRENEAU, c.HEURE_CRENEAU, c.NUM_CRENEAU, COUNT(li.ID_INVITE) as effectif";
         $projectionC['conditions'] = "i.ID_ACTIVITE = {$id} AND c.STATUT = 'O' AND i.ATTENTE = 0";
         $projectionC['groupby'] = "c.NUM_CRENEAU, c.ID_ACTIVITE";
         $resultE = $modEffectif->find($projectionC);
-        $d['effectifs'] = $resultE;
+        $d['effectifsInvite'] = $resultE;
         //var_dump($resultE);
+
+        $modEffectif = $this->loadModel('InscriptionCreneau');
+        $projectionC['projection'] = "c.EFFECTIF_CRENEAU, c.DATE_CRENEAU, c.HEURE_CRENEAU, c.NUM_CRENEAU, COUNT(i.ID_ADHERENT) as effectif";
+        $projectionC['conditions'] = "i.ID_ACTIVITE = {$id} AND c.STATUT = 'O' AND i.ATTENTE = 0";
+        $projectionC['groupby'] = "c.NUM_CRENEAU, c.ID_ACTIVITE";
+        $resultEff = $modEffectif->find($projectionC);
+        $d['effectifs'] = $resultEff;
 
         //Récuperer les personnes qui ne participent pas mais qui ont inscrit des invités
         $modEffectifInvite= $this->loadModel('ActiviteParticipantsAdherent');
@@ -194,7 +201,7 @@ class ActiviteController extends Controller
         $d['invitesfamille'] = $modInvite->find($projection);
 
         $projection['conditions'] = "STATUT = 'EXTERNE' AND ID_ADHERENT = " . Session::get('ID_ADHERENT');
-        $d['invitesext'] = $modInvite->find($projection);
+        $d['invitesext'] = $modInvite->find($projection, true);
 
         // Récupération des créneaux.
         $modCreneau = $this->loadModel('ActiviteCreneauAdmin');
@@ -204,10 +211,14 @@ class ActiviteController extends Controller
 
         //Récupération des prestations
         $modPresta=$this->loadModel('Prestation');
+        $projPresta['projection'] = "ID_PRESTATION, PRIX, LIBELLE";
         $projPresta['conditions'] = "ID_ACTIVITE = {$id} AND SECONDAIRE = 0";
         $d['prestationP'] = $modPresta->find($projPresta);
         $projPresta['conditions'] = "ID_ACTIVITE = {$id} AND SECONDAIRE = 1";
         $d['prestationS'] = $modPresta->find($projPresta);
+        $projPresta['projection'] = "COUNT(ID_PRESTATION) as nbPresta";
+        $projPresta['conditions'] = "ID_ACTIVITE = {$id}";
+        $d['nbPresta']=$modPresta->findfirst($projPresta);
 
         $modInscription = $this->loadModel('ActiviteParticipantsLeader');
         $projection['projection'] = 'INSCRIPTION.ID_PRESTATION as PRESTATION';
@@ -514,12 +525,14 @@ class ActiviteController extends Controller
             }
         }
 
-        if(isset($invites)) {
+        /*if(isset($invites)) {
             $donnees['MONTANT'] = $this->calculMontant($id, $adh, $invites);
         }
         else{
             $donnees['MONTANT'] = $this->calculMontant($id, $adh, NULL);
-        }
+        }*/
+        var_dump($_POST);
+        $donnees['MONTANT'] = $_POST['montant'];
 
         //SI il reste de la place dans la liste principale
         if (!($nombreinscription > $effectifc->places - $effectifc->inscrits)) {
@@ -572,7 +585,7 @@ class ActiviteController extends Controller
             $modListeInvite = $this->loadModel('ListeInvite');
             $reqS['conditions'] = "ID_INSCRIPTION=$inscrit->ID";
             $modListeInvite->delete($reqS);
-//            $IDInscription = $modInscription->insert($colonnes, $donnees);
+            $IDInscription = $modInscription->insert($colonnes, $donnees);
 //            var_dump($IDInscription);
             //// Liste des invités ////
             $colonnes = array('ID_INSCRIPTION', 'ID_INVITE', 'ID_PRESTATION');
@@ -866,14 +879,15 @@ class ActiviteController extends Controller
                 $invites[] += $participant;
             }
         }
-        if(isset($invites)) {
+        /*if(isset($invites)) {
             echo "invites";
 //            var_dump($invites);
             $donnees['MONTANT'] = $this->calculMontant($id, $adh, $invites);
         }
         else{
             $donnees['MONTANT'] = $this->calculMontant($id, $adh, NULL);
-        }
+        }*/
+        $donnees['MONTANT'] = $_POST['montant'];
 
         //SI il reste de la place dans la liste principale
         if (!($nombreinscription > $effectifc->places - $effectifc->inscrits)) {
@@ -971,6 +985,11 @@ class ActiviteController extends Controller
             $this->mesActivites($id);
             $this->render('mesActivites');
         }
+        else {
+            echo '<script type="text/javascript">window.alert("'.$d['info'].'");</script>';
+            $this->formulaireInscription($id);
+            $this->render('formulaireInscription');
+        }
     }
 
 
@@ -1056,7 +1075,7 @@ class ActiviteController extends Controller
         $projectionI['conditions'] = "ID_ACTIVITE = {$ID_ACTIVITE} AND ID_ADHERENT = {$_SESSION['ID_ADHERENT']}";
         //        var_dump($ID_ACTIVITE);
         //        var_dump($_SESSION['ID_ADHERENT']);
-        $d['inscription'] = $modInscription->findfirst($projectionI);
+        $d['inscription'] = $modInscription->findfirst($projectionI, true);
 //                var_dump($d['inscription']);
 
         //requete 4 : on recupère la liste des invites

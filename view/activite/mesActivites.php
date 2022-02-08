@@ -1,6 +1,7 @@
 <legend>Amical des cadres ALSTOM</legend>
 <form class="form-horizontal">
     <?php
+    var_dump($inscription);
     if(isset($inscription->ATTENTE)){
         $attente = $inscription->ATTENTE;
         if($attente==1){

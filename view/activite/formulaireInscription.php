@@ -1,4 +1,5 @@
 <?php if (empty($inscription)) { ?>
+    <body onload="calculMontantLive()"></body>
     <form class="form-horizontal" method="post"
           action="<?= BASE_URL ?>/activite/inscriptionActivite/<?= $donnees->ID_ACTIVITE ?>">
         <fieldset>
@@ -21,6 +22,8 @@
             <?php
             //        var_dump($invitesfamille);
             //        var_dump($prestation);
+
+            var_dump($effectifsInvite);
             ?>
 
             <div class="prestation form-group" id="participations">
@@ -43,7 +46,7 @@
                                 <?php //}
                             }
                         }
-                        if ($donnees->OUVERT_EXT == 1) {
+
                             if (isset($invitesext)) {
 
                                 foreach ($invitesext as $invite) {
@@ -54,11 +57,11 @@
                                     <?php //}
                                 }
                             }
-                        }?>
+                        ?>
                     </select>
                     <br>
                     <strong>Prestation principale:</strong>
-                    <select onchange="calculMontantLive()"  name="prestationprincipale[]">
+                    <select onchange="calculMontantLive()" onload="calculMontantLive()" name="prestationprincipale[]" class="prestationprincipale">
                         <?php
                         foreach ($prestationP as $presta) {
                             echo "<option id=\"$presta->ID_PRESTATION\" value=\"$presta->ID_PRESTATION\">$presta->LIBELLE</option>";
@@ -87,11 +90,12 @@
 
 
             <!--</div>-->
-            <input type="button" value="Ajouter une participation" onclick="addParticipation()">
-            <input type="button" value="Supprimer une participation" onclick="removeParticipation();">
+            <input type="button" value="Ajouter une participation" onclick="addParticipation(); calculMontantLive()">
+            <input type="button" value="Supprimer une participation" onclick="removeParticipation();calculMontantLive()">
 
 
             <div id="live_montant">Montant : <?= $donnees->PRIX_ADULTE ?> €</div>
+            <label for="montant"></label><input hidden id="montant" type="text" name="montant" value="0">
 
             <br>
             Choix du créneau
@@ -108,11 +112,13 @@
                 <?php
                 if(!empty($effectifs)){
 //            var_dump($effectifs);
+                    $c=0;
                     foreach ($effectifs as $eff){
                         $format = date_create($eff->DATE_CRENEAU);
                         $date = date_format($format, 'd-m-Y');
                         $heure = substr($eff->HEURE_CRENEAU, 0, -3);
-                        $effectif=$effectif=$eff->effectif;
+                        $effectif=$eff->effectif+$effectifsInvite[$c]->effectif;
+                        $c+=1;
                         foreach ($effectifInvite as $invite){
                             if($eff->NUM_CRENEAU==$invite->NUM_CRENEAU){
                                 $effectif-=$invite->effectif;
@@ -181,10 +187,10 @@
 
 
 <?php } else { ?>
-
+<body onload="calculMontantLive()"></body>
     <form class="form-horizontal" method="post"
           action="<?= BASE_URL ?>/activite/modificationActivite/<?= $donnees->ID_ACTIVITE ?>">
-        <fieldset>
+
 
             <!-- Form Name -->
             <legend>Formulaire d'Inscription à une Activité</legend>
@@ -221,7 +227,7 @@
                     <label class="control-label" for="textinput">Participation</label>
                     <br>
                     <strong>Participant:</strong>
-                    <select onchange="calculMontantLive()"  name="participant[]">
+                    <select name="participant[]" >
                         <option id="AUTO_PARTICIPATION" value="AUTO_PARTICIPATION"><?= $_SESSION['NOM'] . ' ' . $_SESSION['PRENOM'] ?></option>
                         <?php if (isset($invitesfamille)) {
 
@@ -232,7 +238,6 @@
                                 <?php
                             }
                         }
-                        if ($donnees->OUVERT_EXT == 1) {
                             if (isset($invitesext)) {
 
                                 foreach ($invitesext as $invite) {
@@ -242,11 +247,11 @@
                                     <?php
                                 }
                             }
-                        }?>
+                        ?>
                     </select>
                     <br>
                     <strong>Prestation principale:</strong>
-                    <select onchange="calculMontantLive()" value="0" name="prestationprincipale[]">
+                    <select onchange="calculMontantLive()" onload="calculMontantLive()" name="prestationprincipale[]" class="prestationprincipale">
                         <?php
                         foreach ($prestationP as $presta) {
                             if($presta->ID_PRESTATION==$i->PRESTATION)
@@ -283,6 +288,9 @@
                             <hr>
                             <label class="control-label" for="textinput">Participation</label>
                             <br>
+                            <?php
+//                            var_dump($invites);
+                            ?>
                             <strong>Participant:</strong>
                             <select onchange="calculMontantLive()"  name="participant[]">
                                 <option id="AUTO_PARTICIPATION" value="AUTO_PARTICIPATION"><?= $_SESSION['NOM'] . ' ' . $_SESSION['PRENOM'] ?></option>
@@ -301,21 +309,26 @@
 
                                     }
                                 }
-                                if ($donnees->OUVERT_EXT == 1) {
                                     if (isset($invitesext)) {
 
                                         foreach ($invitesext as $invite) {
 
-                                            ?>
-                                            <option id="<?= ActiviteController::getAge($invite->DATE_NAISSANCE) < 18 ? 'enfant' : 'adulte' ?>"  value=<?= $invite->ID_PERS_EXTERIEUR; ?>><?= $invite->NOM ?> <?= $invite->PRENOM ?></option>
-                                            <?php
+                                            if(ActiviteController::getAge($invite->DATE_NAISSANCE) < 18)
+                                                $id='enfant';
+                                            else
+                                                $id='adulte';
+
+                                            if($invite->ID_PERS_EXTERIEUR == $i->ID_INVITE)
+                                                echo"<option id=\"$id\" selected='selected' value=$invite->ID_PERS_EXTERIEUR>$invite->NOM $invite->PRENOM</option>";
+                                            else
+                                                echo"<option id=\"$id\" value=$invite->ID_PERS_EXTERIEUR>$invite->NOM $invite->PRENOM</option>";
                                         }
                                     }
-                                }?>
+                                ?>
                             </select>
                             <br>
                             <strong>Prestation principale:</strong>
-                            <select onchange="calculMontantLive()" value="0" name="prestationprincipale[]">
+                            <select onchange="calculMontantLive()" onload="calculMontantLive()" name="prestationprincipale[]" class="prestationprincipale">
                                 <?php
                                 foreach ($prestationP as $presta) {
                                     if($presta->ID_PRESTATION==$i->PRESTATION)
@@ -348,11 +361,12 @@
             </div>
 
             <!--</div>-->
-            <input type="button" value="Ajouter une participation" onclick="addParticipation()">
-            <input type="button" value="Supprimer une participation" onclick="removeParticipation();">
+            <input type="button" value="Ajouter une participation" onclick="addParticipation(); calculMontantLive()">
+            <input type="button" value="Supprimer une participation" onclick="removeParticipation();calculMontantLive()">
 
 
-            <div id="live_montant">Montant : <?= $donnees->PRIX_ADULTE ?> €</div>
+           <div id="live_montant">Montant : <?= $donnees->PRIX_ADULTE ?> €</div>
+        <label for="montant"></label><input hidden id="montant" type="text" name="montant" value="0">
 
             <br>
             Choix du créneau
@@ -369,11 +383,13 @@
                 <?php
                 if(!empty($effectifs)){
 //            var_dump($effectifs);
+                    $c=0;
                     foreach ($effectifs as $eff){
                         $format = date_create($eff->DATE_CRENEAU);
                         $date = date_format($format, 'd-m-Y');
                         $heure = substr($eff->HEURE_CRENEAU, 0, -3);
-                        $effectif=$effectif=$eff->effectif;
+                        $effectif=$eff->effectif+$effectifsInvite[$c]->effectif;
+                        $c+=1;
                         foreach ($effectifInvite as $invite){
                             if($eff->NUM_CRENEAU==$invite->NUM_CRENEAU){
                                 $effectif-=$invite->effectif;
@@ -442,7 +458,7 @@
 
 
     <?php
-}
+}var_dump($prestationP);
 //var_dump($creneaux);?>
 <td>
     <button id="singlebutton" name="singlebutton" class="btn btn-info"
@@ -513,21 +529,18 @@
         }
         calculMontantLive();
     }
-    <?php if(isset($donnees->PRIX_ADULTE))
-        echo "let prix_adulte = $donnees->PRIX_ADULTE" ;
-    if(isset($donnees->PRIX_ADULTE_EXT))
-        echo"let prix_adulte_ext = $donnees->PRIX_ADULTE_EXT";
-    if(isset($donnees->PRIX_ENFANT))
-        echo"let prix_enfant = $donnees->PRIX_ENFANT" ;
-    if(isset($donnees->PRIX_ENFANT_EXT))
-        echo"let prix_enfant_ext = $donnees->PRIX_ENFANT_EXT" ;
+    let prix = [];
+    <?php
+
+        foreach ($prestationP as $presta){
+            echo "prix.push($presta->PRIX);";
+        }
     ?>
 
+    let prestations = <?=$nbPresta->nbPresta?>;
 
     function calculMontantLive(){
-        let auto_participation = document.getElementById('AUTO_PARTICIPATION');
-        let extSelectInput = document.getElementsByClassName("participantext");
-        let familleSelectInput = document.getElementsByClassName("participantfamille");
+        let prestation = document.getElementsByClassName("prestationprincipale");
 
         let montant = 0;
 
@@ -535,40 +548,20 @@
         montant = <?= $inscription->MONTANT ?>
         <?php }  ?>
 
-        if(auto_participation.value == 1){
-            if(auto_participation[auto_participation.selectedIndex].id == 'ap'){
-
-            }else{
-                montant += prix_adulte;
-            }
-
-        }
-        for(var i = 0; i < extSelectInput.length; i++){
-            if(extSelectInput[i].value == 'none'){
-
-            }else{
-                if(extSelectInput[i][extSelectInput[i].selectedIndex].id == 'enfant'){
-                    montant += prix_enfant_ext;
-                }else{
-                    montant += prix_adulte_ext;
-                }
-            }
-
-        }
-        for(var i = 0; i < familleSelectInput.length; i++){
-            if(familleSelectInput[i].value == 'none'){
-
-            }else{
-                if(familleSelectInput[i][familleSelectInput[i].selectedIndex].id == 'enfant'){
-                    montant += prix_enfant;
-                }else {
-                    montant += prix_adulte;
+        for(var i = 0; i < prestation.length; i++) {
+            for(var j = 0; j<=prestations; j++){
+                if(prestation[i][prestation[i].selectedIndex].id==j){
+                    montant+=prix[j-1];
                 }
             }
         }
+
+
 
         let divAffichageMontant = document.getElementById('live_montant');
         divAffichageMontant.innerHTML = 'Montant : ' + montant + " €";
+        let inputMontant = document.getElementById("montant");
+        inputMontant.value=montant;
 
     }
 
