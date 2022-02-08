@@ -68,24 +68,28 @@
                         }
                         echo "</select>";
                         if(isset($prestationS)) {
-                            echo "
-<div class = \"PrestationSecondaire\">
+foreach (range(0, 1) as $number) {
+    ?>
+<div class = "PrestationSecondaire">
 <strong>Prestation(s) Secondaire(s)</strong>
-<select name =\"prestationSecondaire0[]\">
-<option value=\"none\">--aucune--</option>
-";
+<select name ="prestationSecondaire0[]">
+<option value="none">--aucune--</option>
+                            <?php                  
                             foreach ($prestationS as $presta) {
                                 echo "<option id=\"$presta->ID_PRESTATION\" value=\"$presta->ID_PRESTATION\">$presta->LIBELLE</option>";
                             }
                             echo"</select>
-<input type=\"button\" value=\"Ajouter\" onclick=\"addPrestationSecondaire()\">
+            <input type=\"button\" value=\"Ajouter\" onclick=\"addPrestationSecondaire()\">
             <input type=\"button\" value=\"Supprimer\" onclick=\"removePrestationSecondaire();\"></div>
-";
+    ";
                         }
+                    }
+
                         ?>
 
                 </div>
             </div>
+                    </div>
 
 
 
@@ -498,23 +502,26 @@
         //calculMontantLive();
     }
 
+    var secondaires = 1;
     function addParticipation() {
         // type sera égal à "famille" où à "ext"
         let formContainer = document.getElementById("participations");
         let baseSelectInput = document.getElementsByClassName("participation");
         let base = baseSelectInput[0];
         formContainer.insertAdjacentHTML('beforeend', base.outerHTML);
+        secondaires +=1;
     }
 
     function removeParticipation(){
         // type sera égal à "famille" où à "ext"
-        let baseSelectInput = document.getElementsByClassName("participation")
+        let baseSelectInput = document.getElementsByClassName("participation");
         if(baseSelectInput.length < 2){
             //baseSelectInput[0].value = 'none';
         }else{
             let latestInput = baseSelectInput[baseSelectInput.length - 1];
             latestInput.remove();
         }
+        secondaires -=1;
         //calculMontantLive();
     }
 
