@@ -312,15 +312,6 @@
                             <label for="OUVERT_EXTERNESecondaire">externe</label>
                         </div>
                     </div>
-
-                    <div class="form-group">
-                        <label class="col-md-2 control-label" for="textinput">Prix Prestation :</label>
-                        <div class="col-md-4">
-                            <input id="PRIXSecondaire[]" name="PRIXSecondaire[]" placeholder="Prix de la prestation" class="form-control input-md " title="Prix de la prestation"
-                                   type="text" value="<?= (isset($presta->PRIX) ? $presta->PRIX : '') ?>">
-
-                        </div>
-                    </div>
                     <hr>
 
                     <?php if($countsec>1) echo "</div>";
@@ -332,8 +323,8 @@
         </div>
 
 
-        <!--<input type="button" onClick="addPrestationSecondaire()" value="Ajout prestation secondaire">
-        <input type="button" onClick="removePrestationSecondaire()" value="Suppression prestation secondaire">-->
+        <input type="button" onClick="addPrestationSecondaire()" value="Ajout prestation secondaire">
+        <input type="button" onClick="removePrestationSecondaire()" value="Suppression prestation secondaire">
 
         <!-- Button -->
         <div class="form-group">
@@ -352,7 +343,7 @@
     var ajout = 1;
     var ajoutsec = 1;
     let baseSelectInput = document.getElementsByClassName("prestationsecondaire");
-    var secondaire = baseSelectInput[baseSelectInput.length-1];
+    var secondaire = baseSelectInput[0];
     secondaire.remove();
     function addPrestationInput() {
         clicks = <?=$count?>+ajout;

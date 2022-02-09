@@ -241,8 +241,8 @@
                 <div>
         <br>
                 </div>
-        <!--<input type="button" title="ajouter une prestation secondaire qui pourra être supprimée plus tard si besoin" onClick="addPrestationSecondaire()" value="Ajout prestation secondaire">
-        <input type="button" title="supprimer la dernière prestation secondaire entrée" onClick="removePrestationSecondaire()" value="Suppression prestation secondaire">-->
+        <input type="button" title="ajouter une prestation secondaire qui pourra être supprimée plus tard si besoin" onClick="addPrestationSecondaire()" value="Ajout prestation secondaire">
+        <input type="button" title="supprimer la dernière prestation secondaire entrée" onClick="removePrestationSecondaire()" value="Suppression prestation secondaire">
 
         <!-- Button -->
         <div class="form-group">
@@ -304,7 +304,7 @@
         }
     }
 
-    /*function addPrestationSecondaire(){
+    function addPrestationSecondaire(){
         let formContainer = document.getElementById("prestation_secondaire");
         let base = "<div class='prestationsecondaire'><hr><br>Prestation secondaire n°"+clicksecond+
             secondaire.innerHTML+
@@ -322,18 +322,18 @@
             "</div>";
 
         clicksecond +=1;
-        document.getElementById("clicksecond").innerHTML = clicksecond;
+        // document.getElementById("clicksecond").innerHTML = clicksecond;
         formContainer.insertAdjacentHTML('beforeend', base);
-    }*/
+    }
 
-    /*function removePrestationSecondaire(){
+    function removePrestationSecondaire(){
         let baseSelectInput = document.getElementsByClassName("prestationsecondaire")
             let latestInput = baseSelectInput[baseSelectInput.length-1];
             latestInput.remove();
             clicksecond-=1;
-            document.getElementById("clicksecond").innerHTML = clicksecond;
+            // document.getElementById("clicksecond").innerHTML = clicksecond;
         
-    }*/
+    }
 
     
     // function InitSecondaire(){
@@ -342,7 +342,7 @@
     //     let latestInput = baseSelectInput[baseSelectInput.length-1];
     //     latestInput.remove();
     //
-    //}
+    // }
 
     function createDiv() {
         let formContainer = document.getElementById("getText");

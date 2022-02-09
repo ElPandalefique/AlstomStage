@@ -33,7 +33,7 @@
             <label class="col-md-2 control-label" for="textinput">Détail :</label>
             <div class="col-md-4">
                 <textarea id="DETAIL" name="DETAIL" placeholder="Détail" class="form-control input-md" type="text"
-                          ><?= (isset($activite->DETAIL) ? $activite->DETAIL : '') ?></textarea>
+                ><?= (isset($activite->DETAIL) ? $activite->DETAIL : '') ?></textarea>
 
             </div>
         </div>
@@ -68,7 +68,7 @@
             <div class="col-md-4">
                 <textarea id="INDICATION_PARTICIPANT" name="INDICATION_PARTICIPANT" placeholder="INDICATION_PARTICIPANT"
                           class="form-control input-md" type="text"
-                          ><?= (isset($activite->INDICATION_PARTICIPANT) ? $activite->INDICATION_PARTICIPANT : '') ?></textarea>
+                ><?= (isset($activite->INDICATION_PARTICIPANT) ? $activite->INDICATION_PARTICIPANT : '') ?></textarea>
 
             </div>
         </div>
@@ -77,7 +77,7 @@
             <div class="col-md-4">
                 <textarea id="INFO_IMPORTANT_PARTICIPANT" name="INFO_IMPORTANT_PARTICIPANT"
                           placeholder="INFO_IMPORTANT_PARTICIPANT" class="form-control input-md" type="text"
-                          ><?= (isset($activite->INFO_IMPORTANT_PARTICIPANT) ? $activite->INFO_IMPORTANT_PARTICIPANT : '') ?></textarea>
+                ><?= (isset($activite->INFO_IMPORTANT_PARTICIPANT) ? $activite->INFO_IMPORTANT_PARTICIPANT : '') ?></textarea>
             </div>
         </div>
 
@@ -158,6 +158,17 @@
                         </div>
 
                     </div>
+
+
+                <div class="form-group">
+                    <label class="col-md-2 control-label" for="textinput">Prix Prestation :</label>
+                    <div class="col-md-4">
+                        <input id="PRIX[]" name="PRIX[]" placeholder="Prix de la prestation" class="form-control input-md " title="Prix de la prestation"
+                               type="text" value="<?= (isset($presta->PRIX) ? $presta->PRIX : '') ?>">
+
+                    </div>
+                </div>
+
                 </div>
 
                 <div class="form-group">
@@ -174,31 +185,82 @@
                     </div>
                 </div>
 
-            <div class="form-group">
-                <label class="col-md-2 control-label" for="textinput">Prix Prestation :</label>
-                <div class="col-md-4">
-                    <input id="PRIX[]" name="PRIX[]" placeholder="Prix de la prestation" class="form-control input-md " title="Prix de la prestation"
-                           type="text" value="<?= (isset($presta->PRIX) ? $presta->PRIX : '') ?>">
 
-                </div>
-            </div>
                 <hr>
 
-                <?php if($count>1) echo "</div>";}?>
+                <?php if($count>1) echo "</div>";}
+            var_dump($count);?>
         </div>
 
         <input type="button" onClick="addPrestationInput()" value="Ajout prestation principale">
         <input type="button" onClick="removePrestationInput()" value="Suppression prestation principale">
 
-        <?php if(isset($prestationsSecondaires)){
-        echo'<div id="prestation_principale"  name = "prestation_principale" class = "prestation_principale">';
-            $count = 0;
-            foreach($prestationsSecondaires as $presta){
-                $count+=1;
-                if($count>1) echo "<div class = 'prestationajoutee'>";
+        <div id="prestation_secondaire"  name = "prestation_secondaire" class = "prestation_secondaire d-inline-block">
+            <div class = "prestationsecondaire">
+
+                <?php //if(isset($prestation)){
+                //ajouter des séparations
+                //ajouter bouton pour supprimer
                 ?>
 
-                <br>Prestation secondaire n°<?= $count ?>
+                <div class="form-group">
+                    <label class="col-md-2 control-label" for="textinput">Prestation<span class="important">*</span> :</label>
+
+                    <div class="col-md-4">
+                        <input id="LibelleSecondaire" title ="Entrez l'intitulé de la prestation, donner un nom qui indique clairement et facilement son contenu" name="LibelleSecondaire[]" placeholder="Intitulé de la prestation" class="libelle"
+                               type="textinput" value="<?= (isset($activite->prestation) ? $activite->prestation : '') ?>"required>
+                    </div>
+
+                </div>
+                <div class="form-group">
+                    <label class="col-md-2 control-label" for="textinput">Coût<span class="important">*</span> :</label>
+
+                    <div class="col-md-4">
+                        <input id="COUTSecondaire" name="COUTSecondaire[]" title="Entrez le coût de la prestation" placeholder="Coût" class="form-control input-md"
+                               type="number" value="<?= (isset($activite->COUT) ? $activite->COUT : '') ?>"required>
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-2 control-label" for="textinput">Âge minimum :</label>
+
+                    <div class="col-md-4">
+                        <input id="AGE_MINSecondaire" name="AGE_MINSecondaire[]" title="Entrez l'âge minimum requis pour participer à la prestation (0 signifie qu'il n'y a pas d'age minimum limite)" placeholder="Âge minimum" class="form-control input-md"
+                               type="number" value="<?= (isset($activite->AGE_MIN) ? $activite->AGE_MIN : '0') ?>">
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label class="col-md-2 control-label" for="textinput">Âge maximum :</label>
+                    <div class="col-md-4">
+                        <input id="AGE_MAXSecondaire" name="AGE_MAXSecondaire[]" title="Entrez l'âge maximum requis pour participer à la prestation (99 signifie qu'il n'y a pas d'age maximum limite)" placeholder="Âge maximum" class="form-control input-md"
+                               type="number" value="<?= (isset($activite->AGE_MAX) ? $activite->AGE_MAX : '99') ?>">
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-2 control-label" for="textinput">Prix Prestation :</label>
+                    <div class="col-md-4">
+                        <input id="PRIXSecondaire[]" name="PRIXSecondaire[]" placeholder="Prix de la prestation" class="form-control input-md " title="Prix de la prestation"
+                               type="text" value="<?= (isset($presta->PRIX) ? $presta->PRIX : '') ?>">
+
+                    </div>
+                </div>
+            </div>
+
+        <?php if(isset($prestationsSecondaires)){
+            echo'<div id="prestation_secondaire"  name = "prestation_secondaire" class = "prestation_secondaire">';
+            $countsec = 0;
+            foreach($prestationsSecondaires as $presta){
+                $countsec+=1;
+                if($countsec>1) echo "<div class = 'prestationsecondaire'>";
+                ?>
+
+                <br>Prestation secondaire n°<?= $countsec ?>
                 <div class = "prestation">
 
                     <div class="form-group">
@@ -239,36 +301,42 @@
                         </div>
 
                     </div>
+
+                    <div class="form-group">
+                        <label class="col-md-2 control-label" for="textinput">Prix Prestation :</label>
+                        <div class="col-md-4">
+                            <input id="PRIXSecondaire[]" name="PRIXSecondaire[]" placeholder="Prix de la prestation" class="form-control input-md " title="Prix de la prestation"
+                                   type="text" value="<?= (isset($presta->PRIX) ? $presta->PRIX : '') ?>">
+
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label class="col-md-2 control-label" for="textinput">adhérent / externe <span class="important">*</span>
                         :</label>
                     <div class="col-md-1">
-                        <input id="OUVERT_EXTERNESecondaire<?= $count ?>" name="OUVERT_EXTERNESecondaire<?= $count ?>" title="Si la prestation n'est ouverte qu'aux adhérents d'Alstom et leur famille" type="radio" value="0" <?php if($presta->OUVERT_EXT==0) echo'checked'; ?> onclick="ouvertEnfants();">
+                        <input id="OUVERT_EXTERNESecondaire<?= ($countsec) ?>" name="OUVERT_EXTERNESecondaire<?= ($countsec) ?>" title="Si la prestation n'est ouverte qu'aux adhérents d'Alstom et leur famille" type="radio" value="0" <?php if($presta->OUVERT_EXT==0) echo'checked'; ?> onclick="ouvertEnfants();">
                         <label for="OUVERT_EXTERNESecondaire">adhérent (+famille)</label>
                     </div>
 
                     <div class="col-md-1">
-                        <input id="OUVERT_EXTERNESecondaire<?= $count ?>" name="OUVERT_EXTERNESecondaire<?= $count ?>" title="Si la prestation est ouverte aux personnes externes à Alstom" type="radio" value="1" <?php if($presta->OUVERT_EXT==1) echo'checked'; ?> onclick="ouvertEnfants();">
+                        <input id="OUVERT_EXTERNESecondaire<?= ($countsec) ?>" name="OUVERT_EXTERNESecondaire<?= ($countsec) ?>" title="Si la prestation est ouverte aux personnes externes à Alstom" type="radio" value="1" <?php if($presta->OUVERT_EXT==1) echo'checked'; ?> onclick="ouvertEnfants();">
                         <label for="OUVERT_EXTERNESecondaire">externe</label>
                     </div>
                 </div>
 
-                <div class="form-group">
-                <label class="col-md-2 control-label" for="textinput">Prix Prestation :</label>
-                <div class="col-md-4">
-                    <input id="PRIXSecondaire[]" name="PRIXSecondaire[]" placeholder="Prix de la prestation" class="form-control input-md " title="Prix de la prestation"
-                           type="text" value="<?= (isset($presta->PRIX) ? $presta->PRIX : '') ?>">
 
-                </div>
-            </div>
                 <hr>
 
-                <?php if($count>1) echo "</div>";
+                <?php if($countsec>1) echo "</div>";
             }
             echo '</div>';
-}?>
+        }?>
+        </div>
+
+        <input type="button" onClick="addPrestationSecondaire()" value="Ajout prestation secondaire">
+        <input type="button" onClick="removePrestationSecondaire()" value="Suppression prestation secondaire">
 
         <div class="form-group">
             <label class="col-md-2 control-label" for="textinput">Statut <span class="important">*</span> :</label>
@@ -310,3 +378,71 @@
 
 
 <!-- Ancien form -->
+<script>
+    var ajout = 1;
+    var ajoutsec = 1;
+    let baseSelectInput = document.getElementsByClassName("prestationsecondaire");
+    var secondaire = baseSelectInput[0];
+    secondaire.remove();
+    function addPrestationInput() {
+        clicks = <?=$count?>+ajout;
+        let formContainer = document.getElementById("prestation_principale");
+        let baseSelectInput = document.getElementsByClassName("prestation")
+        let base = "<div class='prestationajoutee'><hr><br>Prestation principale n°"+clicks+
+            baseSelectInput[0].innerHTML +
+            "<div class='form-group'>" +
+            "<label class='col-md-2 control-label' for='textinput'>adhérent / externe <span class='important'>*</span>:</label> " +
+            "<div class='col-md-1'> " +
+            "<input id='OUVERT_EXTERNE"+(clicks)+"' name='OUVERT_EXTERNE"+(clicks)+"' title='Si la prestation n est ouverte qu aux adhérents d Alstom et leur famille' type='radio' value='0' checked onclick='ouvertEnfants();'> " +
+            "<label for='OUVERT_EXTERNE'>adhérent (+famille)</label> " +
+            "</div> " +
+            "<div class='col-md-1'>" +
+            "<input id='OUVERT_EXTERNE"+(clicks)+"' name='OUVERT_EXTERNE"+(clicks)+"' title='Si la prestation est ouverte aux personnes externes à Alstom' type='radio' value='1' onclick='ouvertEnfants();'> " +
+            "<label for='OUVERT_EXTERNE'>externe</label>" +
+            "</div>" +
+            "</fieldset>"+
+            "</div>";
+        ajout+=1;
+        formContainer.insertAdjacentHTML('beforeend', base);
+    }
+
+    function removePrestationInput(){
+        let baseSelectInput = document.getElementsByClassName("prestationajoutee")
+        if(baseSelectInput.length >= 1){
+            let latestInput = baseSelectInput[baseSelectInput.length-1];
+            latestInput.remove();
+            ajout-=1;
+        }
+    }
+
+    function addPrestationSecondaire(){
+        let formContainer = document.getElementById("prestation_secondaire");
+        clicksec = <?=$countsec?>+ajoutsec
+        let base = "<div class='prestationsecondaire'><hr><br>Prestation secondaire n°"+clicksec+
+            secondaire.innerHTML+
+            "<div class='form-group'>" +
+            "<label class='col-md-2 control-label' for='textinput'>adhérent / externe <span class='important'>*</span>:</label> " +
+            "<div class='col-md-1'> " +
+            "<input id='OUVERT_EXTERNESecondaire"+(clicksec)+"' name='OUVERT_EXTERNESecondaire"+(clicksec)+"' title='Si la prestation n est ouverte qu aux adhérents d Alstom et leur famille' type='radio' value='0' checked onclick='ouvertEnfants();'> " +
+            "<label for='OUVERT_EXTERNESecondaire'>adhérent (+famille)</label> " +
+            "</div> " +
+            "<div class='col-md-1'>" +
+            "<input id='OUVERT_EXTERNESecondaire"+(clicksec)+"' name='OUVERT_EXTERNESecondaire"+(clicksec)+"' title='Si la prestation est ouverte aux personnes externes à Alstom' type='radio' value='1' onclick='ouvertEnfants();'> " +
+            "<label for='OUVERT_EXTERNESecondaire'>externe</label>" +
+            "</div>" +
+            "</fieldset>"+
+            "</div>";
+
+        ajoutsec +=1;
+        //document.getElementById("clicksecond").innerHTML = clicksecond;
+        formContainer.insertAdjacentHTML('beforeend', base);
+    }
+
+    function removePrestationSecondaire(){
+        let baseSelectInput = document.getElementsByClassName("prestationsecondaire")
+        let latestInput = baseSelectInput[baseSelectInput.length-1];
+        latestInput.remove();
+        ajoutsec-=1;
+    }
+
+</script>

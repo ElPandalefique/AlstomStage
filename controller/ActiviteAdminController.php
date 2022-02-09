@@ -33,7 +33,7 @@ class ActiviteAdminController extends Controller {
 
         //prestations
         $modPresta = $this->loadModel('Prestation');
-        $projection['projection'] = "COUT, AGEMIN, AGEMAX, LIBELLE, OUVERT_EXT";
+        $projection['projection'] = "COUT, AGEMIN, AGEMAX, LIBELLE, OUVERT_EXT, PRIX";
         $projection['conditions'] = "ID_ACTIVITE = $ID_ACTIVITE AND SECONDAIRE = 0";
         $d['prestationsPrincipales'] = $modPresta->find($projection, true);
         $projection['conditions'] = "ID_ACTIVITE = $ID_ACTIVITE AND SECONDAIRE = 1";
@@ -120,8 +120,6 @@ class ActiviteAdminController extends Controller {
         $donnees["NOM"] = $_POST["NOM"];
         $donnees["DETAIL"] = $_POST["DETAIL"];
 
-
-
         $donnees["ADRESSE"] = $_POST["ADRESSE"];
         $donnees["CP"] = $_POST["CP"];
         $donnees["VILLE"] = $_POST["VILLE"];
@@ -176,11 +174,14 @@ class ActiviteAdminController extends Controller {
 
         if(isset($_POST['LibelleSecondaire'])){
             $countsec = 0;
+            var_dump($_POST['COUTSecondaire']);
 
             foreach ($_POST['LibelleSecondaire'] as $libelle){
                 //récupération de chaque valeur dans des variables pour facilité la compréhension
                 $post = "OUVERT_EXTERNESecondaire".($countsec+1);
                 $cout = $_POST['COUTSecondaire'][$countsec];
+                var_dump($cout);
+                var_dump($countsec);
                 $agemin = $_POST['AGE_MINSecondaire'][$countsec];
                 $agemax = $_POST['AGE_MAXSecondaire'][$countsec];
                 $ouvertext = $_POST["$post"];
@@ -199,9 +200,12 @@ class ActiviteAdminController extends Controller {
                 $donneesPresta['PRIX'] = $prix;
 
                 //insertion dans la base de données
+                var_dump($colonnesPresta);
+                var_dump($donneesPresta);
                 $modPresta->insert($colonnesPresta, $donneesPresta);
 
                 //ajout d'une valeur du count pour selectionner la prestation suivante de l'activité
+                $countsec+=1;
                 $count+=1;
 
             }
@@ -218,6 +222,174 @@ class ActiviteAdminController extends Controller {
         $this->render('liste');
 
         $this->mailc($ID_ACTIVITE, "modifier");
+    }
+
+    function inscrits($id)
+    {
+        /*  $modInscription = $this->loadModel('ActiviteParticipantsLeader');
+
+          $adinfo = $modInscription->find($projection);
+
+          $modInvites = $this->loadModel('ActiviteParticipants');
+          $projection['projection'] = "INVITE.PRENOM,INVITE.NOM";
+
+          foreach ($adinfo as $i) {
+              $projection['conditions'] = "INSCRIPTION.ID_ACTIVITE = {$id} AND INSCRIPTION.CRENEAU = {$i->CRENEAU}";
+              $invites = $modInvites->find($projection);
+              foreach ($invites as $p) {
+                  $listeinvites[] = array('NOM' => $p->NOM, 'PRENOM' => $p->PRENOM);
+              }
+              $participants[] = array('ID_ACTIVITE' => $id, 'CRENEAU' => $i->CRENEAU, 'MONTANT' => $i->MONTANT, 'PRENOM' => $i->PRENOM, 'NOM' => $i->NOM, 'AUTO_PARTICIPATION' => $i->AUTO_PARTICIPATION,
+                  'LISTE_INVITE' => $listeinvites);
+
+          }
+
+          $d['donnees'] = $participants;*/
+        //PRESTATION.LIBELLE as LIBELLE,
+        $modInscription = $this->loadModel('ActiviteParticipantsLeader');
+        $projection['projection'] = 'INSCRIPTION.DATE_INSCRIPTION, INSCRIPTION.DATE_PAIEMENT, INSCRIPTION.ID,CRENEAU.NUM_CRENEAU, CRENEAU.DATE_CRENEAU, CRENEAU.HEURE_CRENEAU,INSCRIPTION.PAYE, INSCRIPTION.CRENEAU, INSCRIPTION.ID_ADHERENT, MONTANT, AUTO_PARTICIPATION, INSCRIPTION.ID_ACTIVITE, ADHERENT.NOM as ADN, ADHERENT.PRENOM as ADP,ADHERENT.TELEPHONE, GROUP_CONCAT(INVITE.NOM, " ", INVITE.PRENOM separator "<br>") as INN,  INSCRIPTION.ATTENTE as ATTENTE, INSCRIPTION.ID_PRESTATION as PRESTATION, INSCRIPTION.PRESTATIONSEC1 as PrestationSecondaire1, INSCRIPTION.PRESTATIONSEC2 as PrestationSecondaire2';
+        $projection['conditions'] = "INSCRIPTION.ID_ACTIVITE = {$id} AND INSCRIPTION.ATTENTE = 0";
+        $projection['groupby'] = "INSCRIPTION.DATE_INSCRIPTION ";
+        $projection['orderby'] = "INSCRIPTION.CRENEAU";
+        //$projection['order by'] = "INSCRIPTION.DATE_INSCRIPTION";
+        //var_dump($projection);
+        $result = $modInscription->find($projection);
+        $d['inscrits'] = $result;
+
+
+        $modPresta = $this->loadModel('InvitePrestation');
+        $proj['projection'] = 'LISTE_INVITES.ID_PRESTATION as PRESTATION, LISTE_INVITES.PRESTATIONSEC1 as PrestationSecondaire1, LISTE_INVITES.PRESTATIONSEC2 as PrestationSecondaire2, INVITE.NOM, INVITE.PRENOM';
+        $proj['conditions'] = "INSCRIPTION.ID_ACTIVITE = {$id} AND INSCRIPTION.ATTENTE = 0";
+//        $proj['groupby'] = "INSCRIPTION.ID ";
+        //var_dump($projection);
+        $resultPI = $modPresta->find($proj);
+        $d['prestationI'] = $resultPI;
+
+        //récupération du nom des prestations des adherents
+        $modPrestation = $this->loadModel('InscriptionPrestation');
+        $proj['projection'] = 'PRESTATION.LIBELLE, PRESTATION.PRIX';
+        $proj['conditions'] = "PRESTATION.ID_ACTIVITE = $id";
+        $resultP = $modPrestation->find($proj);
+        $d['prestation'] = $resultP;
+
+
+        $projection['groupby'] = "INSCRIPTION.DATE_INSCRIPTION ";
+        $projection['conditions'] = "INSCRIPTION.ID_ACTIVITE = {$id} AND INSCRIPTION.ATTENTE = 1";
+        $projection['orderby'] = "INSCRIPTION.DATE_INSCRIPTION";
+        $resultA = $modInscription->find($projection);
+        $d['inscritsA'] = $resultA;
+        //var_dump($result);
+        //var_dump($resultA);
+
+        //Récuperer les effectifs des créneaux
+        $modEffectif = $this->loadModel('ActiviteParticipantsAdherent');
+        $projectionC['projection'] = "c.EFFECTIF_CRENEAU, c.DATE_CRENEAU, c.HEURE_CRENEAU, c.NUM_CRENEAU, COUNT(li.ID_INVITE) as effectif";
+        $projectionC['conditions'] = "i.ID_ACTIVITE = {$id} AND c.STATUT = 'O' AND i.ATTENTE = 0";
+        $projectionC['groupby'] = "c.NUM_CRENEAU, c.ID_ACTIVITE";
+        $resultE = $modEffectif->find($projectionC);
+        $d['effectifsInvite'] = $resultE;
+        //var_dump($resultE);
+
+        $modEffectif = $this->loadModel('InscriptionCreneau');
+        $projectionC['projection'] = "c.EFFECTIF_CRENEAU, c.DATE_CRENEAU, c.HEURE_CRENEAU, c.NUM_CRENEAU, COUNT(i.ID_ADHERENT) as effectif";
+        $projectionC['conditions'] = "i.ID_ACTIVITE = {$id} AND c.STATUT = 'O' AND i.ATTENTE = 0";
+        $projectionC['groupby'] = "c.NUM_CRENEAU, c.ID_ACTIVITE";
+        $resultEff = $modEffectif->find($projectionC);
+        $d['effectifs'] = $resultEff;
+
+        //Récuperer les personnes qui ne participent pas mais qui ont inscrit des invités
+        $modEffectifInvite= $this->loadModel('ActiviteParticipantsAdherent');
+        $projectionC['projection'] = "c.EFFECTIF_CRENEAU, c.DATE_CRENEAU, c.HEURE_CRENEAU, c.NUM_CRENEAU, COUNT(i.ID) as effectif";
+        $projectionC['conditions'] = "i.ID_ACTIVITE = {$id} AND c.STATUT = 'O' AND i.ATTENTE = 0 AND i.AUTO_PARTICIPATION=0";
+        $projectionC['groupby'] = "c.NUM_CRENEAU, c.ID_ACTIVITE";
+        $resultEI = $modEffectifInvite->find($projectionC);
+        $d['effectifInvite'] = $resultEI;
+
+        $this->set($d);
+        $this->render('inscrits');
+
+    }
+
+    public function gerer($id)
+    {
+
+        // Récupérer l'adhérent et l'activité associé.
+        $modInscription = $this->loadModel('Inscription');
+        $projection['projection'] = 'CRENEAU, ID, ID_ACTIVITE, ID_ADHERENT, PAYE, DATE_PAIEMENT';
+        $projection['conditions'] = "ID = " . $id;
+        $d['donnees'] = $modInscription->findfirst($projection);
+
+        $modCreneau = $this->loadModel('ActiviteCreneauAdmin');
+        $projection['projection'] = 'NUM_CRENEAU, DATE_CRENEAU, HEURE_CRENEAU';
+        $projection['conditions'] = "STATUT = 'O' AND ID_ACTIVITE = ". $d['donnees']->ID_ACTIVITE;
+        $d['creneaux'] = $modCreneau->find($projection);
+
+
+        // Rendu du formulaire
+        $this->set($d);
+        $this->render('gerer');
+    }
+
+    public function gererAttente($id)
+    {
+
+        // Récupérer l'adhérent et l'activité associé.
+        $modInscription = $this->loadModel('Inscription');
+        $projection['projection'] = 'CRENEAU, ID, ID_ACTIVITE, ID_ADHERENT, PAYE, DATE_PAIEMENT';
+        $projection['conditions'] = "ID = " . $id;
+        $d['donnees'] = $modInscription->findfirst($projection);
+
+        $modCreneau = $this->loadModel('ActiviteCreneauAdmin');
+        $projection['projection'] = 'NUM_CRENEAU, DATE_CRENEAU, HEURE_CRENEAU';
+        $projection['conditions'] = "STATUT = 'O' AND ID_ACTIVITE = ". $d['donnees']->ID_ACTIVITE;
+        $d['creneaux'] = $modCreneau->find($projection);
+
+        //echo'var_dump d';
+        //var_dump($d);
+        // Rendu du formulaire
+        $this->set($d);
+        $this->render('gererAttente');
+
+    }
+
+    public function passagePrincipale($id){
+        $modParticipants = $this->loadModel('ActiviteParticipantsAdherent');
+        $reqI['projection'] = '
+            COUNT(DISTINCT i.ID) + COUNT(li.ID_INVITE) as inscrits,
+            c.EFFECTIF_CRENEAU as places';
+        $reqI['conditions'] = "c.ID_ACTIVITE = {$id} AND c.NUM_CRENEAU = {$_POST['creneau']} AND i.ATTENTE = 0" ;
+        $effectifc = $modParticipants->findfirst($reqI);
+        $modInscription = $this->loadModel('ActiviteParticipantsLeader');
+        $projection['projection'] = 'INSCRIPTION.DATE_INSCRIPTION, INSCRIPTION.DATE_PAIEMENT, INSCRIPTION.ID as ID, CRENEAU.DATE_CRENEAU, CRENEAU.HEURE_CRENEAU,INSCRIPTION.PAYE, INSCRIPTION.CRENEAU, INSCRIPTION.ID_ADHERENT, MONTANT, AUTO_PARTICIPATION as ap, INSCRIPTION.ID_ACTIVITE, ADHERENT.NOM as ADN, ADHERENT.PRENOM as ADP, COUNT(INVITE.ID_PERS_EXTERIEUR) as INN, INSCRIPTION.ATTENTE as ATTENTE';
+
+        $projection['conditions'] = "INSCRIPTION.ID_ACTIVITE = {$id} AND INSCRIPTION.ATTENTE = 1 AND INSCRIPTION.ID_ADHERENT = $_POST[idadh]";
+        $resultA = $modInscription->findfirst($projection);
+        $nombreinscription = intval($resultA->ap) + intval($resultA->INN);
+
+
+        //compte les personnes qui ne sont pas en auto-participation
+        $modEffectifInvite= $this->loadModel('ActiviteParticipantsAdherent');
+        $projectionC['projection'] = "COUNT(i.ID) as effectif";
+        $projectionC['conditions'] = "c.ID_ACTIVITE = {$id} AND c.NUM_CRENEAU = {$_POST['creneau']} AND i.ATTENTE = 0 AND i.AUTO_PARTICIPATION=0";
+        $resultEI = $modEffectifInvite->findfirst($projectionC, true);
+
+        $inscrits = $effectifc->inscrits-$resultEI->effectif;
+        //var_dump($inscrits);
+
+        if (!($nombreinscription > $effectifc->places - $inscrits)) {
+            $donnees['ATTENTE'] = 0;
+            $tab = array('conditions' => array('ID' => $_POST['id']), 'donnees' => $donnees);
+            //var_dump($resultA->ID);
+            //var_dump($id);
+            $this->mailSolo($resultA->ID, "principale", $id);
+            $modInscription->update($tab);
+            $d['info'] = "Passage en liste principale effectué";
+        }
+        else{
+            $d['info'] = "Passage en liste principale impossible, l'effectif est complet";
+        }
+        $this->set($d);
+        $this->inscrits($id);
     }
 
     function archivage($id) {
@@ -337,6 +509,60 @@ class ActiviteAdminController extends Controller {
         header('Location: ../liste');
     }
 
+    public function paye($id)
+    {
+        // Récupérer l'adhérent et l'activité associé.
+        $modInscription = $this->loadModel('Inscription');
+        $projection['projection'] = 'ID_ACTIVITE, ID_ADHERENT';
+        $projection['conditions'] = "ID = " . $id;
+        $infoi = $modInscription->findfirst($projection);
+
+        $donnees["PAYE"] = 1;
+        $donnees["DATE_PAIEMENT"] = date("Y-m-d");
+        $tab = array('conditions' => array('ID_ADHERENT' => $infoi->ID_ADHERENT, 'ID_ACTIVITE' => $infoi->ID_ACTIVITE), 'donnees' => $donnees);
+        $modInscription->update($tab);
+
+        $d['info'] = "Le paiement de l'adhérent a été validé avec succès.";
+        $this->mailSolo($id, "paye", $infoi->ID_ACTIVITE);
+        $this->set($d);
+        $this->gerer($id);
+    }
+
+    public function deplacerCreneau($id){
+
+        // Récupérer l'adhérent et l'activité associé.
+        $modInscription = $this->loadModel('Inscription');
+        $projection['projection'] = 'ID_ACTIVITE, ID_ADHERENT';
+        $projection['conditions'] = "ID = " . $id;
+        $infoi = $modInscription->findfirst($projection);
+
+        $donnees["CRENEAU"] = $_POST["CRENEAU"];
+        $tab = array('conditions' => array('ID' => $id), 'donnees' => $donnees);
+        $modInscription->update($tab);
+
+        $d['info'] = "Le créneau de l'adhérent a été déplacé avec succès.";
+        $this->mailSolo($id, "creneauAdherent", $infoi->ID_ACTIVITE);
+//        $this->set($d);
+//        $this->gerer($id);
+        $this->inscrits($infoi->ID_ACTIVITE);
+
+    }
+
+    public function desinscrire($id){
+        $modInscription = $this->loadModel('Inscription');
+        $projection['projection'] = 'ID_ACTIVITE, ID_ADHERENT';
+        $projection['conditions'] = "ID = " . $id;
+        $infoi = $modInscription->findfirst($projection);
+
+        $tab = array('conditions' => array('ID' => $id));
+        $this->mailSolo($id, "desinscrire", $infoi->ID_ACTIVITE);
+        $modInscription->delete($tab);
+
+        $d['info'] = "L'adhérent a été désinscrit avec succès.";
+        $this->set($d);
+        $this->inscrits($infoi->ID_ACTIVITE);
+    }
+
     public function mailLeader($idactivite, $mail)
     {
         //Récupérer adresse leader
@@ -347,6 +573,56 @@ class ActiviteAdminController extends Controller {
         foreach($result as $dest){
             $mail->addAddress($dest->mail);
         }
+    }
+
+    public function mailSolo($idinscrit, $mess, $activite){
+
+        $configMail = new mailConfig();
+        $mail = $configMail->config();
+
+        //récupération adresse participant
+        $modInscription = $this->loadModel('ActiviteParticipantsLeader');
+        $projection['projection'] = 'ADHERENT.mail';
+        $projection['conditions'] = "INSCRIPTION.ID = {$idinscrit}";
+        $result = $modInscription->find($projection);
+
+        //récupération nom activité
+        $nomactivite=$this->nomActivite($activite);
+        /*$modActivite = $this->loadModel("ActiviteInscrit");
+        $projection['projection'] = "ACTIVITE.nom";
+        $projection['conditions'] = "ACTIVITE.ID_ACTIVITE = {$activite}";
+        $resulta = $modActivite->findfirst($projection);
+        var_dump($result);
+        var_dump($resulta);
+        var_dump($mess);
+        foreach($resulta as $nom){
+            $nomactivite=$nom;
+        }*/
+
+        foreach($result as $dest){
+            $mail->addAddress($dest->mail);
+        }
+        switch ($mess){
+            case "paye":
+                $mail->Subject="Paiement confirmé";
+                $mail->Body="Votre paiement à été confirmé pour l'activité $nomactivite";
+                break;
+            case "desinscrire":
+                $mail->Subject="Désinscription";
+                $mail->Body="Vous avez été désinscrit de l'activité $nomactivite";
+                break;
+            case "creneauAdherent":
+                $mail->Subject="Modification créneau";
+                $mail->Body="Vous avez été changé de créneau sur l'activité $nomactivite";
+                break;
+            case "principale":
+                $mail->Subject="Passage en liste principale";
+                $mail->Body="Vous avez été changé en liste principale sur l'activité $nomactivite";
+                break;
+        }
+        $mail->send();
+        $mail->smtpClose();
+        //        var_dump($mail);
     }
 
     public function mailc($idactivite, $mess){

@@ -62,7 +62,7 @@
             <td> </td>
         </tr>";
                 }
-                $redirect=BASE_URL . '/activiteLeader/gerer/' . $i->ID;
+                $redirect=BASE_URL . '/activiteAdmin/gerer/' . $i->ID;
                 $c=0;
                 $libelle = $prestation[($i->PRESTATION-1)]->LIBELLE;
                 if($i->PrestationSecondaire1!=null) {
@@ -87,7 +87,7 @@
                         <?= "{$i->ADN} {$i->ADP}" ?>
                     </td>
                     <td>
-
+                       
                     </td>
                     <td>
                         <?=$libelle?>
@@ -181,7 +181,7 @@
             <td></td>
         </tr>";
             }
-            $redirect=BASE_URL . '/activiteLeader/gererAttente/' . $i->ID;
+            $redirect=BASE_URL . '/activiteAdmin/gererAttente/' . $i->ID;
             $c=0;
             $libelle = $prestation[($i->PRESTATION-1)]->LIBELLE;
             if($i->PrestationSecondaire1!=null) {

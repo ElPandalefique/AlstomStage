@@ -26,7 +26,7 @@ if(!isset($_SESSION['ID_ADHERENT'])){
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <title><?php echo isset($title_for_layout) ? $title_for_layout : 'Amicale des cadres ALSTOM'; ?></title>
+    <title><?php echo isset($title_for_layout) ? $title_for_layout : 'Amicale des cadres ALSTOM v2'; ?></title>
     <link href='<?php echo BASE_SITE . DS . '/css/bootstrap/css/bootstrap.css' ?>' rel="stylesheet">
     <link href='<?php echo BASE_SITE . DS . '/css/style.css' ?>' rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -41,7 +41,7 @@ if(!isset($_SESSION['ID_ADHERENT'])){
 
 <header>
     <div class="row hidden-xs" id="header_img"></div>
-    <h1 class="row"> Amicale des cadres ALSTOM </h1>
+    <h1 class="row"> Amicale des cadres ALSTOM v2</h1>
 </header>
 
 <ul class="nav navbar-nav">

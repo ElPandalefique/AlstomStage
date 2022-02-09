@@ -25,7 +25,8 @@
         <!-- valeur tableau -->           
         <?php foreach ($activite as $a): ?>
             <tr>
-                <td> <a href="<?php echo BASE_URL . '/activiteAdmin/detail/' . $a->ID_ACTIVITE ?>">Modifier</td>
+                <td> <a href="<?php echo BASE_URL . '/activiteAdmin/detail/' . $a->ID_ACTIVITE ?>">Modifier<br>
+                     <a href="<?php echo BASE_URL . '/activiteAdmin/inscrits/' . $a->ID_ACTIVITE ?>">Inscriptions</a><br></td>
                 <td><?= $a->NOM ?></td>
                 <td><?= $a->DETAIL ?></td>
                 <td><?= $a->VILLE ?></td>

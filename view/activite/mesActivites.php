@@ -1,7 +1,7 @@
 <legend>Amical des cadres ALSTOM</legend>
 <form class="form-horizontal">
     <?php
-    var_dump($inscription);
+//    var_dump($inscription);
     if(isset($inscription->ATTENTE)){
         $attente = $inscription->ATTENTE;
         if($attente==1){
@@ -90,9 +90,20 @@
                     <td class="text-right"><strong>Mon inscription :</strong></td>
                     <td class="pl-3">
                         <?php if ($inscription->AUTO_PARTICIPATION == 1) $participants[] = Session::get('NOM') . ' ' . Session::get('PRENOM');
-                        $participants[]="";
+                        //$participants[]="";
                         foreach ($invites as $invite) : $participants[] = "{$invite->NOM} {$invite->PRENOM}"; endforeach;
                         echo implode(', ', $participants);
+                        ?>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="text-right"><strong>Horaire créneau</strong></td>
+                    <td class="pl-3">
+                        <?php
+                        $heure = $creneau->heure;
+                        $date = date_format(date_create($creneau->date), 'd-m-Y');
+                        echo "Le $date à $heure";
                         ?>
                     </td>
                 </tr>

@@ -83,6 +83,7 @@ class ActiviteLeaderController extends Controller
         $this->mail($ID_ACTIVITE, "creer");
     }
 
+    //création d'une nouvelle activité
     function nouveau($id)
     {
         $modActivite = $this->loadModel('ActiviteLeader');
@@ -153,9 +154,9 @@ class ActiviteLeaderController extends Controller
                 $countsec =0;
                 $colonnesPrestaSecondaire=array('ID_ACTIVITE', 'ID_PRESTATION', 'COUT', 'AGEMIN', 'AGEMAX', 'LIBELLE', 'OUVERT_EXT', 'SECONDAIRE');
                 var_dump($_POST['COUTSecondaire']);
-                foreach(range(0, 3) as $n){
-                    var_dump($_POST['COUTSecondaire'][$n]);
-                }
+//                foreach(range(0, 3) as $n){
+//                    var_dump($_POST['COUTSecondaire'][$n]);
+//                }
                 foreach ($_POST['LibelleSecondaire'] as $libelle){
                     //récupération de chaque valeur dans des variables pour facilité la compréhension
                     $post = "OUVERT_EXTERNESecondaire".$countsec;
@@ -277,33 +278,37 @@ class ActiviteLeaderController extends Controller
           $d['donnees'] = $participants;*/
         //PRESTATION.LIBELLE as LIBELLE,
         $modInscription = $this->loadModel('ActiviteParticipantsLeader');
-        $projection['projection'] = 'INSCRIPTION.DATE_INSCRIPTION, INSCRIPTION.DATE_PAIEMENT, INSCRIPTION.ID,CRENEAU.NUM_CRENEAU, CRENEAU.DATE_CRENEAU, CRENEAU.HEURE_CRENEAU,INSCRIPTION.PAYE, INSCRIPTION.CRENEAU, INSCRIPTION.ID_ADHERENT, MONTANT, AUTO_PARTICIPATION, INSCRIPTION.ID_ACTIVITE, ADHERENT.NOM as ADN, ADHERENT.PRENOM as ADP,ADHERENT.TELEPHONE, GROUP_CONCAT(INVITE.NOM, " ", INVITE.PRENOM separator "<br>") as INN,  INSCRIPTION.ATTENTE as ATTENTE, INSCRIPTION.ID_PRESTATION as PRESTATION';
+        $projection['projection'] = 'INSCRIPTION.DATE_INSCRIPTION, INSCRIPTION.DATE_PAIEMENT, INSCRIPTION.ID,CRENEAU.NUM_CRENEAU, CRENEAU.DATE_CRENEAU, CRENEAU.HEURE_CRENEAU,INSCRIPTION.PAYE, INSCRIPTION.CRENEAU, INSCRIPTION.ID_ADHERENT, MONTANT, AUTO_PARTICIPATION, INSCRIPTION.ID_ACTIVITE, ADHERENT.NOM as ADN, ADHERENT.PRENOM as ADP,ADHERENT.TELEPHONE, GROUP_CONCAT(INVITE.NOM, " ", INVITE.PRENOM separator "<br>") as INN,  INSCRIPTION.ATTENTE as ATTENTE, INSCRIPTION.ID_PRESTATION as PRESTATION, INSCRIPTION.PRESTATIONSEC1 as PrestationSecondaire1, INSCRIPTION.PRESTATIONSEC2 as PrestationSecondaire2';
         $projection['conditions'] = "INSCRIPTION.ID_ACTIVITE = {$id} AND INSCRIPTION.ATTENTE = 0";
         $projection['groupby'] = "INSCRIPTION.DATE_INSCRIPTION ";
         $projection['orderby'] = "INSCRIPTION.CRENEAU";
         //$projection['order by'] = "INSCRIPTION.DATE_INSCRIPTION";
         //var_dump($projection);
         $result = $modInscription->find($projection);
+        $d['inscrits'] = $result;
 
 
         $modPresta = $this->loadModel('InvitePrestation');
-        $proj['projection'] = 'LISTE_INVITES.ID_PRESTATION as PRESTATION, INVITE.NOM, INVITE.PRENOM';
+        $proj['projection'] = 'LISTE_INVITES.ID_PRESTATION as PRESTATION, LISTE_INVITES.PRESTATIONSEC1 as PrestationSecondaire1, LISTE_INVITES.PRESTATIONSEC2 as PrestationSecondaire2, INVITE.NOM, INVITE.PRENOM';
         $proj['conditions'] = "INSCRIPTION.ID_ACTIVITE = {$id} AND INSCRIPTION.ATTENTE = 0";
 //        $proj['groupby'] = "INSCRIPTION.ID ";
         //var_dump($projection);
         $resultPI = $modPresta->find($proj);
+        $d['prestationI'] = $resultPI;
 
         //récupération du nom des prestations des adherents
         $modPrestation = $this->loadModel('InscriptionPrestation');
         $proj['projection'] = 'PRESTATION.LIBELLE, PRESTATION.PRIX';
         $proj['conditions'] = "PRESTATION.ID_ACTIVITE = $id";
         $resultP = $modPrestation->find($proj);
+        $d['prestation'] = $resultP;
 
 
         $projection['groupby'] = "INSCRIPTION.DATE_INSCRIPTION ";
         $projection['conditions'] = "INSCRIPTION.ID_ACTIVITE = {$id} AND INSCRIPTION.ATTENTE = 1";
         $projection['orderby'] = "INSCRIPTION.DATE_INSCRIPTION";
         $resultA = $modInscription->find($projection);
+        $d['inscritsA'] = $resultA;
         //var_dump($result);
         //var_dump($resultA);
 
@@ -313,6 +318,7 @@ class ActiviteLeaderController extends Controller
         $projectionC['conditions'] = "i.ID_ACTIVITE = {$id} AND c.STATUT = 'O' AND i.ATTENTE = 0";
         $projectionC['groupby'] = "c.NUM_CRENEAU, c.ID_ACTIVITE";
         $resultE = $modEffectif->find($projectionC);
+        $d['effectifsInvite'] = $resultE;
         //var_dump($resultE);
 
         $modEffectif = $this->loadModel('InscriptionCreneau');
@@ -320,6 +326,7 @@ class ActiviteLeaderController extends Controller
         $projectionC['conditions'] = "i.ID_ACTIVITE = {$id} AND c.STATUT = 'O' AND i.ATTENTE = 0";
         $projectionC['groupby'] = "c.NUM_CRENEAU, c.ID_ACTIVITE";
         $resultEff = $modEffectif->find($projectionC);
+        $d['effectifs'] = $resultEff;
 
         //Récuperer les personnes qui ne participent pas mais qui ont inscrit des invités
         $modEffectifInvite= $this->loadModel('ActiviteParticipantsAdherent');
@@ -327,14 +334,8 @@ class ActiviteLeaderController extends Controller
         $projectionC['conditions'] = "i.ID_ACTIVITE = {$id} AND c.STATUT = 'O' AND i.ATTENTE = 0 AND i.AUTO_PARTICIPATION=0";
         $projectionC['groupby'] = "c.NUM_CRENEAU, c.ID_ACTIVITE";
         $resultEI = $modEffectifInvite->find($projectionC);
-
-        $d['inscrits'] = $result;
-        $d['prestation'] = $resultP;
-        $d['prestationI'] = $resultPI;
-        $d['inscritsA'] = $resultA;
-        $d['effectifsInvite'] = $resultE;
-        $d['effectifs'] = $resultEff;
         $d['effectifInvite'] = $resultEI;
+
         $this->set($d);
         $this->render('inscrits');
 
@@ -510,7 +511,7 @@ class ActiviteLeaderController extends Controller
 
         // $req['conditions'] = 'ID_ACTIVITE' => $ID_ACTIVITE;
         // $tabPresta = array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE));
-        $modPresta->delete(array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE)));
+        //$modPresta->delete(array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE)));
 
         foreach ($_POST['Libelle'] as $libelle){
             //récupération de chaque valeur dans des variables pour facilité la compréhension
@@ -525,15 +526,18 @@ class ActiviteLeaderController extends Controller
             $donneesPresta['ID_ACTIVITE']=$ID_ACTIVITE;
             $donneesPresta['ID_PRESTATION'] = $count+1;
             $donneesPresta['COUT'] = $cout;
-            $donneesPresta['AGE_MIN'] = $agemin;
-            $donneesPresta['AGE_MAX'] = $agemax;
+            $donneesPresta['AGEMIN'] = $agemin;
+            $donneesPresta['AGEMAX'] = $agemax;
             $donneesPresta['LIBELLE'] = $libelle;
             $donneesPresta['OUVERT_EXT'] = $ouvertext;
             $donneesPresta['SECONDAIRE'] = 0;
 
+            $tab = array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE, 'ID_PRESTATION' => $count+1), 'donnees' => $donneesPresta);
+
 
             //insertion dans la base de données
-            $modPresta->insert($colonnesPresta, $donneesPresta);
+            //$modPresta->insert($colonnesPresta, $donneesPresta);
+            $modPresta->update($tab, true);
 
             //ajout d'une valeur du count pour selectionner la prestation suivante de l'activité
             $count+=1;
@@ -545,7 +549,7 @@ class ActiviteLeaderController extends Controller
 
             foreach ($_POST['LibelleSecondaire'] as $libelle){
                 //récupération de chaque valeur dans des variables pour facilité la compréhension
-                $post = "OUVERT_EXTERNESecondaire".($countsec+1);
+                $post = "OUVERT_EXTERNESecondaire".($countsec);
                 $cout = $_POST['COUTSecondaire'][$countsec];
                 $agemin = $_POST['AGE_MINSecondaire'][$countsec];
                 $agemax = $_POST['AGE_MAXSecondaire'][$countsec];
@@ -556,17 +560,21 @@ class ActiviteLeaderController extends Controller
                 $donneesPresta['ID_ACTIVITE']=$ID_ACTIVITE;
                 $donneesPresta['ID_PRESTATION'] = $count+1;
                 $donneesPresta['COUT'] = $cout;
-                $donneesPresta['AGE_MIN'] = $agemin;
-                $donneesPresta['AGE_MAX'] = $agemax;
+                $donneesPresta['AGEMIN'] = $agemin;
+                $donneesPresta['AGEMAX'] = $agemax;
                 $donneesPresta['LIBELLE'] = $libelle;
                 $donneesPresta['OUVERT_EXT'] = $ouvertext;
                 $donneesPresta['SECONDAIRE'] = 1;
 
+                $tab = array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE, 'ID_PRESTATION' => $count+1), 'donnees' => $donneesPresta);
+
                 //insertion dans la base de données
-                $modPresta->insert($colonnesPresta, $donneesPresta);
+                //$modPresta->insert($colonnesPresta, $donneesPresta);
+                $modPresta->update($tab, true);
 
                 //ajout d'une valeur du count pour selectionner la prestation suivante de l'activité
                 $count+=1;
+                $countsec+=1;
 
             }
         }

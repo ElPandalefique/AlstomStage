@@ -10,6 +10,7 @@
         <td>information importante</td>
         <td>Montant</td>
         <td>Voir</td>
+        <td>Modifier</td>
         <td>Se désinscrire</td>
         </tr>
         <?php foreach ($inscription as $ia):
@@ -28,6 +29,7 @@
                 <td><?= $ia->INDICATION_PARTICIPANT?></td>
                 <td><?= $ia->MONTANT . " €"?></td>
                 <td><button id="singlebutton" name="singlebutton" class="btn btn-info" onclick="window.location.href = '../activite/mesActivites/<?= $ia->ID_ACTIVITE?>'">Voir</button></td>
+                <td><button id="singlebutton" name="singlebutton" class="btn btn-info" onclick="window.location.href = '/activite/formulaireInscription/<?= $ia->ID_ACTIVITE ?>'">Modifier</button></td>
                 <td><button class="btn btn-danger" onclick="alert(`Si vous souhaitez vous désinscrire de cette activité, veuillez contacter le leader de celle-ci : <?= $ia->an . ' ' . $ia->ap ?>`)">Se désinscrire</button></td>
             </tr>
 

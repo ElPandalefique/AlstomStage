@@ -1,12 +1,17 @@
-leader voir activite:
-creneau
-participant
-adhérent lié
-prestation
-numéro de téléphone
-montant
-gerer
+leader voir activite:**
+creneau**
+participant**
+adhérent lié**
+prestation**
+prestations secondaires**
+numéro de téléphone**
+montant**
+gerer**
 
 Faire les prestations secondaires
 
 Voir pour gérer la BDD actuelle (inscriptions)
+
+Erreur sur "mesActivites"
+
+Pour base de test, finaliser le tout (avant ce soir)
