@@ -8,9 +8,9 @@ numéro de téléphone**
 montant**
 gerer**
 
-Faire les prestations secondaires
+Faire les prestations secondaires**
 
-Voir pour gérer la BDD actuelle (inscriptions)
+Voir pour gérer la BDD actuelle (inscriptions)*/*
 
 Erreur sur "mesActivites"
 

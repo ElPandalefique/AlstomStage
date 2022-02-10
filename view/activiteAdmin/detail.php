@@ -175,12 +175,12 @@
                     <label class="col-md-2 control-label" for="textinput">adhérent / externe <span class="important">*</span>
                         :</label>
                     <div class="col-md-1">
-                        <input id="OUVERT_EXTERNE<?= $count ?>" name="OUVERT_EXTERNE<?= $count ?>" title="Si la prestation n'est ouverte qu'aux adhérents d'Alstom et leur famille" type="radio" value="0" <?php if($presta->OUVERT_EXT==0) echo'checked'; ?> onclick="ouvertEnfants();">
+                        <input id="OUVERT_EXTERNE<?= ($count-1) ?>" name="OUVERT_EXTERNE<?= ($count-1) ?>" title="Si la prestation n'est ouverte qu'aux adhérents d'Alstom et leur famille" type="radio" value="0" <?php if($presta->OUVERT_EXT==0) echo'checked'; ?> onclick="ouvertEnfants();">
                         <label for="OUVERT_EXTERNE">adhérent (+famille)</label>
                     </div>
 
                     <div class="col-md-1">
-                        <input id="OUVERT_EXTERNE<?= $count ?>" name="OUVERT_EXTERNE<?= $count ?>" title="Si la prestation est ouverte aux personnes externes à Alstom" type="radio" value="1" <?php if($presta->OUVERT_EXT==1) echo'checked'; ?> onclick="ouvertEnfants();">
+                        <input id="OUVERT_EXTERNE<?= ($count-1) ?>" name="OUVERT_EXTERNE<?= ($count-1) ?>" title="Si la prestation est ouverte aux personnes externes à Alstom" type="radio" value="1" <?php if($presta->OUVERT_EXT==1) echo'checked'; ?> onclick="ouvertEnfants();">
                         <label for="OUVERT_EXTERNE">externe</label>
                     </div>
                 </div>
@@ -316,12 +316,12 @@
                     <label class="col-md-2 control-label" for="textinput">adhérent / externe <span class="important">*</span>
                         :</label>
                     <div class="col-md-1">
-                        <input id="OUVERT_EXTERNESecondaire<?= ($countsec) ?>" name="OUVERT_EXTERNESecondaire<?= ($countsec) ?>" title="Si la prestation n'est ouverte qu'aux adhérents d'Alstom et leur famille" type="radio" value="0" <?php if($presta->OUVERT_EXT==0) echo'checked'; ?> onclick="ouvertEnfants();">
+                        <input id="OUVERT_EXTERNESecondaire<?= ($countsec-1) ?>" name="OUVERT_EXTERNESecondaire<?= ($countsec-1) ?>" title="Si la prestation n'est ouverte qu'aux adhérents d'Alstom et leur famille" type="radio" value="0" <?php if($presta->OUVERT_EXT==0) echo'checked'; ?> onclick="ouvertEnfants();">
                         <label for="OUVERT_EXTERNESecondaire">adhérent (+famille)</label>
                     </div>
 
                     <div class="col-md-1">
-                        <input id="OUVERT_EXTERNESecondaire<?= ($countsec) ?>" name="OUVERT_EXTERNESecondaire<?= ($countsec) ?>" title="Si la prestation est ouverte aux personnes externes à Alstom" type="radio" value="1" <?php if($presta->OUVERT_EXT==1) echo'checked'; ?> onclick="ouvertEnfants();">
+                        <input id="OUVERT_EXTERNESecondaire<?= ($countsec-1) ?>" name="OUVERT_EXTERNESecondaire<?= ($countsec-1) ?>" title="Si la prestation est ouverte aux personnes externes à Alstom" type="radio" value="1" <?php if($presta->OUVERT_EXT==1) echo'checked'; ?> onclick="ouvertEnfants();">
                         <label for="OUVERT_EXTERNESecondaire">externe</label>
                     </div>
                 </div>
@@ -393,11 +393,11 @@
             "<div class='form-group'>" +
             "<label class='col-md-2 control-label' for='textinput'>adhérent / externe <span class='important'>*</span>:</label> " +
             "<div class='col-md-1'> " +
-            "<input id='OUVERT_EXTERNE"+(clicks)+"' name='OUVERT_EXTERNE"+(clicks)+"' title='Si la prestation n est ouverte qu aux adhérents d Alstom et leur famille' type='radio' value='0' checked onclick='ouvertEnfants();'> " +
+            "<input id='OUVERT_EXTERNE"+(clicks-1)+"' name='OUVERT_EXTERNE"+(clicks-1)+"' title='Si la prestation n est ouverte qu aux adhérents d Alstom et leur famille' type='radio' value='0' checked onclick='ouvertEnfants();'> " +
             "<label for='OUVERT_EXTERNE'>adhérent (+famille)</label> " +
             "</div> " +
             "<div class='col-md-1'>" +
-            "<input id='OUVERT_EXTERNE"+(clicks)+"' name='OUVERT_EXTERNE"+(clicks)+"' title='Si la prestation est ouverte aux personnes externes à Alstom' type='radio' value='1' onclick='ouvertEnfants();'> " +
+            "<input id='OUVERT_EXTERNE"+(clicks-1)+"' name='OUVERT_EXTERNE"+(clicks-1)+"' title='Si la prestation est ouverte aux personnes externes à Alstom' type='radio' value='1' onclick='ouvertEnfants();'> " +
             "<label for='OUVERT_EXTERNE'>externe</label>" +
             "</div>" +
             "</fieldset>"+
@@ -423,11 +423,11 @@
             "<div class='form-group'>" +
             "<label class='col-md-2 control-label' for='textinput'>adhérent / externe <span class='important'>*</span>:</label> " +
             "<div class='col-md-1'> " +
-            "<input id='OUVERT_EXTERNESecondaire"+(clicksec)+"' name='OUVERT_EXTERNESecondaire"+(clicksec)+"' title='Si la prestation n est ouverte qu aux adhérents d Alstom et leur famille' type='radio' value='0' checked onclick='ouvertEnfants();'> " +
+            "<input id='OUVERT_EXTERNESecondaire"+(clicksec-1)+"' name='OUVERT_EXTERNESecondaire"+(clicksec-1)+"' title='Si la prestation n est ouverte qu aux adhérents d Alstom et leur famille' type='radio' value='0' checked onclick='ouvertEnfants();'> " +
             "<label for='OUVERT_EXTERNESecondaire'>adhérent (+famille)</label> " +
             "</div> " +
             "<div class='col-md-1'>" +
-            "<input id='OUVERT_EXTERNESecondaire"+(clicksec)+"' name='OUVERT_EXTERNESecondaire"+(clicksec)+"' title='Si la prestation est ouverte aux personnes externes à Alstom' type='radio' value='1' onclick='ouvertEnfants();'> " +
+            "<input id='OUVERT_EXTERNESecondaire"+(clicksec-1)+"' name='OUVERT_EXTERNESecondaire"+(clicksec-1)+"' title='Si la prestation est ouverte aux personnes externes à Alstom' type='radio' value='1' onclick='ouvertEnfants();'> " +
             "<label for='OUVERT_EXTERNESecondaire'>externe</label>" +
             "</div>" +
             "</fieldset>"+

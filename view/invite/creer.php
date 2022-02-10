@@ -15,11 +15,11 @@
         <div class="form-group">
             <label class="col-md-2 control-label" for="textinput">Statut <span class="important">*</span> :</label>
             <div class="col-md-2">
-                <input id="FAMILLE" name="STATUT" type="radio" value="FAMILLE" required <?= $invite->STATUT == 'FAMILLE' ? 'checked' : '' ?>>
+                <input id="FAMILLE" name="STATUT" type="radio" value="FAMILLE" required <?= isset($invite->STATUT) == 'FAMILLE' ? 'checked' : '' ?>>
                 <label for="FAMILLE">Famille</label>
             </div>
             <div class="col-md-2">
-                <input id="EXTERNE" name="STATUT" type="radio" value="EXTERNE" <?= $invite->STATUT == 'EXTERNE' ? 'checked' : '' ?>>
+                <input id="EXTERNE" name="STATUT" type="radio" value="EXTERNE" <?= isset($invite->STATUT) == 'EXTERNE' ? 'checked' : '' ?>>
                 <label for="EXTERNE">Externe</label>
             </div>
 

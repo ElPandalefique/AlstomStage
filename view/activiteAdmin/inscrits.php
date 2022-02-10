@@ -240,7 +240,7 @@
 //                        var_dump($i);
 //                        var_dump($prestation);
 //                        var_dump($prestationI);
-                    foreach ($prestationI as $presta) {
+                    foreach ($prestationIA as $presta) {
                         $nominvite = "$presta->NOM $presta->PRENOM";
                         if($nominvite == $nom) {
                             $libellePresta = $prestation[($presta->PRESTATION-1)]->LIBELLE;

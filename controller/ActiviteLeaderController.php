@@ -296,6 +296,14 @@ class ActiviteLeaderController extends Controller
         $resultPI = $modPresta->find($proj);
         $d['prestationI'] = $resultPI;
 
+        $modPresta = $this->loadModel('InvitePrestation');
+        $proj['projection'] = 'LISTE_INVITES.ID_PRESTATION as PRESTATION, LISTE_INVITES.PRESTATIONSEC1 as PrestationSecondaire1, LISTE_INVITES.PRESTATIONSEC2 as PrestationSecondaire2, INVITE.NOM, INVITE.PRENOM';
+        $proj['conditions'] = "INSCRIPTION.ID_ACTIVITE = {$id} AND INSCRIPTION.ATTENTE = 1";
+//        $proj['groupby'] = "INSCRIPTION.ID ";
+        //var_dump($projection);
+        $resultPIA = $modPresta->find($proj);
+        $d['prestationIA'] = $resultPIA;
+
         //récupération du nom des prestations des adherents
         $modPrestation = $this->loadModel('InscriptionPrestation');
         $proj['projection'] = 'PRESTATION.LIBELLE, PRESTATION.PRIX';
@@ -491,8 +499,27 @@ class ActiviteLeaderController extends Controller
 
         //préparation de la récup des prestations
         $modPresta = $this->loadModel('Prestation');
-        $colonnesPresta=array('ID_ACTIVITE', 'ID_PRESTATION', 'COUT', 'AGEMIN', 'AGEMAX', 'LIBELLE', 'OUVERT_EXT', 'SECONDAIRE');
+        $colonnesPresta=array('ID_ACTIVITE', 'ID_PRESTATION', 'COUT', 'AGEMIN', 'AGEMAX', 'LIBELLE', 'OUVERT_EXT', 'SECONDAIRE', 'PRIX');
         $count=0;
+
+        //Nombre de prestations principales avant modification
+        $requete['projection']="COUNT(ID_PRESTATION) as nbPresta";
+        $requete['conditions']="ID_ACTIVITE=$id and SECONDAIRE=0";
+        $nbPresta=$modPresta->findfirst($requete);
+
+        //récupération des prix des prestations principales
+        $requete['projection']="PRIX";
+        $requete['conditions']="ID_ACTIVITE=$id and SECONDAIRE=0";
+        $prixPrincipale=$modPresta->find($requete, true);
+
+        var_dump($prixPrincipale);
+
+        //récupération des prix des prestations secondaires
+        $requete['projection']="PRIX";
+        $requete['conditions']="ID_ACTIVITE=$id and SECONDAIRE=1";
+        $prixSecondaire=$modPresta->find($requete, true);
+
+        var_dump($prixSecondaire);
 
         //recup les données du form
         $donnees = array();
@@ -511,7 +538,7 @@ class ActiviteLeaderController extends Controller
 
         // $req['conditions'] = 'ID_ACTIVITE' => $ID_ACTIVITE;
         // $tabPresta = array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE));
-        //$modPresta->delete(array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE)));
+        $modPresta->delete(array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE)));
 
         foreach ($_POST['Libelle'] as $libelle){
             //récupération de chaque valeur dans des variables pour facilité la compréhension
@@ -531,13 +558,18 @@ class ActiviteLeaderController extends Controller
             $donneesPresta['LIBELLE'] = $libelle;
             $donneesPresta['OUVERT_EXT'] = $ouvertext;
             $donneesPresta['SECONDAIRE'] = 0;
+            if(isset($prixPrincipale[$count]))
+                $donneesPresta['PRIX'] = $prixPrincipale[$count]->PRIX;
+            else
+                $donneesPresta['PRIX'] = $cout;
 
-            $tab = array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE, 'ID_PRESTATION' => $count+1), 'donnees' => $donneesPresta);
+
+//            $tab = array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE, 'ID_PRESTATION' => $count+1), 'donnees' => $donneesPresta);
 
 
             //insertion dans la base de données
-            //$modPresta->insert($colonnesPresta, $donneesPresta);
-            $modPresta->update($tab, true);
+            $modPresta->insert($colonnesPresta, $donneesPresta);
+//            $modPresta->update($tab, true);
 
             //ajout d'une valeur du count pour selectionner la prestation suivante de l'activité
             $count+=1;
@@ -565,12 +597,16 @@ class ActiviteLeaderController extends Controller
                 $donneesPresta['LIBELLE'] = $libelle;
                 $donneesPresta['OUVERT_EXT'] = $ouvertext;
                 $donneesPresta['SECONDAIRE'] = 1;
+                if(isset($prixSecondaire[$countsec]))
+                    $donneesPresta['PRIX'] = $prixSecondaire[$countsec]->PRIX;
+                else
+                    $donneesPresta['PRIX'] = $cout;
 
-                $tab = array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE, 'ID_PRESTATION' => $count+1), 'donnees' => $donneesPresta);
+//                $tab = array('conditions' => array('ID_ACTIVITE' => $ID_ACTIVITE, 'ID_PRESTATION' => $count+1), 'donnees' => $donneesPresta);
 
                 //insertion dans la base de données
-                //$modPresta->insert($colonnesPresta, $donneesPresta);
-                $modPresta->update($tab, true);
+                $modPresta->insert($colonnesPresta, $donneesPresta);
+//                $modPresta->update($tab, true);
 
                 //ajout d'une valeur du count pour selectionner la prestation suivante de l'activité
                 $count+=1;
@@ -583,6 +619,67 @@ class ActiviteLeaderController extends Controller
         //appeler la methode update
         $modActivite->update($tab);
         $d['info'] = "Activité modifié";
+
+
+        //mise a jour des inscription des membres pour qu'ils conservent leurs prestations secondaires
+        //Nombre de prestations principales apres modification
+        $requete['projection']="COUNT(ID_PRESTATION) as nbPresta";
+        $requete['conditions']="ID_ACTIVITE=$id and SECONDAIRE=0";
+        $nbPrestaApres=$modPresta->findfirst($requete);
+
+        $diff=$nbPrestaApres->nbPresta - $nbPresta->nbPresta;
+        var_dump($diff);
+
+        //récupération des adherents inscrits et modification de leurs prestations secondaires
+        $modInscription = $this->loadModel('Inscription');
+        $reqInscription['conditions']="ID_ACTIVITE=$id";
+        $inscriptions=$modInscription->find($reqInscription);
+        var_dump($inscriptions);
+        //préparation des invites
+        $modInscriptionInvites = $this->loadModel('ListeInvite');
+        $reqInscriptionInvites['projection'] = "DISTINCT *";
+
+        foreach($inscriptions as $i){
+
+            if($i->PRESTATIONSEC1>1)
+                $donneesInsc['PRESTATIONSEC1']= $i->PRESTATIONSEC1 + $diff;
+            if($i->PRESTATIONSEC2>1)
+                $donneesInsc['PRESTATIONSEC2']=$i->PRESTATIONSEC2 + $diff;
+
+            if(isset($donneesInsc['PRESTATIONSEC1']) || isset($donneesInsc['PRESTATIONSEC2'])){
+                $tab = array('conditions' => array('ID' => $i->ID), 'donnees' => $donneesInsc);
+                $modInscription->update($tab);
+                if(isset($donneesInsc['PRESTATIONSEC1']))
+                    unset($donneesInsc['PRESTATIONSEC1']);
+                if(isset($donneesInsc['PRESTATIONSEC2']))
+                    unset($donneesInsc['PRESTATIONSEC2']);
+            }
+
+
+            //gestion des invites
+            $reqInscriptionInvites['conditions']="ID_INSCRIPTION=$i->ID";
+            $inscriptionsInvites=$modInscriptionInvites->find($reqInscriptionInvites, true);
+//            var_dump($inscriptionsInvites);
+
+            foreach($inscriptionsInvites as $inv){
+                if($inv->PRESTATIONSEC1>1)
+                    $donneesInscInv['PRESTATIONSEC1']= $inv->PRESTATIONSEC1 + $diff;
+                if($inv->PRESTATIONSEC2>1)
+                    $donneesInscInv['PRESTATIONSEC2']=$inv->PRESTATIONSEC2 + $diff;
+
+                if(isset($donneesInscInv['PRESTATIONSEC1']) || isset($donneesInscInv['PRESTATIONSEC2'])) {
+                    $tab = array('conditions' => array('ID_INSCRIPTION' => $i->ID), 'donnees' => $donneesInscInv);
+                    $modInscriptionInvites->update($tab, true);
+                    if(isset($donneesInscInv['PRESTATIONSEC1']))
+                        unset($donneesInscInv['PRESTATIONSEC1']);
+                    if(isset($donneesInscInv['PRESTATIONSEC2']))
+                        unset($donneesInscInv['PRESTATIONSEC2']);
+                }
+
+            }
+        }
+
+
         //charger le tableau
         $this->liste();
         $this->render('liste');
@@ -594,6 +691,7 @@ class ActiviteLeaderController extends Controller
     //        $d['activiteleader'] = $modActiviteLeader->find(array('conditions' => 1));
     //        $this->set($d);
     //    }
+
     public function liste()
     {
         $modActiviteLeader = $this->loadModel('ActiviteLeader'); //instancier le modele 
@@ -633,7 +731,6 @@ class ActiviteLeaderController extends Controller
          * 
          */
     }
-
 
     function formulaireCreneau($id)
     {
@@ -775,6 +872,7 @@ class ActiviteLeaderController extends Controller
         $this->set($d);
         $this->gerer($id);
     }
+
     public function deplacerCreneau($id){
 
         // Récupérer l'adhérent et l'activité associé.
@@ -872,8 +970,8 @@ class ActiviteLeaderController extends Controller
 
         //récupérer la date et l'heure du créneau
         $modCreneau = $this->loadModel('Creneau');
-        $projection['projection'] = 'Creneau.date_creneau as date, creneau.heure_creneau as heure';
-        $projection['conditions'] = "Creneau.ID_ACTIVITE = {$idactivite} and Creneau.NUM_CRENEAU= {$creneau}";
+        $projection['projection'] = 'CRENEAU.date_creneau as date, CRENEAU.heure_creneau as heure';
+        $projection['conditions'] = "CRENEAU.ID_ACTIVITE = {$idactivite} and CRENEAU.NUM_CRENEAU= {$creneau}";
         $resultc = $modCreneau->findfirst($projection);
         $date = $resultc->date;
         $heure = $resultc->heure;
@@ -979,7 +1077,7 @@ class ActiviteLeaderController extends Controller
     public function mailAdmin($mail){
         $modInscription = $this->loadModel('Adherent');
         $projection['projection'] = 'ADHERENT.mail';
-        $projection['conditions'] = "Adherent.grade = 'A'";
+        $projection['conditions'] = "ADHERENT.grade = 'A'";
         $result = $modInscription->find($projection);
         foreach($result as $dest){
             $mail->addAddress($dest->mail);

@@ -105,7 +105,7 @@ class ActiviteController extends Controller
         $projectionC['groupby'] = "c.NUM_CRENEAU, c.ID_ACTIVITE";
         $resultE = $modEffectif->find($projectionC);
         $d['effectifs'] = $resultE;
-        //var_dump($resultE);
+        ////var_dump($resultE);
 
         //Récuperer les personnes qui ne participent pas mais qui ont inscrit des invités
         $modEffectifInvite= $this->loadModel('ActiviteParticipantsAdherent');
@@ -122,7 +122,7 @@ class ActiviteController extends Controller
         $projectionC['groupby'] = "c.NUM_CRENEAU, c.ID_ACTIVITE";
         $resultE = $modEffectif->find($projectionC);
         $d['effectifsattente'] = $resultE;
-        //var_dump($resultE);
+        ////var_dump($resultE);
 
         //Récuperer les personnes qui ne participent pas mais qui ont inscrit des invités en attente
         $modEffectifInvite= $this->loadModel('ActiviteParticipantsAdherent');
@@ -161,7 +161,7 @@ class ActiviteController extends Controller
         $projectionC['groupby'] = "c.NUM_CRENEAU, c.ID_ACTIVITE";
         $resultE = $modEffectif->find($projectionC);
         $d['effectifsInvite'] = $resultE;
-        //var_dump($resultE);
+        ////var_dump($resultE);
 
         $modEffectif = $this->loadModel('InscriptionCreneau');
         $projectionC['projection'] = "c.EFFECTIF_CRENEAU, c.DATE_CRENEAU, c.HEURE_CRENEAU, c.NUM_CRENEAU, COUNT(i.ID_ADHERENT) as effectif";
@@ -185,7 +185,7 @@ class ActiviteController extends Controller
         $projectionC['groupby'] = "c.NUM_CRENEAU, c.ID_ACTIVITE";
         $resultE = $modEffectif->find($projectionC);
         $d['effectifsattente'] = $resultE;
-        //var_dump($resultE);
+        ////var_dump($resultE);
 
         //Récuperer les personnes qui ne participent pas mais qui ont inscrit des invités en attente
         $modEffectifInvite= $this->loadModel('ActiviteParticipantsAdherent');
@@ -229,7 +229,7 @@ class ActiviteController extends Controller
         $projection['groupby'] = "INSCRIPTION.DATE_INSCRIPTION ";
         $projection['orderby'] = "INSCRIPTION.CRENEAU";
         //$projection['order by'] = "INSCRIPTION.DATE_INSCRIPTION";
-        //var_dump($projection);
+        ////var_dump($projection);
         $result = $modInscription->find($projection);
         $d['inscrits'] = $result;
 
@@ -278,9 +278,9 @@ class ActiviteController extends Controller
         if (isset($invites)) {
             foreach ($invites as $inv) {
                 //                echo "invites=";
-                //                var_dump($invites);
+                ////                var_dump($invites);
                 //                echo "nouvel invité";
-                //                var_dump($inv);
+                ////                var_dump($inv);
                 if ($inv->STATUT == 'FAMILLE') {
                     $famille[] = $inv->ID_INVITE;
                 } else if ($inv->STATUT == 'EXTERNE') {
@@ -514,7 +514,7 @@ class ActiviteController extends Controller
                 $donnees['AUTO_PARTICIPATION'] = 1;
             }
         }
-        var_dump($_POST['CRENEAU']);
+        //var_dump($_POST['CRENEAU']);
         $donnees['CRENEAU'] = $_POST['CRENEAU'];
         $donnees['DATE_INSCRIPTION'] = date('Y-m-d H:i:s');
 
@@ -535,7 +535,7 @@ class ActiviteController extends Controller
         else{
             $donnees['MONTANT'] = $this->calculMontant($id, $adh, NULL);
         }*/
-//        var_dump($_POST);
+////        var_dump($_POST);
         $donnees['MONTANT'] = $_POST['montant'];
 
         //SI il reste de la place dans la liste principale
@@ -573,8 +573,8 @@ class ActiviteController extends Controller
             $count = 0;
             foreach ($_POST['participant'] as $key) {
                 if ($_POST['prestationSecondaire'][$count * 2] == $_POST['prestationSecondaire'][$count * 2 + 1] && $_POST['prestationSecondaire'][$count * 2]!="none") {
-//                    var_dump($_POST['prestationSecondaire'][$count * 2]);
-//                    var_dump($count);
+////                    var_dump($_POST['prestationSecondaire'][$count * 2]);
+////                    var_dump($count);
                     $inscription = false;
                     $d['info'] = "Vous ne pouvez inscrire un participant à deux prestations secondaires identiques";
                 }
@@ -584,8 +584,8 @@ class ActiviteController extends Controller
 
 
         if($inscription){
-            //var_dump($colonnes);
-            //var_dump($donnees);
+            ////var_dump($colonnes);
+            ////var_dump($donnees);
             $projection['conditions'] = "ID_ADHERENT = " . $_SESSION['ID_ADHERENT'];
 
             //on cherche la prestation de l'adhérent
@@ -618,16 +618,16 @@ class ActiviteController extends Controller
 //            $modInscription->delete($reqS);
             $modListeInvite->delete($reqS);
 //            $IDInscription = $modInscription->insert($colonnes, $donnees);
-//            var_dump($IDInscription);
+////            var_dump($IDInscription);
 //// Liste des invités ////
             $colonnes = array('ID_INSCRIPTION', 'ID_INVITE', 'ID_PRESTATION');
             $donneesInvite['ID_INSCRIPTION'] = $inscrit->ID;
             $count = 0;
             foreach ($_POST['participant'] as $key) {
-//                var_dump($colonnes);
+////                var_dump($colonnes);
                 unset($colonnes[4]);
                 unset($colonnes[3]);
-//                var_dump($colonnes);
+////                var_dump($colonnes);
                 if ($key == 'none' or $key=='AUTO_PARTICIPATION') {
                     $count+=1;
                 } else {
@@ -646,11 +646,11 @@ class ActiviteController extends Controller
                             $donneesInvite['PRESTATIONSEC2'] = $_POST['prestationSecondaire'][$count * 2 + 1];
                         }
                     }
-//                    var_dump($donneesInvite);
+////                    var_dump($donneesInvite);
 
 //                    echo"insertion dans la base de données";
 //                    $tab = array('conditions' => array('ID_INSCRIPTION' => $inscrit->ID), 'donnees' => $donneesInvite);
-//                    var_dump($tab);
+////                    var_dump($tab);
 //                    $modListeInvite->update($tab, true);
                     $modListeInvite->insert($colonnes, $donneesInvite);
                     $count+=1;
@@ -673,7 +673,7 @@ class ActiviteController extends Controller
                 $projectionC['projection'] = "COUNT(li.ID_INVITE) as effectif";
                 $projectionC['conditions'] = "c.ID_ACTIVITE = {$id} AND c.NUM_CRENEAU = $creneau";
                 $effectifinv = $modEffectif->findfirst($projectionC);
-                //var_dump($resultE);
+                ////var_dump($resultE);
 
                 $modEffectif = $this->loadModel('InscriptionCreneau');
                 $projectionC['projection'] = "c.EFFECTIF_CRENEAU,COUNT(i.ID_ADHERENT) as effectif";
@@ -685,7 +685,7 @@ class ActiviteController extends Controller
                 else
                     $donnees['ATTENTE'] = 0;
                 $tab = array('conditions' => array('ID' => $IDInscription), 'donnees' => $donnees);
-                var_dump($tab);
+                //var_dump($tab);
                 $modInscription->update($tab);
                 if(!isset($d['info'])){
                     $d['info'] = "L'inscription à l'activité a été effectuée";
@@ -694,11 +694,11 @@ class ActiviteController extends Controller
                 $d['info'] = "Problème pour s'inscrire à l'activité";
             }
 //                echo "data";
-//                var_dump($data);
+////                var_dump($data);
 //                echo "donnees";
-//                var_dump($donnees);
+////                var_dump($donnees);
 //                echo "d";
-//                var_dump($d);
+////                var_dump($d);
 
             $this->set($d);
             $this->mesActivites($id);
@@ -755,15 +755,15 @@ class ActiviteController extends Controller
         if (isset($_POST['ext'])) $nombreinscription += count($_POST['ext']);
         if ($_POST['AUTO_PARTICIPATION'] == 1) $nombreinscription++;
         //echo 'nombreinscription';
-        //var_dump($nombreinscription);
+        ////var_dump($nombreinscription);
         //echo'places';
-        //var_dump($effectifc->places);
+        ////var_dump($effectifc->places);
         //echo'inscrits';
-        //var_dump($effectifc->inscrits);$donnees = array();
+        ////var_dump($effectifc->inscrits);$donnees = array();
         //echo'places attente';
-        //var_dump(($effectifca->places*3));
+        ////var_dump(($effectifca->places*3));
         //echo'inscrits attente';
-        //var_dump(($effectifca->inscrits));
+        ////var_dump(($effectifca->inscrits));
         $donnees['ID_ACTIVITE'] = $id;
         $donnees['ID_ADHERENT'] = $_SESSION['ID_ADHERENT'];
         if ($_POST['AUTO_PARTICIPATION'] == 1) {
@@ -840,8 +840,8 @@ class ActiviteController extends Controller
             } elseif (isset($_POST['ext']) && $this->has_dupes($_POST['ext']) == true) {
                 $d['info'] = "Une erreur est survenue : vous ne pouvez pas incrire la même personne plusieurs fois !";
             } else {
-                //var_dump($colonnes);
-                //var_dump($donnees);
+                ////var_dump($colonnes);
+                ////var_dump($donnees);
                 $projection['conditions'] = "ID_ADHERENT = " . $_SESSION['ID_ADHERENT'];
 
                 $IDInscription = $modInscription->insertAI($colonnes, $donnees);
@@ -888,11 +888,11 @@ class ActiviteController extends Controller
                     $d['info'] = "Problème pour s'inscrire à l'activité";
                 }
                 //                echo "data";
-                //                var_dump($data);
+                ////                var_dump($data);
                 //                echo "donnees";
-                //                var_dump($donnees);
+                ////                var_dump($donnees);
                 //                echo "d";
-                //                var_dump($d);
+                ////                var_dump($d);
 
                 $this->set($d);
                 $this->mesActivites($id);
@@ -940,7 +940,7 @@ class ActiviteController extends Controller
         //on vérifie dans chaque participation s'il y a l'auto_inscription de l'utilisateur
         foreach ($_POST['participant'] as $participant) {
 //            echo "participant";
-//            var_dump($participant);
+////            var_dump($participant);
             if ($participant == 'AUTO_PARTICIPATION') {
                 $adh = Session::get('ID_ADHERENT');
                 $donnees['AUTO_PARTICIPATION'] = 1;
@@ -959,7 +959,7 @@ class ActiviteController extends Controller
         }
         /*if(isset($invites)) {
             echo "invites";
-    //            var_dump($invites);
+    ////            var_dump($invites);
             $donnees['MONTANT'] = $this->calculMontant($id, $adh, $invites);
         }
         else{
@@ -1016,8 +1016,8 @@ class ActiviteController extends Controller
         }
 
         if($inscription){
-            //var_dump($colonnes);
-            //var_dump($donnees);
+            ////var_dump($colonnes);
+            ////var_dump($donnees);
             $projection['conditions'] = "ID_ADHERENT = " . $_SESSION['ID_ADHERENT'];
 
             //on cherche la prestation de l'adhérent
@@ -1026,8 +1026,8 @@ class ActiviteController extends Controller
             foreach ($_POST['participant'] as $key) {
                 if ($key=='AUTO_PARTICIPATION') {
                     echo "prestations sec adherent";
-                    var_dump($_POST['prestationSecondaire'][$count*2]);
-                    var_dump($_POST['prestationSecondaire'][$count*2+1]);
+                    //var_dump($_POST['prestationSecondaire'][$count*2]);
+                    //var_dump($_POST['prestationSecondaire'][$count*2+1]);
                     $donnees['ID_PRESTATION'] = $_POST['prestationprincipale'][$count];
 
                     //test de prestations secondaire//
@@ -1036,7 +1036,7 @@ class ActiviteController extends Controller
                         //si le deuxieme select est rempli
                         if($_POST['prestationSecondaire'][$count*2+1]!="none") {
                             //on ajoute dans les colonnes prestationsec1 pour inserer des données dans cet colonne de la table
-                            array_push($colonnes, "PRESTATIONSEC1");
+                            $colonnes[] = "PRESTATIONSEC1";
                             //on set les données d'insertion pour la premiere presta secondaire sur le deuxieme select
                             $donnees['PRESTATIONSEC1'] = $_POST['prestationSecondaire'][$count*2+1];
                         }
@@ -1044,13 +1044,13 @@ class ActiviteController extends Controller
                     //si le premier select est rempli
                     else{
                         //on ajoute dans les colonnes prestationsec1 pour inserer des données dans cet colonne de la table
-                        array_push($colonnes, "PRESTATIONSEC1");
+                        $colonnes[] = "PRESTATIONSEC1";
                         //on set les données d'insertion pour la premiere presta secondaire sur le premier select
                         $donnees['PRESTATIONSEC1'] = $_POST['prestationSecondaire'][$count*2];
                         //si le deuxieme select n'est pas vide
                         if($_POST['prestationSecondaire'][$count*2+1]!="none") {
                             //on ajoute l'insertion dans la colonne prestasec2 et on set la donnée à entrée sur le deuxieme select
-                            array_push($colonnes, "PRESTATIONSEC2");
+                            $colonnes[] = "PRESTATIONSEC2";
                             $donnees['PRESTATIONSEC2'] = $_POST['prestationSecondaire'][$count*2+1];
                         }
                     }
@@ -1063,8 +1063,8 @@ class ActiviteController extends Controller
                     $donnees['PRESTATIONSEC2'] = $_POST['prestationSecondaire'][$count*2+1];
                     else
                         $donnees['PRESTATIONSEC2'] = null;*/
-                    var_dump($donnees);
-                    var_dump($colonnes);
+                    //var_dump($donnees);
+                    //var_dump($colonnes);
                     $count+=1;
                 } else {
                     $count+=1;
@@ -1072,7 +1072,7 @@ class ActiviteController extends Controller
             }
 
             $IDInscription = $modInscription->insertAI($colonnes, $donnees);
-//            var_dump($IDInscription);
+////            var_dump($IDInscription);
 
             //// Liste des invités ////
             $modListeInvite = $this->loadModel('ListeInvite');
@@ -1084,21 +1084,21 @@ class ActiviteController extends Controller
                     $count+=1;
                 } else {
                     echo"prestations sec invites";
-                    var_dump($_POST['prestationSecondaire'][$count*2]);
-                    var_dump($_POST['prestationSecondaire'][$count*2+1]);
+                    //var_dump($_POST['prestationSecondaire'][$count*2]);
+                    //var_dump($_POST['prestationSecondaire'][$count*2+1]);
                     $donneesInvite['ID_INVITE'] = $key;
                     $donneesInvite['ID_PRESTATION'] = $_POST['prestationprincipale'][$count];
                     if($_POST['prestationSecondaire'][$count*2]=="none"){
                         if($_POST['prestationSecondaire'][$count*2+1]!="none") {
-                            array_push($colonnes, "PRESTATIONSEC1");
+                            $colonnes[] = "PRESTATIONSEC1";
                             $donneesInvite['PRESTATIONSEC1'] = $_POST['prestationSecondaire'][$count*2+1];
                         }
                     }
                     else{
-                        array_push($colonnes, "PRESTATIONSEC1");
+                        $colonnes[] = "PRESTATIONSEC1";
                         $donneesInvite['PRESTATIONSEC1'] = $_POST['prestationSecondaire'][$count*2];
                         if($_POST['prestationSecondaire'][$count*2+1]!="none") {
-                            array_push($colonnes, "PRESTATIONSEC2");
+                            $colonnes[] = "PRESTATIONSEC2";
                             $donneesInvite['PRESTATIONSEC2'] = $_POST['prestationSecondaire'][$count*2+1];
                         }
                     }
@@ -1112,8 +1112,8 @@ class ActiviteController extends Controller
                      else
                          $donneesInvite['PRESTATIONSEC2'] = null;*/
 
-                    var_dump($donneesInvite);
-                    var_dump($colonnes);
+                    //var_dump($donneesInvite);
+                    //var_dump($colonnes);
                     $modListeInvite->insert($colonnes, $donneesInvite);
                     $count+=1;
                 }
@@ -1128,7 +1128,7 @@ class ActiviteController extends Controller
                 $proj['conditions'] = 'ID_INSCRIPTION = ' . $IDInscription;
                 $data['MONTANT'] = $this->calculMontant($id, $adh, $modListeInviteNom->find($proj));
                 $tab = array('conditions' => array('ID' => $IDInscription), 'donnees' => $data);
-//                var_dump($tab);
+////                var_dump($tab);
                 $modInscription->update($tab);
                 if(!isset($d['info'])){
                     $d['info'] = "L'inscription à l'activité a été effectuée";
@@ -1137,11 +1137,11 @@ class ActiviteController extends Controller
                 $d['info'] = "Problème pour s'inscrire à l'activité";
             }
             //                echo "data";
-            //                var_dump($data);
+            ////                var_dump($data);
             //                echo "donnees";
-            //                var_dump($donnees);
+            ////                var_dump($donnees);
             //                echo "d";
-            //                var_dump($d);
+            ////                var_dump($d);
 
             $this->set($d);
             $this->mesActivites($id);
@@ -1212,7 +1212,7 @@ class ActiviteController extends Controller
         // $projection['conditions'] = 'ID_ADHERENT = '.$_SESSION['ID_ADHERENT'];
         //  $params = array('projection' => $projection, 'condition' => $condition);
         //  $d['activites'] = $modActiviteInscrit->find($params);
-//        var_dump($d['inscription']);
+////        var_dump($d['inscription']);
         $this->set($d);
     }
 
@@ -1235,17 +1235,17 @@ class ActiviteController extends Controller
         // requete 3 pour récupérer les info de l'inscription
         $modInscription = $this->loadModel('Inscription');
         $projectionI['conditions'] = "ID_ACTIVITE = {$ID_ACTIVITE} AND ID_ADHERENT = {$_SESSION['ID_ADHERENT']}";
-        //        var_dump($ID_ACTIVITE);
-        //        var_dump($_SESSION['ID_ADHERENT']);
+        ////        var_dump($ID_ACTIVITE);
+        ////        var_dump($_SESSION['ID_ADHERENT']);
         $d['inscription'] = $modInscription->findfirst($projectionI);
-//                var_dump($d['inscription']);
+////                var_dump($d['inscription']);
 
         //requete 4 : on recupère la liste des invites
         $modListeInvite = $this->loadModel('ListeInviteNom');
         $projectionL['conditions'] = "ID_INSCRIPTION = {$d['inscription']->ID}";
         //$projectionL['conditions'] = "ID_INSCRIPTION = {$d['inscription']}";
         $d['invites'] = $modListeInvite->find($projectionL);
-        //        var_dump($d['invites']);
+        ////        var_dump($d['invites']);
         $modCreneaudate = $this->loadModel('ListeCreneau');
         $projectionM['projection'] = "CRENEAU.DATE_PAIEMENT, CRENEAU.DATE_CRENEAU as date, CRENEAU.HEURE_CRENEAU as heure";
         $projectionM['conditions'] = "ID_ACTIVITE = {$ID_ACTIVITE} AND NUM_CRENEAU = {$d['inscription']->CRENEAU}";
